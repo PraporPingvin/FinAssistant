@@ -1,0 +1,349 @@
+/* Дополнительные стили для селектора целей */
+:root {
+  --primary-dark: #495631;
+  --primary-accent: #EAED74;
+  --primary-light: #EFF2DD;
+  --card-bg: #FFFFFF;
+  --border-color: #DDE0C5;
+  --text-muted: #717959;
+  --text-dark: #3A3F29;
+  --shadow: 0 4px 12px rgba(73, 86, 49, 0.08);
+  --shadow-hover: 0 8px 24px rgba(73, 86, 49, 0.12);
+  --success-color: #4caf50;
+  --warning-color: #ff9800;
+  --danger-color: #f44336;
+}
+
+.goalSelectorSection {
+  background: white;
+  border-radius: 12px;
+  padding: 25px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.selectorContainer {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.selectorLabel {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+  min-width: 200px;
+}
+
+.selectorWrapper {
+  position: relative;
+  flex: 1;
+  min-width: 300px;
+}
+
+.goalSelect {
+  width: 100%;
+  padding: 12px 40px 12px 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #333;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 15px center;
+  background-size: 15px;
+}
+
+.goalSelect:hover {
+  border-color: #495631;
+}
+
+.goalSelect:focus {
+  outline: none;
+  border-color: #495631;
+  box-shadow: 0 0 0 3px rgba(73, 86, 49, 0.1);
+}
+
+.clearSelectionButton {
+  position: absolute;
+  right: 40px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #999;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 5px;
+  transition: color 0.3s ease;
+}
+
+.clearSelectionButton:hover {
+  color: #f44336;
+}
+
+.goalsStats {
+  display: flex;
+  gap: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+.statItem {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.statLabel {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.statValue {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #495631;
+}
+
+/* Сетка целей */
+.goalsFlex {
+  display: flex;
+  flex-direction: column;
+  margin-top: 20px;
+}
+
+.goalsGrid h2 {
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 1.5rem;
+}
+
+.goalsCardFlex {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.goalCard {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.goalCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  border-color: #495631;
+}
+
+.goalCard.active {
+  border-left: 4px solid #4caf50;
+}
+
+.goalCard.completed {
+  border-left: 4px solid #2196f3;
+  opacity: 0.8;
+}
+
+.goalCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.goalCardHeader h3 {
+  font-size: 1.2rem;
+  color: #333;
+  margin: 0;
+}
+
+.goalStatusBadge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.goalStatusBadge.active {
+  background: #e8f5e8;
+  color: #2e7d32;
+}
+
+.goalStatusBadge.completed {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.goalCardBody {
+  margin-bottom: 15px;
+}
+
+.goalCardRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px dashed #eee;
+}
+
+.goalCardRow:last-child {
+  border-bottom: none;
+}
+
+.goalCardRow span {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.goalCardRow strong {
+  color: #333;
+  font-size: 1rem;
+}
+
+.goalCardFooter {
+  text-align: right;
+}
+
+.selectGoalButton {
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid #495631;
+  border-radius: 6px;
+  color: #495631;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.selectGoalButton:hover {
+  background: #495631;
+  color: white;
+}
+
+/* Информация о цели */
+.goalLink {
+  display: inline-block;
+  margin-top: 5px;
+  color: #495631;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.3s ease;
+}
+
+.goalLink:hover {
+  color: #5a6b3d;
+  text-decoration: underline;
+}
+
+/* Кнопка обновления анализа */
+.refreshAnalysisButton {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
+.loadingSubtext {
+  color: #666;
+  font-size: 0.9rem;
+  margin-top: 10px;
+}
+
+.headerContentForecast {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.goalInfoFlex {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.tabsContainer {
+  margin-bottom: 30px;
+}
+
+.optimalStrategyCard {
+  margin-bottom: 20px;
+  margin-top: 20px;
+}
+
+.comparisonTableForecast {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.comparisonTableForecast td {
+  padding: 14px 12px;
+  border-bottom: 1px solid rgba(221, 224, 197, 0.5);
+  vertical-align: middle;
+}
+
+.tableContainerForecast {
+  overflow-x: auto;
+  background: var(--bg-white);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  border: 1px solid var(--border-color);
+}
+
+.recalculateButton{
+  margin-top: 30px;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .selectorContainer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .selectorLabel {
+    min-width: auto;
+  }
+
+  .selectorWrapper {
+    min-width: auto;
+  }
+
+  .goalsStats {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .goalsCardGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .goalCardHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .goalSelectorSection {
+    padding: 15px;
+  }
+
+  .statItem {
+    flex-direction: column;
+    gap: 4px;
+  }
+}

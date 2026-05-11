@@ -1,0 +1,722 @@
+/* client/src/pages/CheckpointsPage/CheckpointsOverview.css */
+
+.checkpoints-overview {
+  padding: 20px 0;
+}
+
+/* Статистика */
+.stats-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.stat-card.warning {
+  background: linear-gradient(135deg, #fff5f5, #ffe5e5);
+  border-left: 4px solid #f44336;
+}
+
+.stat-icon {
+  font-size: 32px;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(73, 86, 49, 0.1);
+  border-radius: 50%;
+}
+
+.stat-content {
+  flex: 1;
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #333;
+  line-height: 1.2;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #666;
+  margin-top: 4px;
+}
+
+/* Фильтры */
+.filters-bar {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  min-width: 200px;
+  flex: 1;
+}
+
+.filter-select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  background: white;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.filter-select:hover {
+  border-color: #495631;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #495631;
+  box-shadow: 0 0 0 2px rgba(73, 86, 49, 0.2);
+}
+
+.search-group {
+  flex: 2;
+  position: relative;
+  min-width: 250px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 12px 16px;
+  padding-right: 40px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #495631;
+  box-shadow: 0 0 0 2px rgba(73, 86, 49, 0.2);
+}
+
+.clear-search {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #999;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px;
+}
+
+.clear-search:hover {
+  color: #666;
+}
+
+.create-button {
+  padding: 12px 24px;
+  background: #495631;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+}
+
+.create-button:hover {
+  background: #2d3a1f;
+}
+
+/* Список контрольных точек */
+.checkpoints-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+}
+
+.checkpoint-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: 1px solid #f0f0f0;
+}
+
+.checkpoint-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.checkpoint-header {
+  margin-bottom: 15px;
+}
+
+.checkpoint-title-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.checkpoint-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.checkpoint-badges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.status-badge.status-pending {
+  background: #fff3e0;
+  color: #f57c00;
+}
+
+.status-badge.status-completed {
+  background: #e8f5e8;
+  color: #2e7d32;
+}
+
+.status-badge.status-overdue {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.status-badge.status-cancelled {
+  background: #f5f5f5;
+  color: #757575;
+}
+
+.priority-badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.priority-badge.priority-high {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.priority-badge.priority-medium {
+  background: #fff3e0;
+  color: #f57c00;
+}
+
+.priority-badge.priority-low {
+  background: #e8f5e8;
+  color: #2e7d32;
+}
+
+/* Контент карточки */
+.checkpoint-content {
+  margin-bottom: 20px;
+}
+
+.checkpoint-goal {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 15px;
+  padding: 10px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.goal-icon {
+  font-size: 16px;
+}
+
+.goal-title {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+.checkpoint-details {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.detail-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.detail-item.description {
+  margin-top: 5px;
+  padding-top: 10px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.detail-label {
+  min-width: 60px;
+  font-size: 14px;
+  color: #999;
+}
+
+.detail-value {
+  flex: 1;
+  font-size: 14px;
+  color: #333;
+  word-break: break-word;
+}
+
+.detail-value.highlight {
+  font-weight: 600;
+  color: #495631;
+}
+
+.overdue-text {
+  color: #c62828;
+  font-weight: 500;
+}
+
+.overdue-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  background: #ffebee;
+  color: #c62828;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* Действия */
+.checkpoint-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  border-top: 1px solid #f0f0f0;
+  padding-top: 15px;
+}
+
+.action-button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.action-button.complete {
+  background: #e8f5e8;
+  color: #2e7d32;
+}
+
+.action-button.complete:hover {
+  background: #2e7d32;
+  color: white;
+}
+
+.action-button.view {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.action-button.view:hover {
+  background: #1976d2;
+  color: white;
+}
+
+.action-button.delete {
+  background: #ffebee;
+  color: #c62828;
+  padding: 8px 12px;
+}
+
+.action-button.delete:hover {
+  background: #c62828;
+  color: white;
+}
+
+/* Пустое состояние */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.empty-icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+  opacity: 0.5;
+}
+
+.empty-state h3 {
+  font-size: 20px;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.empty-state p {
+  color: #666;
+  margin-bottom: 25px;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.create-first-button {
+  padding: 12px 30px;
+  background: #495631;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.create-first-button:hover {
+  background: #2d3a1f;
+}
+
+/* Загрузка */
+.overview-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid #f0f0f0;
+  border-top-color: #495631;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+/* Дополнительные стили для CheckpointsOverview.css */
+
+/* Прогресс-бар общего выполнения */
+.overall-progress {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.progress-percent {
+  font-weight: 600;
+  color: #495631;
+}
+
+/* Секция графиков */
+.charts-section {
+  background: white;
+  border-radius: 16px;
+  padding: 25px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.charts-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.charts-header h3 {
+  font-size: 18px;
+  color: #333;
+  margin: 0;
+}
+
+.toggle-charts {
+  padding: 8px 16px;
+  background: #f5f5f5;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.toggle-charts:hover {
+  background: #e0e0e0;
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 25px;
+}
+
+.chart-card {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.chart-card.full-width {
+  grid-column: 1 / -1;
+}
+
+.chart-card h4 {
+  font-size: 16px;
+  color: #333;
+  margin: 0 0 15px 0;
+  text-align: center;
+}
+
+.chart-container {
+  position: relative;
+  height: 250px;
+  margin-bottom: 15px;
+}
+
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #666;
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+/* Кнопка показа графиков */
+.show-charts-button {
+  width: 100%;
+  padding: 15px;
+  background: white;
+  border: 2px dashed #495631;
+  border-radius: 12px;
+  font-size: 16px;
+  color: #495631;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 30px;
+}
+
+.show-charts-button:hover {
+  background: #e8f0e0;
+}
+
+/* Таблица */
+.table-container {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  overflow-x: auto;
+}
+
+.checkpoints-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.checkpoints-table th {
+  text-align: left;
+  padding: 12px;
+  background: #f8f9fa;
+  color: #495631;
+  font-weight: 600;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.checkpoints-table td {
+  padding: 12px;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: middle;
+}
+
+.checkpoints-table tr:hover {
+  background: #f8f9fa;
+}
+
+.amount-cell {
+  font-weight: 600;
+  color: #495631;
+}
+
+.table-status-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.table-priority-badge {
+  font-size: 18px;
+}
+
+.table-actions {
+  display: flex;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.table-action {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 6px;
+  background: #f5f5f5;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.table-action.complete:hover {
+  background: #4caf50;
+  color: white;
+}
+
+.table-action.view:hover {
+  background: #2196f3;
+  color: white;
+}
+
+.table-action.delete:hover {
+  background: #f44336;
+  color: white;
+}
+
+/* Кнопки сортировки */
+.sort-order-button {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #e0e0e0;
+  background: white;
+  border-radius: 8px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sort-order-button:hover {
+  background: #f5f5f5;
+  border-color: #495631;
+}
+
+.view-mode-button {
+  padding: 0 20px;
+  height: 40px;
+  border: 1px solid #e0e0e0;
+  background: white;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.view-mode-button:hover,
+.view-mode-button.active {
+  background: #495631;
+  color: white;
+  border-color: #495631;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .filters-bar {
+    flex-direction: column;
+  }
+  
+  .filter-group,
+  .search-group,
+  .create-button {
+    width: 100%;
+  }
+  
+  .checkpoints-list {
+    grid-template-columns: 1fr;
+  }
+  
+  .checkpoint-title-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .checkpoint-actions {
+    flex-wrap: wrap;
+  }
+  
+  .action-button {
+    flex: 1;
+    text-align: center;
+  }
+}

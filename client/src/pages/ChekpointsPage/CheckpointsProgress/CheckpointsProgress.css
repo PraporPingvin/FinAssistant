@@ -1,0 +1,334 @@
+/* client/src/pages/CheckpointsPage/CheckpointsProgress.css */
+
+.progress-page {
+  padding: 20px 0;
+}
+
+.goals-progress-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 25px;
+}
+
+.goal-progress-card {
+  background: white;
+  border-radius: 16px;
+  padding: 25px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: 1px solid #f0f0f0;
+}
+
+.goal-progress-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+/* Заголовок */
+.goal-progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 15px;
+  cursor: pointer;
+}
+
+.goal-title-section {
+  flex: 1;
+}
+
+.goal-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 8px 0;
+  line-height: 1.4;
+}
+
+.goal-status {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.goal-status.status-active {
+  background: #e8f5e8;
+  color: #2e7d32;
+}
+
+.goal-status.status-completed {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.goal-status.status-paused {
+  background: #fff3e0;
+  color: #f57c00;
+}
+
+.goal-progress-preview {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.progress-percent {
+  font-size: 24px;
+  font-weight: 700;
+  color: #495631;
+}
+
+.expand-icon {
+  font-size: 20px;
+  color: #999;
+  transition: transform 0.2s;
+}
+
+/* Прогресс-бар */
+.progress-bar-container {
+  height: 10px;
+  background: #f0f0f0;
+  border-radius: 10px;
+  margin: 15px 0 20px 0;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #495631, #6b8c42);
+  border-radius: 10px;
+  transition: width 0.3s ease;
+}
+
+/* Статистика цели */
+.goal-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  margin-bottom: 20px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.stat-row {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+}
+
+.stat-value.highlight {
+  color: #495631;
+  font-weight: 600;
+}
+
+/* Прогноз */
+.forecast-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 15px;
+  background: #e8f0e0;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.forecast-icon {
+  font-size: 20px;
+}
+
+.forecast-text {
+  flex: 1;
+  font-size: 14px;
+  color: #333;
+}
+
+.forecast-text strong {
+  color: #495631;
+  font-size: 16px;
+}
+
+.forecast-date {
+  display: inline-block;
+  margin-left: 8px;
+  color: #666;
+  font-size: 12px;
+}
+
+/* Превью контрольных точек */
+.checkpoints-preview {
+  margin-bottom: 15px;
+}
+
+.checkpoints-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.checkpoints-count {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+.checkpoints-breakdown {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.checkpoints-breakdown span {
+  padding: 4px 8px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.checkpoints-breakdown .completed {
+  background: #e8f5e8;
+  color: #2e7d32;
+}
+
+.checkpoints-breakdown .pending {
+  background: #fff3e0;
+  color: #f57c00;
+}
+
+.checkpoints-breakdown .overdue {
+  background: #ffebee;
+  color: #c62828;
+}
+
+/* Список контрольных точек в развернутом виде */
+.goal-checkpoints-list {
+  margin: 20px 0;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.goal-checkpoints-list h4 {
+  font-size: 16px;
+  color: #333;
+  margin: 0 0 15px 0;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.checkpoint-mini-item {
+  padding: 12px;
+  background: white;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #f0f0f0;
+}
+
+.checkpoint-mini-item:last-child {
+  margin-bottom: 0;
+}
+
+.checkpoint-mini-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.checkpoint-mini-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.checkpoint-mini-status {
+  font-size: 16px;
+}
+
+.checkpoint-mini-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  color: #666;
+}
+
+/* Действия */
+.goal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.goal-actions .action-button {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: #f5f5f5;
+  color: #333;
+}
+
+.goal-actions .action-button:hover {
+  background: #e0e0e0;
+}
+
+.goal-actions .action-button.primary {
+  background: #495631;
+  color: white;
+}
+
+.goal-actions .action-button.primary:hover {
+  background: #2d3a1f;
+}
+
+/* Загрузка */
+.progress-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .goals-progress-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .goal-stats {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .goal-actions {
+    flex-direction: column;
+  }
+  
+  .checkpoints-stats {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

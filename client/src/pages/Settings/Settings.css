@@ -1,0 +1,150 @@
+/* src/pages/Settings/Settings.css */
+.settings-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.settings-container h1 {
+  color: var(--primary-dark, #495631);
+  margin-bottom: 30px;
+  font-weight: 300;
+  font-size: 28px;
+}
+
+.settings-card {
+  background: white;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 4px 20px rgba(73, 86, 49, 0.1);
+  margin-bottom: 30px;
+}
+
+.settings-card h2 {
+  color: #495631;
+  margin-bottom: 20px;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.settings-form .form-group {
+  margin-bottom: 20px;
+}
+
+.settings-form .form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #495631;
+  font-weight: 500;
+}
+
+.settings-form .form-group input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #DDE0C5;
+  border-radius: 12px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.settings-form .form-group input:focus {
+  outline: none;
+  border-color: #EAED74;
+}
+
+.password-input-wrapper {
+  position: relative;
+}
+
+.show-password-checkbox {
+  margin: 15px 0;
+}
+
+.show-password-checkbox label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: #717959;
+  font-size: 14px;
+}
+
+.change-password-button {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #495631, #6b8c4a);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+}
+
+.change-password-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(73, 86, 49, 0.3);
+}
+
+.change-password-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.account-info {
+  margin-top: 10px;
+}
+
+.account-info .info-row {
+  display: flex;
+  padding: 12px 0;
+  border-bottom: 1px solid #DDE0C5;
+}
+
+.account-info .info-row label {
+  width: 100px;
+  font-weight: 600;
+  color: #495631;
+}
+
+.account-info .info-row span {
+  flex: 1;
+  color: #717959;
+}
+
+.settings-message {
+  padding: 12px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.settings-message.success {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.settings-message.error {
+  background: #fee;
+  color: #d32f2f;
+}
+
+@media (max-width: 480px) {
+  .settings-container {
+    padding: 15px;
+  }
+  
+  .settings-card {
+    padding: 20px;
+  }
+  
+  .account-info .info-row {
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .account-info .info-row label {
+    width: auto;
+  }
+}

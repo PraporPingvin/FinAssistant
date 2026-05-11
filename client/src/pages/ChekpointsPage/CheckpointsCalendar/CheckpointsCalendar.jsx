@@ -1,0 +1,200 @@
+// client/src/pages/CheckpointsPage/CheckpointsCalendar.jsx
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { getCheckpoints, getGoals } from "../../../api/api";
+import "./CheckpointsCalendar.css";
+
+function CheckpointsCalendar() {
+  const navigate = useNavigate();
+  const [checkpoints, setCheckpoints] = useState([]);
+  const [goals, setGoals] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(null);
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      const [goalsData, checkpointsData] = await Promise.all([
+        getGoals(),
+        getCheckpoints().catch(() => [])
+      ]);
+      
+      setGoals(goalsData);
+      setCheckpoints(checkpointsData || []);
+    } catch (error) {
+      console.error("Ошибка загрузки:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getDaysInMonth = (date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    return new Date(year, month + 1, 0).getDate();
+  };
+
+  const getFirstDayOfMonth = (date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    return new Date(year, month, 1).getDay();
+  };
+
+  const formatDate = (date) => {
+    return date.toISOString().split('T')[0];
+  };
+
+  const getCheckpointsForDate = (date) => {
+    const dateStr = formatDate(date);
+    return checkpoints.filter(cp => {
+      if (!cp.target_date) return false;
+      const cpDate = new Date(cp.target_date);
+      return formatDate(cpDate) === dateStr;
+    });
+  };
+
+  const getGoalTitle = (goalId) => {
+    const goal = goals.find(g => g.goal_id === goalId);
+    return goal?.title || "Неизвестная цель";
+  };
+
+  const renderCalendar = () => {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    const daysInMonth = getDaysInMonth(currentDate);
+    const firstDay = getFirstDayOfMonth(currentDate);
+    
+    const days = [];
+    const weekDays = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
+    
+    // Заголовки дней недели
+    days.push(
+      <div key="weekdays" className="calendar-weekdays">
+        {weekDays.map(day => (
+          <div key={day} className="weekday">{day}</div>
+        ))}
+      </div>
+    );
+
+    // Пустые ячейки до первого дня месяца
+    const emptyCells = [];
+    for (let i = 1; i < firstDay; i++) {
+      emptyCells.push(<div key={`empty-${i}`} className="calendar-day empty"></div>);
+    }
+    
+    // Ячейки с днями
+    const dayCells = [];
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(year, month, day);
+      const dateStr = formatDate(date);
+      const dayCheckpoints = getCheckpointsForDate(date);
+      const isToday = date.toDateString() === new Date().toDateString();
+      const isSelected = selectedDate && dateStr === formatDate(selectedDate);
+      
+      dayCells.push(
+        <div 
+          key={`day-${day}`} 
+          className={`calendar-day ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''} ${dayCheckpoints.length > 0 ? 'has-checkpoints' : ''}`}
+          onClick={() => setSelectedDate(date)}
+        >
+          <span className="day-number">{day}</span>
+          {dayCheckpoints.length > 0 && (
+            <span className="checkpoints-indicator">
+              {dayCheckpoints.length}
+            </span>
+          )}
+        </div>
+      );
+    }
+
+    return (
+      <div className="calendar-grid">
+        {emptyCells}
+        {dayCells}
+      </div>
+    );
+  };
+
+  const changeMonth = (delta) => {
+    const newDate = new Date(currentDate);
+    newDate.setMonth(currentDate.getMonth() + delta);
+    setCurrentDate(newDate);
+    setSelectedDate(null);
+  };
+
+  const monthNames = [
+    "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
+    "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
+  ];
+
+  if (loading) {
+    return (
+      <div className="calendar-loading">
+        <div className="loading-spinner"></div>
+        <p>Загрузка календаря...</p>
+      </div>
+    );
+  }
+
+  const selectedDateCheckpoints = selectedDate ? getCheckpointsForDate(selectedDate) : [];
+
+  return (
+    <div className="calendar-page">
+      <div className="calendar-container">
+        <div className="calendar-header">
+          <button className="month-nav" onClick={() => changeMonth(-1)}>←</button>
+          <h2 className="current-month">
+            {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
+          </h2>
+          <button className="month-nav" onClick={() => changeMonth(1)}>→</button>
+        </div>
+
+        {renderCalendar()}
+      </div>
+
+      {selectedDate && (
+        <div className="selected-date-checkpoints">
+          <h3>
+            Контрольные точки на {selectedDate.toLocaleDateString('ru-RU')}
+            {selectedDateCheckpoints.length === 0 && " — нет"}
+          </h3>
+          
+          {selectedDateCheckpoints.length > 0 && (
+            <div className="checkpoints-mini-list">
+              {selectedDateCheckpoints.map(cp => (
+                <div key={cp.checkpoint_id} className="calendar-checkpoint-item">
+                  <div className="checkpoint-mini-header">
+                    <span className="checkpoint-mini-title">{cp.title}</span>
+                    <span className={`checkpoint-mini-status status-${cp.status}`}>
+                      {cp.status === "completed" ? "✅" : 
+                       cp.status === "pending" ? "⏳" : "⚠️"}
+                    </span>
+                  </div>
+                  <div className="checkpoint-mini-details">
+                    <span>🎯 {getGoalTitle(cp.goal_id)}</span>
+                    <span className="checkpoint-amount">
+                      {new Intl.NumberFormat('ru-RU').format(cp.target_amount)} ₽
+                    </span>
+                  </div>
+                  <button 
+                    className="view-button"
+                    onClick={() => navigate(`/goals/${cp.goal_id}`)}
+                  >
+                    👁️ Просмотр
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default CheckpointsCalendar;

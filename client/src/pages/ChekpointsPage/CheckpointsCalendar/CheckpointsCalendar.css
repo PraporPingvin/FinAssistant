@@ -1,0 +1,287 @@
+/* client/src/pages/CheckpointsPage/CheckpointsCalendar.css */
+
+.calendar-page {
+  padding: 20px 0;
+}
+
+.calendar-container {
+  background: white;
+  border-radius: 16px;
+  padding: 25px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  margin-bottom: 30px;
+}
+
+/* Заголовок календаря */
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 30px;
+}
+
+.month-nav {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #e0e0e0;
+  background: white;
+  border-radius: 50%;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.month-nav:hover {
+  background: #495631;
+  color: white;
+  border-color: #495631;
+}
+
+.current-month {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+/* Дни недели */
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+.weekday {
+  text-align: center;
+  font-weight: 600;
+  color: #666;
+  padding: 10px;
+  font-size: 14px;
+}
+
+/* Сетка календаря */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+}
+
+.calendar-day {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 10px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  border: 2px solid transparent;
+}
+
+.calendar-day:hover {
+  background: #e8f0e0;
+  transform: scale(1.02);
+}
+
+.calendar-day.empty {
+  background: transparent;
+  cursor: default;
+}
+
+.calendar-day.today {
+  border-color: #495631;
+  background: #e8f0e0;
+}
+
+.calendar-day.selected {
+  border-color: #495631;
+  background: #d4e0c8;
+  transform: scale(1.02);
+}
+
+.calendar-day.has-checkpoints {
+  background: #fff3e0;
+}
+
+.day-number {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.checkpoints-indicator {
+  display: inline-block;
+  padding: 2px 6px;
+  background: #495631;
+  color: white;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  min-width: 20px;
+  text-align: center;
+}
+
+/* Секция выбранной даты */
+.selected-date-checkpoints {
+  background: white;
+  border-radius: 16px;
+  padding: 25px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.selected-date-checkpoints h3 {
+  font-size: 20px;
+  color: #333;
+  margin: 0 0 20px 0;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+/* Список контрольных точек для выбранной даты */
+.checkpoints-mini-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 15px;
+}
+
+.calendar-checkpoint-item {
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  border: 1px solid #f0f0f0;
+  transition: transform 0.2s;
+}
+
+.calendar-checkpoint-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.checkpoint-mini-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.checkpoint-mini-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.checkpoint-mini-status {
+  font-size: 16px;
+}
+
+.checkpoint-mini-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: #666;
+}
+
+.checkpoint-amount {
+  font-weight: 600;
+  color: #495631;
+}
+
+.view-button {
+  width: 100%;
+  padding: 8px;
+  background: #495631;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.view-button:hover {
+  background: #2d3a1f;
+}
+
+/* Статусы */
+.status-pending .checkpoint-mini-status {
+  color: #f57c00;
+}
+
+.status-completed .checkpoint-mini-status {
+  color: #2e7d32;
+}
+
+.status-overdue .checkpoint-mini-status {
+  color: #c62828;
+}
+
+/* Загрузка */
+.calendar-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .calendar-header {
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+  
+  .current-month {
+    order: -1;
+    width: 100%;
+    text-align: center;
+  }
+  
+  .calendar-weekdays .weekday {
+    font-size: 12px;
+    padding: 5px;
+  }
+  
+  .calendar-day {
+    padding: 5px;
+  }
+  
+  .day-number {
+    font-size: 14px;
+  }
+  
+  .checkpoints-indicator {
+    font-size: 10px;
+    padding: 1px 4px;
+    min-width: 16px;
+  }
+  
+  .checkpoints-mini-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .calendar-weekdays {
+    display: none;
+  }
+  
+  .calendar-grid {
+    gap: 2px;
+  }
+  
+  .calendar-day {
+    aspect-ratio: auto;
+    min-height: 60px;
+  }
+}

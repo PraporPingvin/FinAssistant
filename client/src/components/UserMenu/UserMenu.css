@@ -1,0 +1,142 @@
+/* src/components/UserMenu/UserMenu.css */
+.user-menu {
+  position: relative;
+  display: inline-block;
+}
+
+.user-menu-button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(234, 237, 116, 0.15);
+  border: 1px solid rgba(234, 237, 116, 0.3);
+  border-radius: 30px;
+  padding: 5px 15px 5px 5px;
+  cursor: pointer;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.user-menu-button:hover {
+  background: rgba(234, 237, 116, 0.25);
+  border-color: rgba(234, 237, 116, 0.5);
+}
+
+.user-avatar {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  background: var(--primary-accent, #EAED74);
+  color: var(--primary-dark, #495631);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.user-name {
+  font-size: 14px;
+  font-weight: 500;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-menu-arrow {
+  font-size: 10px;
+  transition: transform 0.3s ease;
+}
+
+.user-menu-arrow.open {
+  transform: rotate(180deg);
+}
+
+.user-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  width: 250px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(73, 86, 49, 0.15);
+  border: 1px solid var(--border-color, #DDE0C5);
+  overflow: hidden;
+  z-index: 1000;
+  animation: dropdownFade 0.2s ease;
+}
+
+@keyframes dropdownFade {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.user-info {
+  padding: 16px;
+  background: var(--primary-light, #EFF2DD);
+}
+
+.user-info-name {
+  font-weight: 600;
+  color: var(--primary-dark, #495631);
+  margin-bottom: 4px;
+}
+
+.user-info-email {
+  font-size: 12px;
+  color: var(--text-muted, #717959);
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: var(--border-color, #DDE0C5);
+  margin: 4px 0;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  background: none;
+  text-align: left;
+  font-size: 14px;
+  color: var(--primary-dark, #495631);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background: var(--primary-light, #EFF2DD);
+}
+
+.dropdown-item.logout {
+  color: #d32f2f;
+}
+
+.dropdown-item.logout:hover {
+  background: #ffebee;
+}
+
+@media (max-width: 768px) {
+  .user-name {
+    display: none;
+  }
+  
+  .user-menu-button {
+    padding: 5px;
+  }
+  
+  .user-dropdown {
+    width: 220px;
+    right: -10px;
+  }
+}

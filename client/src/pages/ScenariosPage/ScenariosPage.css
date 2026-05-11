@@ -1,0 +1,501 @@
+/* Добавьте эти стили в существующий CSS файл */
+
+.scenariosStats {
+  background-color: white;
+  padding: 25px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.scenariosStats h3 {
+  margin: 0 0 20px 0;
+  color: #333;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.statCard {
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  border: 1px solid #dee2e6;
+}
+
+.statIcon {
+  font-size: 32px;
+  margin-bottom: 10px;
+}
+
+.statValue {
+  font-size: 24px;
+  font-weight: bold;
+  color: #495631;
+  margin-bottom: 5px;
+}
+
+.statLabel {
+  font-size: 14px;
+  color: #666;
+}
+
+.filtersContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 20px;
+  background-color: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.filterGroup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filterLabel {
+  font-weight: 500;
+  color: #333;
+}
+
+.filterSelect {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  background-color: white;
+}
+
+.refreshButtonContainer {
+  display: flex;
+  gap: 10px;
+}
+
+.refreshButton {
+  padding: 8px 16px;
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.refreshButton:hover {
+  background-color: #e9ecef;
+}
+
+.scenariosListAll {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background-color: white;
+  padding: 25px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.scenariosList h3 {
+  margin: 0 0 20px 0;
+  color: #333;
+}
+
+.scenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+}
+
+.scenarioDetailCard {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+  border-radius: 8px;
+  border: 1px solid #b6b6b6;
+}
+
+.scenarioCard {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.scenarioCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  border-color: #495631;
+}
+
+.scenarioCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: column;
+  padding: 20px 20px 15px;
+  background-color: #fff;
+  border-bottom: 1px solid #eee;
+}
+
+.scenarioTitleSection {
+  flex: 1;
+}
+
+.scenarioCardTitle {
+  margin: 0 0 5px 0;
+  color: #333;
+  font-size: 18px;
+}
+
+.scenarioIndex {
+  font-size: 12px;
+  color: #666;
+  background-color: #f1f1f1;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.scenarioActions {
+  display: flex;
+  gap: 5px;
+}
+
+.scenarioActionButton {
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  background-color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.scenarioActionButton:hover {
+  background-color: #f5f5f5;
+}
+
+.scenarioActionButton.smallButton {
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.scenarioContent {
+  padding: 15px 20px;
+}
+
+.scenarioMainInfoPage {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+
+.infoRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed #eee;
+}
+
+.infoLabel {
+  color: #666;
+  font-size: 14px;
+}
+
+.infoValue {
+  font-weight: 500;
+  color: #333;
+}
+
+.infoValue.highlight {
+  color: #495631;
+  font-weight: bold;
+}
+
+.scenarioCalculations {
+  background-color: white;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  border: 1px solid #eee;
+}
+
+.calculationRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.calculationLabel {
+  color: #333;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.calculationValue {
+  text-align: right;
+  font-size: 14px;
+}
+
+.subText {
+  display: block;
+  font-size: 12px;
+  color: #666;
+  margin-top: 2px;
+}
+
+.warningText {
+  color: #f44336;
+  font-weight: 500;
+}
+
+.riskBadge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 15px;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  margin-right: 8px;
+}
+
+.riskDescription {
+  font-size: 12px;
+  color: #666;
+}
+
+.scenarioMeta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #666;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #eee;
+}
+
+.metaRow {
+  display: flex;
+  flex-direction: column;
+}
+
+.metaLabel {
+  margin-bottom: 3px;
+}
+
+.metaValue {
+  font-weight: 500;
+}
+
+.scenarioProgress {
+  padding: 15px 20px;
+  background-color: #fff;
+  border-top: 1px solid #eee;
+}
+
+.progressLabel {
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.progressBar {
+  height: 8px;
+  background-color: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #4CAF50, #8BC34A);
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.progressText {
+  font-size: 12px;
+  color: #666;
+  text-align: center;
+}
+
+.emptyState {
+  background-color: white;
+  padding: 40px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
+}
+
+.emptyStateIcon {
+  font-size: 48px;
+  margin-bottom: 20px;
+}
+
+.emptyState h3 {
+  margin: 0 0 15px 0;
+  color: #333;
+}
+
+.emptyState p {
+  color: #666;
+  max-width: 600px;
+  margin: 0 auto 20px;
+  line-height: 1.6;
+}
+
+.emptyStateTips {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 30px;
+  text-align: left;
+}
+
+.emptyStateTips h4 {
+  margin: 0 0 15px 0;
+  color: #333;
+}
+
+.emptyStateTips ul {
+  margin: 0;
+  padding-left: 20px;
+  color: #666;
+}
+
+.emptyStateTips li {
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.infoPanel {
+  background-color: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.infoPanel h4 {
+  margin: 0 0 20px 0;
+  color: #333;
+}
+
+.infoContent {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.infoItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+}
+
+.infoIcon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.compareButtonScenarios {
+  background-color: #f5f5f5;
+  color: #333;
+  border: 1px solid #ddd;
+}
+
+.primaryButtonScenarios {
+  background-color: #f5f5f5;
+  color: #333;
+  border: 1px solid #ddd;
+}
+
+.secondaryButtonScenarios {
+  background-color: #f5f5f5;
+  color: #333;
+  border: 1px solid #ddd;
+}
+
+.actionButtonScenarios {
+  padding: 10px 20px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  width: 200px;
+}
+
+.compareButtonScenarios:hover {
+  background-color: #dee2e6;
+}
+
+.primaryButtonScenarios:hover {
+  background-color: #dee2e6;
+}
+
+.secondaryButtonScenarios:hover {
+  background-color: #dee2e6;
+}
+
+.actionsContainerScenariosPage {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.createFirstButton {
+  background-color: #f5f5f5;
+  color: #333;
+  border: 1px solid #ddd;
+}
+
+.createFirstButton:hover {
+  background-color: #dee2e6;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .scenariosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .filtersContainer {
+    flex-direction: column;
+    gap: 15px;
+    align-items: stretch;
+  }
+
+  .filterGroup {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .refreshButtonContainer {
+    justify-content: center;
+  }
+
+  .scenarioCardHeader {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .scenarioActions {
+    align-self: flex-end;
+  }
+}

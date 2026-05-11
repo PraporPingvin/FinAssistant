@@ -1,0 +1,26 @@
+{
+  "name": "finroad-app",
+  "version": "1.0.0",
+  "description": "FinRoad Financial Planning Application",
+  "scripts": {
+    "install-all": "npm install && cd server && npm install && cd ../client && npm install",
+    "server": "cd server && npm run dev",
+    "client": "cd client && npm run dev",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "db:setup": "cd server && npm run setup-db",
+    "docker:up": "docker-compose up -d postgres",
+    "docker:down": "docker-compose down",
+    "setup": "npm run install-all && npm run docker:up && sleep 5 && npm run db:setup"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "dependencies": {
+    "chart.js": "^4.5.1",
+    "react-chartjs-2": "^5.3.1"
+  }
+}

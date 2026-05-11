@@ -1,0 +1,323 @@
+/* client/src/pages/CheckpointsPage/CheckpointsForecast.css */
+
+.forecast-page {
+  padding: 20px 0;
+}
+
+.forecast-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+  gap: 25px;
+}
+
+.forecast-card {
+  background: white;
+  border-radius: 16px;
+  padding: 25px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: 1px solid #f0f0f0;
+}
+
+.forecast-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Заголовок */
+.forecast-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 15px;
+  cursor: pointer;
+}
+
+.forecast-title-section {
+  flex: 1;
+}
+
+.forecast-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 8px 0;
+  line-height: 1.4;
+}
+
+.forecast-progress {
+  display: inline-block;
+  padding: 4px 12px;
+  background: #495631;
+  color: white;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.forecast-status {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.achieved-badge {
+  padding: 6px 12px;
+  background: #e8f5e8;
+  color: #2e7d32;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.forecast-badge {
+  padding: 6px 12px;
+  background: #e3f2fd;
+  color: #1976d2;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.forecast-badge.warning {
+  background: #fff3e0;
+  color: #f57c00;
+}
+
+.expand-icon {
+  font-size: 20px;
+  color: #999;
+  transition: transform 0.2s;
+}
+
+/* Прогресс-бар */
+.forecast-progress-bar {
+  height: 8px;
+  background: #f0f0f0;
+  border-radius: 8px;
+  margin: 15px 0 20px 0;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #495631, #6b8c42);
+  border-radius: 8px;
+  transition: width 0.3s ease;
+}
+
+/* Детали прогноза */
+.forecast-details {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 2px solid #f0f0f0;
+}
+
+.fastest-scenario {
+  background: linear-gradient(135deg, #f8f9fa, #ffffff);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  border: 1px solid #e0e0e0;
+}
+
+.fastest-scenario h4 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  color: #333;
+  margin: 0 0 15px 0;
+}
+
+.scenario-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.scenario-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: #495631;
+}
+
+.scenario-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.metric-label {
+  font-size: 12px;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.metric-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Статистика прогноза */
+.forecast-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  margin-bottom: 20px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.forecast-stats .stat {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.forecast-stats .stat-label {
+  font-size: 12px;
+  color: #999;
+}
+
+.forecast-stats .stat-value {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Действия */
+.forecast-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.forecast-actions .action-button {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: #f5f5f5;
+  color: #333;
+}
+
+.forecast-actions .action-button:hover {
+  background: #e0e0e0;
+}
+
+.forecast-actions .action-button.primary {
+  background: #495631;
+  color: white;
+}
+
+.forecast-actions .action-button.primary:hover {
+  background: #2d3a1f;
+}
+
+/* Пустое состояние */
+.forecast-empty {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.empty-icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+  opacity: 0.5;
+}
+
+.forecast-empty h3 {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.forecast-empty p {
+  color: #666;
+  margin-bottom: 25px;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.forecast-empty .create-button {
+  padding: 12px 30px;
+  background: #495631;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.forecast-empty .create-button:hover {
+  background: #2d3a1f;
+}
+
+/* Загрузка */
+.forecast-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+
+.forecast-summary {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 50px;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .forecast-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .forecast-card-header {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .forecast-status {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .scenario-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .forecast-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .forecast-actions {
+    flex-direction: column;
+  }
+}

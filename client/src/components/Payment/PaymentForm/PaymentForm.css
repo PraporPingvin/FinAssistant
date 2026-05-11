@@ -1,0 +1,232 @@
+/* PaymentForm.css */
+
+/* Основные цвета новой палитры */
+:root {
+  --primary-dark: #495631;
+  --primary-accent: #EAED74;
+  --primary-light: #EFF2DD;
+  --card-bg: #FFFFFF;
+  --border-color: #DDE0C5;
+  --text-muted: #717959;
+  --text-dark: #3A3F29;
+  --danger-color: #f44336;
+  --success-color: #2e7d32;
+  --input-border: #DDE0C5;
+  --input-focus: #EAED74;
+}
+
+/* Форма */
+.paymentForm {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Информация о цели */
+.goalInfoCard {
+  background-color: rgba(234, 237, 116, 0.1);
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 5px;
+  border: 1px solid rgba(221, 224, 197, 0.5);
+}
+
+.infoItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed rgba(221, 224, 197, 0.5);
+}
+
+.infoItem:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.infoLabel {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 300;
+}
+
+.infoValue {
+  color: var(--primary-dark);
+  font-size: 0.95rem;
+  font-weight: 400;
+}
+
+.remainingAmount {
+  color: var(--danger-color);
+  font-weight: 400;
+}
+
+.currency {
+  color: var(--primary-dark);
+  margin-left: 2px;
+}
+
+/* Группы формы */
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.formLabel {
+  font-size: 0.95rem;
+  font-weight: 300;
+  color: var(--primary-dark);
+}
+
+.required {
+  color: var(--danger-color);
+}
+
+/* Инпуты */
+.formInput {
+  padding: 12px 16px;
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 300;
+  color: var(--primary-dark);
+  background-color: var(--card-bg);
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.formInput:focus {
+  outline: none;
+  border-color: var(--primary-accent);
+  box-shadow: 0 0 0 3px rgba(234, 237, 116, 0.2);
+}
+
+.formInputError {
+  border-color: var(--danger-color) !important;
+}
+
+.formInputError:focus {
+  box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.2) !important;
+}
+
+/* Текстовое поле */
+.formTextarea {
+  padding: 12px 16px;
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  font-size: 1rem;
+  min-height: 80px;
+  resize: vertical;
+  box-sizing: border-box;
+  font-family: inherit;
+  font-weight: 300;
+  color: var(--primary-dark);
+  transition: all 0.3s ease;
+}
+
+.formTextarea:focus {
+  outline: none;
+  border-color: var(--primary-accent);
+  box-shadow: 0 0 0 3px rgba(234, 237, 116, 0.2);
+}
+
+/* Превью валюты */
+.currencyPreview {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  font-style: italic;
+  font-weight: 300;
+}
+
+/* Валидация ошибок */
+.formError {
+  color: var(--danger-color);
+  font-size: 0.85rem;
+  font-weight: 300;
+}
+
+/* Ошибка отправки */
+.submitError {
+  background-color: rgba(244, 67, 54, 0.1);
+  color: var(--danger-color);
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 300;
+  border-left: 4px solid var(--danger-color);
+}
+
+/* Кнопки */
+.formButtons {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 10px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color);
+}
+
+@media (max-width: 480px) {
+  .formButtons {
+    flex-direction: column;
+  }
+}
+
+.formButton {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 300;
+  min-width: 140px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 480px) {
+  .formButton {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+.submitButton {
+  background-color: var(--primary-dark);
+  color: var(--primary-accent);
+}
+
+.submitButton:hover:not(:disabled) {
+  background-color: var(--primary-accent);
+  color: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(73, 86, 49, 0.15);
+}
+
+.submitButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.cancelButton {
+  background-color: transparent;
+  color: var(--primary-dark);
+  border: 1px solid var(--border-color);
+}
+
+.cancelButton:hover:not(:disabled) {
+  background-color: rgba(221, 224, 197, 0.2);
+  transform: translateY(-2px);
+}
+
+.cancelButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
