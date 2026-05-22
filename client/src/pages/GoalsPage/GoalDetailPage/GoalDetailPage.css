@@ -544,3 +544,231 @@
     font-size: 1.2rem;
   }
 }
+
+/* ============ КОНТРОЛЬНЫЕ ТОЧКИ ============ */
+.checkpointsTab {
+  padding: 20px 0;
+}
+
+.addCheckpointButton {
+  margin-bottom: 20px;
+  text-align: right;
+}
+
+.checkpoint-form-inline {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 25px;
+  border: 1px solid #e0e0e0;
+}
+
+.checkpoint-form-inline h4 {
+  margin: 0 0 15px 0;
+  color: #333;
+}
+
+.checkpoint-form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-end;
+  margin-bottom: 15px;
+}
+
+.checkpoint-form-group {
+  flex: 1;
+  min-width: 140px;
+}
+
+.checkpoint-form-group input,
+.checkpoint-form-group select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.checkpoint-form-group input:focus,
+.checkpoint-form-group select:focus {
+  outline: none;
+  border-color: #495631;
+}
+
+.checkpoint-form-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.checkpoint-form-buttons .cancel-btn {
+  padding: 10px 20px;
+  background: #f5f5f5;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.checkpoint-form-buttons .submit-btn {
+  padding: 10px 20px;
+  background: #495631;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.checkpoint-form-buttons .submit-btn:hover,
+.checkpoint-form-buttons .cancel-btn:hover {
+  opacity: 0.9;
+}
+
+.error {
+  color: #c62828;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.submit-error {
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+/* Таблица контрольных точек */
+.checkpointsTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.checkpointsTable th {
+  text-align: left;
+  padding: 12px;
+  background: #f8f9fa;
+  color: #495631;
+  font-weight: 600;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.checkpointsTable td {
+  padding: 12px;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: middle;
+}
+
+.checkpointsTable tr:hover {
+  background: #f8f9fa;
+}
+
+.checkpointsTable .overdue-row {
+  background: rgba(198, 40, 40, 0.05);
+}
+
+.checkpoint-desc {
+  font-size: 12px;
+  color: #888;
+  margin-top: 4px;
+}
+
+.amount-cell {
+  font-weight: 600;
+  color: #495631;
+  white-space: nowrap;
+}
+
+.priority-icon {
+  font-size: 14px;
+}
+
+.checkpoint-status {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.checkpoint-status.pending {
+  background: #fff3e0;
+  color: #f57c00;
+}
+
+.checkpoint-status.completed {
+  background: #e8f5e8;
+  color: #2e7d32;
+}
+
+.checkpoint-status.overdue {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.overdue-badge {
+  margin-left: 5px;
+  font-size: 11px;
+}
+
+.table-actions {
+  display: flex;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.action-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background: #f5f5f5;
+  transition: all 0.2s;
+}
+
+.action-btn.complete {
+  background: #e8f5e8;
+  color: #2e7d32;
+}
+
+.action-btn.complete:hover {
+  background: #2e7d32;
+  color: white;
+}
+
+.action-btn.edit {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.action-btn.edit:hover {
+  background: #1976d2;
+  color: white;
+}
+
+.action-btn.delete {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.action-btn.delete:hover {
+  background: #c62828;
+  color: white;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .checkpoint-form-row {
+    flex-direction: column;
+  }
+  
+  .checkpoint-form-group {
+    width: 100%;
+  }
+  
+  .checkpointsTable {
+    font-size: 13px;
+  }
+  
+  .table-actions {
+    flex-wrap: wrap;
+  }
+}

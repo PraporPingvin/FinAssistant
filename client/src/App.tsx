@@ -15,7 +15,7 @@ import ScenarioDetailPage from './pages/ScenariosPage/ScenarioDetail/ScenarioDet
 import EditScenarioPage from './pages/ScenariosPage/EditScenario/EditScenarioPage';
 import ScenariosMainPage from './pages/ScenariosPage/MainScenario/ScenariosMainPage';
 import ScenarioComparisonPage from './pages/ScenariosPage/ComparisonScenario/ScenarioComparisonPage';
-import CheckpointsPage from './pages/ChekpointsPage/ChekpointsPage';
+import CheckpointsPage from './pages/ChekpointsPage/CheckpointsPage';
 import EditGoalPage from './pages/GoalsPage/EditGoalPage/EditGoalPage';
 import Profile from "./pages/Profile/Profile";
 import Settings from "./pages/Settings/Settings";

@@ -792,7 +792,7 @@ function ForecastPage() {
               </div>
             )}
 
-            {/* Кнопка пересчета */}
+            {/* Кнопка пересчета
             <div className="recalculateButton">
               <button
                 onClick={calculateForecast}
@@ -800,7 +800,7 @@ function ForecastPage() {
               >
                 🔄 Пересчитать прогноз
               </button>
-            </div>
+            </div> */}
           </>
         )}
       </div>

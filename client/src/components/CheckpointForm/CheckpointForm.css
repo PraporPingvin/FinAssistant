@@ -1,0 +1,111 @@
+.checkpoint-form {
+  background: white;
+  border-radius: 16px;
+  padding: 25px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.checkpoint-form h3 {
+  margin: 0 0 5px 0;
+  color: #333;
+}
+
+.form-goal-info {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.checkpoint-form .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.checkpoint-form .form-group {
+  margin-bottom: 20px;
+}
+
+.checkpoint-form .form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #333;
+}
+
+.checkpoint-form .form-group input,
+.checkpoint-form .form-group select,
+.checkpoint-form .form-group textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+
+.checkpoint-form .form-group input:focus,
+.checkpoint-form .form-group select:focus,
+.checkpoint-form .form-group textarea:focus {
+  outline: none;
+  border-color: #495631;
+}
+
+.checkpoint-form .preview {
+  font-size: 12px;
+  color: #666;
+  margin-top: 5px;
+}
+
+.checkpoint-form .error {
+  color: #c62828;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.checkpoint-form .submit-error {
+  background: #ffebee;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.checkpoint-form .form-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.checkpoint-form .cancel-btn {
+  padding: 12px 24px;
+  background: #f5f5f5;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.checkpoint-form .submit-btn {
+  padding: 12px 24px;
+  background: #495631;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.checkpoint-form .submit-btn:hover,
+.checkpoint-form .cancel-btn:hover {
+  opacity: 0.9;
+}
+
+@media (max-width: 768px) {
+  .checkpoint-form .form-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}

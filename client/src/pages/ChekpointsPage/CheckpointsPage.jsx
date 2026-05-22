@@ -62,13 +62,6 @@ function CheckpointsPage() {
           {activeTab === "stats" && <CheckpointsStats />}
         </div>
 
-        {/* Кнопка "Наверх" */}
-        <button 
-          className="scroll-to-top"
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-        >
-          ↑
-        </button>
       </div>
     </Layout>
   );

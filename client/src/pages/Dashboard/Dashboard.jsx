@@ -14,13 +14,13 @@ function Dashboard() {
   const [lastUpdate, setLastUpdate] = useState(new Date());
   const [totalProgress, setTotalProgress] = useState(0);
   
-  const { user, isAuthenticated } = useAuth(); // Получаем текущего пользователя
+  const { user, isAuthenticated } = useAuth(); 
 
   useEffect(() => {
     if (isAuthenticated && user) {
       loadGoals();
     }
-  }, [isAuthenticated, user]); // Загружаем при изменении пользователя
+  }, [isAuthenticated, user]); 
 
   const calculateTotalProgress = (goalsList) => {
     if (!goalsList || goalsList.length === 0) return 0;
@@ -53,7 +53,7 @@ function Dashboard() {
       }
       
       console.log("Загрузка целей для пользователя:", user.id);
-      const data = await getGoals(user.id); // Используем ID текущего пользователя
+      const data = await getGoals(user.id); 
       console.log("Полученные данные:", data);
       
       if (data && Array.isArray(data)) {
