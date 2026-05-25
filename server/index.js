@@ -8,30 +8,50 @@ const cors = require('cors');
 const { Pool } = require('pg');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
 require('dotenv').config();
 
 // ==================== ИНИЦИАЛИЗАЦИЯ ====================
 const app = express();
 
 // ==================== КОНФИГУРАЦИЯ ====================
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this';
+// Убираем дефолтные значения - только из переменных окружения
+const JWT_SECRET = process.env.JWT_SECRET;
 const PORT = process.env.PORT || 5000;
+
+// Проверка наличия обязательных переменных окружения
+if (!JWT_SECRET) {
+  console.error('\n❌ ОШИБКА: JWT_SECRET не задан в переменных окружения!');
+  console.error('Создайте файл .env на основе .env.example\n');
+  process.exit(1);
+}
+
+if (!process.env.DB_HOST || !process.env.DB_NAME || !process.env.DB_USER || !process.env.DB_PASSWORD) {
+  console.error('\n❌ ОШИБКА: Не все параметры БД заданы в переменных окружения!');
+  console.error('Создайте файл .env на основе .env.example\n');
+  process.exit(1);
+}
 
 // ==================== ПОДКЛЮЧЕНИЕ К БАЗЕ ДАННЫХ ====================
 const pool = new Pool({
-  host: process.env.DB_HOST || 'localhost',
+  host: process.env.DB_HOST,
   port: process.env.DB_PORT || 5432,
-  database: process.env.DB_NAME || 'finroad_db',
-  user: process.env.DB_USER || 'finroad_user',
-  password: process.env.DB_PASSWORD || 'secure_password123',
+  database: process.env.DB_NAME,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
 });
 
 app.locals.pool = pool;
 
 // ==================== НАСТРОЙКА CORS ====================
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  process.env.FRONTEND_URL
+].filter(Boolean);
+
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:5173', 'http://127.0.0.1:5173'],
+  origin: allowedOrigins,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -42,11 +62,22 @@ app.use(cors({
 // Парсинг JSON
 app.use(express.json());
 
-// Логирование всех запросов
+// Безопасное логирование запросов (маскируем пароли)
 app.use((req, res, next) => {
   console.log(`\n📨 ${req.method} ${req.url}`);
   if (req.body && Object.keys(req.body).length > 0) {
-    console.log('📦 Body:', req.body);
+    // Копируем тело запроса для безопасного логирования
+    const safeBody = { ...req.body };
+    
+    // Маскируем поля с паролями
+    const sensitiveFields = ['password', 'newPassword', 'currentPassword', 'new_password', 'current_password'];
+    sensitiveFields.forEach(field => {
+      if (safeBody[field]) {
+        safeBody[field] = '***';
+      }
+    });
+    
+    console.log('📦 Body:', safeBody);
   }
   next();
 });
@@ -132,8 +163,12 @@ app.get('/api/test', (req, res) => {
       '/api/auth/register',
       '/api/auth/login',
       '/api/auth/verify',
-      '/api/auth/forgot-password',
-      '/api/auth/reset-password'
+      '/api/user/profile',
+      '/api/goals',
+      '/api/scenarios',
+      '/api/payments',
+      '/api/checkpoints',
+      '/api/forecast'
     ]
   });
 });
@@ -162,6 +197,12 @@ app.post('/api/auth/register', async (req, res) => {
 
     if (password.length < 6) {
       return res.status(400).json({ error: 'Пароль должен быть не менее 6 символов' });
+    }
+
+    // Проверка формата email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ error: 'Некорректный формат email' });
     }
 
     // Проверка уникальности email
@@ -278,19 +319,11 @@ app.post('/api/auth/login', async (req, res) => {
  * GET /api/auth/verify
  * Проверка валидности JWT токена
  */
-app.get('/api/auth/verify', async (req, res) => {
+app.get('/api/auth/verify', authenticateToken, async (req, res) => {
   try {
-    const token = req.headers.authorization?.split(' ')[1];
-
-    if (!token) {
-      return res.status(401).json({ error: 'Токен не предоставлен' });
-    }
-
-    const decoded = jwt.verify(token, JWT_SECRET);
-
     const result = await pool.query(
       'SELECT user_id, email, first_name, last_name FROM users WHERE user_id = $1',
-      [decoded.userId]
+      [req.user.userId]
     );
 
     const user = result.rows[0];
@@ -315,54 +348,131 @@ app.get('/api/auth/verify', async (req, res) => {
 });
 
 /**
- * POST /api/auth/simple-reset-password
- * Простой сброс пароля (без токенов, для демо-режима)
- * 
- * @body {string} email - Email пользователя
- * @body {string} newPassword - Новый пароль
+ * POST /api/auth/forgot-password
+ * ЗАГОТОВКА: Отправка email для сброса пароля
+ * В production здесь должна быть отправка письма с токеном
  */
-app.post('/api/auth/simple-reset-password', async (req, res) => {
+app.post('/api/auth/forgot-password', async (req, res) => {
   try {
-    const { email, newPassword } = req.body;
-
-    console.log('📝 [simple-reset] Запрос для:', email);
-
-    if (!email || !newPassword) {
-      return res.status(400).json({ error: 'Email и новый пароль обязательны' });
+    const { email } = req.body;
+    
+    if (!email) {
+      return res.status(400).json({ error: 'Email обязателен' });
     }
-
-    if (newPassword.length < 6) {
-      return res.status(400).json({ error: 'Пароль должен быть не менее 6 символов' });
-    }
-
+    
     const userResult = await pool.query(
       'SELECT user_id FROM users WHERE email = $1',
       [email]
     );
-
+    
     if (userResult.rows.length === 0) {
-      return res.status(404).json({ error: 'Пользователь с таким email не найден' });
+      // Не сообщаем, что пользователь не найден (безопасность)
+      return res.json({ 
+        message: 'Если пользователь с таким email существует, инструкция по сбросу пароля будет отправлена' 
+      });
     }
-
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-    await pool.query(
-      'UPDATE users SET password_hash = $1, updated_at = CURRENT_TIMESTAMP WHERE email = $2',
-      [hashedPassword, email]
-    );
-
-    console.log('✅ Пароль изменен для:', email);
-
-    res.json({
-      success: true,
-      message: 'Пароль успешно изменен!'
+    
+    // В реальном приложении здесь:
+    // 1. Генерируем токен сброса пароля
+    // 2. Сохраняем его в БД с временем жизни
+    // 3. Отправляем email со ссылкой
+    
+    console.log(`📧 Запрос сброса пароля для: ${email} (в production здесь будет отправлено письмо)`);
+    
+    res.json({ 
+      message: 'Если пользователь с таким email существует, инструкция по сбросу пароля будет отправлена' 
     });
-
+    
   } catch (error) {
     console.error('❌ Ошибка:', error);
-    res.status(500).json({ error: 'Ошибка сервера: ' + error.message });
+    res.status(500).json({ error: 'Ошибка сервера' });
   }
 });
+
+/**
+ * POST /api/auth/reset-password
+ * ЗАГОТОВКА: Сброс пароля по токену
+ * В production требует токен из email
+ */
+app.post('/api/auth/reset-password', async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+    
+    if (!token || !newPassword) {
+      return res.status(400).json({ error: 'Токен и новый пароль обязательны' });
+    }
+    
+    if (newPassword.length < 6) {
+      return res.status(400).json({ error: 'Пароль должен быть не менее 6 символов' });
+    }
+    
+    // В реальном приложении здесь:
+    // 1. Проверяем токен в БД
+    // 2. Проверяем, не истек ли он
+    // 3. Обновляем пароль
+    
+    console.log('🔐 Запрос сброса пароля по токену (требуется реализация)');
+    
+    res.status(501).json({ 
+      error: 'Функция сброса пароля требует реализации. Используйте демо-режим для тестирования.' 
+    });
+    
+  } catch (error) {
+    console.error('❌ Ошибка:', error);
+    res.status(500).json({ error: 'Ошибка сервера' });
+  }
+});
+
+/**
+ * POST /api/auth/demo-reset-password
+ * ДЕМО-РЕЖИМ: Только для разработки и тестирования!
+ * НЕ ИСПОЛЬЗУЙТЕ В PRODUCTION
+ */
+if (process.env.NODE_ENV !== 'production') {
+  app.post('/api/auth/demo-reset-password', async (req, res) => {
+    console.warn('⚠️ ВНИМАНИЕ: Используется демо-эндпоинт сброса пароля!');
+    console.warn('⚠️ Этот эндпоинт небезопасен и не должен использоваться в production!');
+    
+    try {
+      const { email, newPassword } = req.body;
+      
+      if (!email || !newPassword) {
+        return res.status(400).json({ error: 'Email и новый пароль обязательны' });
+      }
+      
+      if (newPassword.length < 6) {
+        return res.status(400).json({ error: 'Пароль должен быть не менее 6 символов' });
+      }
+      
+      const userResult = await pool.query(
+        'SELECT user_id FROM users WHERE email = $1',
+        [email]
+      );
+      
+      if (userResult.rows.length === 0) {
+        return res.status(404).json({ error: 'Пользователь с таким email не найден' });
+      }
+      
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      
+      await pool.query(
+        'UPDATE users SET password_hash = $1, updated_at = CURRENT_TIMESTAMP WHERE email = $2',
+        [hashedPassword, email]
+      );
+      
+      console.log('✅ [DEMO] Пароль изменен для:', email);
+      
+      res.json({
+        success: true,
+        message: 'Пароль успешно изменен! (ДЕМО-РЕЖИМ)'
+      });
+      
+    } catch (error) {
+      console.error('❌ Ошибка:', error);
+      res.status(500).json({ error: 'Ошибка сервера' });
+    }
+  });
+}
 
 // ============================================================
 // ==================== СЕКЦИЯ 2: ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ ====================
@@ -895,6 +1005,37 @@ app.get('/api/payments/:goalId', authenticateToken, checkGoalOwnership, async (r
 });
 
 /**
+ * GET /api/payments/payment/:paymentId
+ * Получить конкретный платеж по ID
+ */
+app.get('/api/payments/payment/:paymentId', authenticateToken, async (req, res) => {
+  try {
+    const { paymentId } = req.params;
+
+    const result = await pool.query(
+      `SELECT p.*, g.user_id 
+       FROM payments p
+       JOIN goals g ON p.goal_id = g.goal_id
+       WHERE p.payment_id = $1`,
+      [paymentId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Платеж не найден' });
+    }
+
+    if (result.rows[0].user_id !== req.user.userId) {
+      return res.status(403).json({ error: 'Доступ запрещен' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Ошибка получения платежа:', error);
+    res.status(500).json({ error: 'Ошибка сервера' });
+  }
+});
+
+/**
  * POST /api/payments
  * Добавить новый платеж и обновить текущую сумму цели
  * 
@@ -946,6 +1087,171 @@ app.post('/api/payments', authenticateToken, async (req, res) => {
   } catch (error) {
     console.error('Ошибка добавления платежа:', error);
     res.status(500).json({ error: 'Ошибка добавления платежа' });
+  }
+});
+
+/**
+ * PATCH /api/payments/:paymentId
+ * Обновить существующий платеж и пересчитать current_amount цели
+ */
+app.patch('/api/payments/:paymentId', authenticateToken, async (req, res) => {
+  try {
+    const { paymentId } = req.params;
+    const { amount, payment_date, description } = req.body;
+
+    console.log(`📝 Обновление платежа ${paymentId}:`, { amount, payment_date, description });
+
+    // Проверка доступа и получение текущего платежа
+    const paymentCheck = await pool.query(
+      `SELECT p.*, g.user_id, g.goal_id 
+       FROM payments p
+       JOIN goals g ON p.goal_id = g.goal_id
+       WHERE p.payment_id = $1`,
+      [paymentId]
+    );
+
+    if (paymentCheck.rows.length === 0) {
+      return res.status(404).json({ error: 'Платеж не найден' });
+    }
+
+    if (paymentCheck.rows[0].user_id !== req.user.userId) {
+      return res.status(403).json({ error: 'Доступ запрещен' });
+    }
+
+    const oldPayment = paymentCheck.rows[0];
+    const goalId = oldPayment.goal_id;
+
+    // Начинаем транзакцию
+    await pool.query('BEGIN');
+
+    try {
+      // Сначала вычитаем старую сумму из current_amount
+      await pool.query(
+        'UPDATE goals SET current_amount = current_amount - $1, updated_at = CURRENT_TIMESTAMP WHERE goal_id = $2',
+        [parseFloat(oldPayment.amount), goalId]
+      );
+
+      // Обновляем платеж
+      let updateQuery = 'UPDATE payments SET';
+      const values = [];
+      let paramIndex = 1;
+
+      if (amount !== undefined) {
+        updateQuery += ` amount = $${paramIndex}`;
+        values.push(parseFloat(amount));
+        paramIndex++;
+      }
+
+      if (payment_date !== undefined) {
+        if (paramIndex > 1) updateQuery += ',';
+        updateQuery += ` payment_date = $${paramIndex}`;
+        values.push(payment_date);
+        paramIndex++;
+      }
+
+      if (description !== undefined) {
+        if (paramIndex > 1) updateQuery += ',';
+        updateQuery += ` description = $${paramIndex}`;
+        values.push(description);
+        paramIndex++;
+      }
+
+      if (paramIndex === 1) {
+        await pool.query('ROLLBACK');
+        return res.status(400).json({ error: 'Нет полей для обновления' });
+      }
+
+      updateQuery += ` WHERE payment_id = $${paramIndex} RETURNING *`;
+      values.push(paymentId);
+
+      const updatedResult = await pool.query(updateQuery, values);
+      const updatedPayment = updatedResult.rows[0];
+
+      // Добавляем новую сумму обратно в current_amount
+      const newAmount = amount !== undefined ? parseFloat(amount) : parseFloat(oldPayment.amount);
+      await pool.query(
+        'UPDATE goals SET current_amount = current_amount + $1, updated_at = CURRENT_TIMESTAMP WHERE goal_id = $2',
+        [newAmount, goalId]
+      );
+
+      await pool.query('COMMIT');
+
+      console.log('✅ Платеж обновлен, суммы пересчитаны');
+      res.json(updatedPayment);
+
+    } catch (error) {
+      await pool.query('ROLLBACK');
+      throw error;
+    }
+
+  } catch (error) {
+    console.error('❌ Ошибка обновления платежа:', error);
+    res.status(500).json({ error: 'Ошибка обновления платежа' });
+  }
+});
+
+/**
+ * DELETE /api/payments/:paymentId
+ * Удалить платеж и вычесть его сумму из current_amount цели
+ */
+app.delete('/api/payments/:paymentId', authenticateToken, async (req, res) => {
+  try {
+    const { paymentId } = req.params;
+
+    console.log(`🗑️ Удаление платежа ${paymentId}`);
+
+    // Проверка доступа и получение платежа
+    const paymentCheck = await pool.query(
+      `SELECT p.*, g.user_id, g.goal_id 
+       FROM payments p
+       JOIN goals g ON p.goal_id = g.goal_id
+       WHERE p.payment_id = $1`,
+      [paymentId]
+    );
+
+    if (paymentCheck.rows.length === 0) {
+      return res.status(404).json({ error: 'Платеж не найден' });
+    }
+
+    if (paymentCheck.rows[0].user_id !== req.user.userId) {
+      return res.status(403).json({ error: 'Доступ запрещен' });
+    }
+
+    const payment = paymentCheck.rows[0];
+    const goalId = payment.goal_id;
+
+    // Начинаем транзакцию
+    await pool.query('BEGIN');
+
+    try {
+      // Вычитаем сумму платежа из current_amount цели
+      await pool.query(
+        'UPDATE goals SET current_amount = current_amount - $1, updated_at = CURRENT_TIMESTAMP WHERE goal_id = $2',
+        [parseFloat(payment.amount), goalId]
+      );
+
+      // Удаляем платеж
+      const result = await pool.query(
+        'DELETE FROM payments WHERE payment_id = $1 RETURNING *',
+        [paymentId]
+      );
+
+      await pool.query('COMMIT');
+
+      console.log('✅ Платеж удален, сумма вычтена из цели');
+      res.json({ 
+        message: 'Платеж успешно удален', 
+        deletedPayment: result.rows[0] 
+      });
+
+    } catch (error) {
+      await pool.query('ROLLBACK');
+      throw error;
+    }
+
+  } catch (error) {
+    console.error('❌ Ошибка удаления платежа:', error);
+    res.status(500).json({ error: 'Ошибка удаления платежа' });
   }
 });
 
@@ -1271,6 +1577,43 @@ app.post('/api/forecast', authenticateToken, async (req, res) => {
   }
 });
 
+/**
+ * DELETE /api/forecast/:forecastId
+ * Удалить прогноз
+ */
+app.delete('/api/forecast/:forecastId', authenticateToken, async (req, res) => {
+  try {
+    const { forecastId } = req.params;
+
+    // Проверка доступа
+    const forecastCheck = await pool.query(
+      `SELECT f.*, g.user_id 
+       FROM forecasts f
+       JOIN goals g ON f.goal_id = g.goal_id
+       WHERE f.forecast_id = $1`,
+      [forecastId]
+    );
+
+    if (forecastCheck.rows.length === 0) {
+      return res.status(404).json({ error: 'Прогноз не найден' });
+    }
+
+    if (forecastCheck.rows[0].user_id !== req.user.userId) {
+      return res.status(403).json({ error: 'Доступ запрещен' });
+    }
+
+    const result = await pool.query(
+      'DELETE FROM forecasts WHERE forecast_id = $1 RETURNING *',
+      [forecastId]
+    );
+
+    res.json({ message: 'Прогноз успешно удален', deleted: result.rows[0] });
+  } catch (error) {
+    console.error('Ошибка удаления прогноза:', error);
+    res.status(500).json({ error: 'Ошибка удаления прогноза' });
+  }
+});
+
 // ============================================================
 // ==================== СЕКЦИЯ 8: СТАТИСТИКА ====================
 // ============================================================
@@ -1288,7 +1631,7 @@ app.get('/api/user/stats', authenticateToken, async (req, res) => {
          COUNT(DISTINCT g.goal_id) as total_goals,
          COUNT(DISTINCT s.scenario_id) as total_scenarios,
          COUNT(DISTINCT p.payment_id) as total_payments,
-         SUM(p.amount) as total_saved,
+         COALESCE(SUM(p.amount), 0) as total_saved,
          COUNT(DISTINCT cp.checkpoint_id) as total_checkpoints,
          SUM(CASE WHEN cp.status = 'completed' THEN 1 ELSE 0 END) as completed_checkpoints
        FROM users u
@@ -1319,12 +1662,20 @@ app.get('/api/user/stats', authenticateToken, async (req, res) => {
 // ==================== СЕКЦИЯ 9: ОБРАБОТКА ОШИБОК ====================
 // ============================================================
 
+// Глобальный обработчик ошибок
+app.use((err, req, res, next) => {
+  console.error('❌ Необработанная ошибка:', err);
+  res.status(500).json({ error: 'Внутренняя ошибка сервера' });
+});
+
 process.on('uncaughtException', (err) => {
   console.error('❌ Необработанная ошибка:', err);
+  process.exit(1);
 });
 
 process.on('unhandledRejection', (err) => {
   console.error('❌ Необработанный reject:', err);
+  process.exit(1);
 });
 
 // ============================================================
@@ -1335,6 +1686,7 @@ app.listen(PORT, () => {
   console.log('\n' + '='.repeat(60));
   console.log(`🚀 Сервер запущен на порту ${PORT}`);
   console.log('='.repeat(60));
+  console.log(`\n🔧 Режим: ${process.env.NODE_ENV || 'development'}`);
   console.log('\n📊 Доступные маршруты:');
   console.log('   🏥 GET  /api/health');
   console.log('   🔧 GET  /api/test');
@@ -1342,7 +1694,11 @@ app.listen(PORT, () => {
   console.log('   📝 POST /api/auth/register');
   console.log('   🔑 POST /api/auth/login');
   console.log('   ✅ GET  /api/auth/verify');
-  console.log('   🔄 POST /api/auth/simple-reset-password');
+  console.log('   📧 POST /api/auth/forgot-password (заготовка)');
+  console.log('   🔐 POST /api/auth/reset-password (заготовка)');
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('   ⚠️  POST /api/auth/demo-reset-password (ДЕМО-РЕЖИМ, НЕБЕЗОПАСНО!)');
+  }
   console.log('\n👤 Профиль:');
   console.log('   👤 GET    /api/user/profile');
   console.log('   ✏️ PATCH  /api/user/profile');
@@ -1361,7 +1717,10 @@ app.listen(PORT, () => {
   console.log('   🗑️ DELETE /api/scenarios/:scenarioId');
   console.log('\n💳 Платежи:');
   console.log('   📋 GET    /api/payments/:goalId');
+  console.log('   🔍 GET    /api/payments/payment/:paymentId');
   console.log('   ✨ POST   /api/payments');
+  console.log('   📝 PATCH  /api/payments/:paymentId');
+  console.log('   🗑️ DELETE /api/payments/:paymentId');
   console.log('\n📌 Контрольные точки:');
   console.log('   📋 GET    /api/checkpoints');
   console.log('   🎯 GET    /api/checkpoints/goal/:goalId');
@@ -1371,6 +1730,7 @@ app.listen(PORT, () => {
   console.log('\n🔮 Прогнозы:');
   console.log('   🔍 GET    /api/forecast/:goalId');
   console.log('   ✨ POST   /api/forecast');
+  console.log('   🗑️ DELETE /api/forecast/:forecastId');
   console.log('\n📊 Статистика:');
   console.log('   📈 GET    /api/user/stats');
   console.log('\n' + '='.repeat(60) + '\n');

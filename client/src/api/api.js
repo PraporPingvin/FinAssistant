@@ -77,6 +77,21 @@ export async function createPayment(paymentData) {
   return apiClient.post('/payments', paymentData);
 }
 
+// Обновить платеж
+export async function updatePayment(paymentId, paymentData) {
+  return apiClient.patch(`/payments/${paymentId}`, paymentData);
+}
+
+// Удалить платеж
+export async function deletePayment(paymentId) {
+  return apiClient.delete(`/payments/${paymentId}`);
+}
+
+// Получить конкретный платеж
+export async function getPayment(paymentId) {
+  return apiClient.get(`/payments/payment/${paymentId}`);
+}
+
 // ============ КОНТРОЛЬНЫЕ ТОЧКИ (CHECKPOINTS) ============
 
 // Получить все контрольные точки пользователя

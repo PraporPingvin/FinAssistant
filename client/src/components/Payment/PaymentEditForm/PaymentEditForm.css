@@ -1,0 +1,15 @@
+/* PaymentEditForm.css */
+.paymentEditForm {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.editFormTitle {
+  font-size: 1.2rem;
+  font-weight: 400;
+  color: var(--primary-dark);
+  margin: 0 0 10px 0;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-color);
+}

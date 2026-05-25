@@ -1,7 +1,7 @@
 import React from "react";
 import "./PaymentList.css";
 
-function PaymentList({ payments }) {
+function PaymentList({ payments, onEdit, onDelete }) {
   const formatCurrency = (amount) => {
     const num = parseFloat(amount) || 0;
     return new Intl.NumberFormat('ru-RU').format(num);
@@ -20,6 +20,12 @@ function PaymentList({ payments }) {
     }
   };
 
+  const handleDelete = async (payment) => {
+    if (window.confirm(`Вы уверены, что хотите удалить платеж на сумму ${formatCurrency(payment.amount)} ₽?\n\nЭто действие нельзя отменить.`)) {
+      onDelete(payment.payment_id);
+    }
+  };
+
   if (!payments || payments.length === 0) {
     return (
       <div className="emptyState">
@@ -28,24 +34,18 @@ function PaymentList({ payments }) {
     );
   }
 
-  // Рассчитываем общую сумму
   const totalAmount = payments.reduce((sum, payment) => {
     return sum + (parseFloat(payment.amount) || 0);
   }, 0);
 
-  // Средний платеж
   const averageAmount = payments.length > 0 
     ? Math.round(totalAmount / payments.length) 
     : 0;
 
-  // Последний платеж
-  const lastPayment = payments.length > 0 
-    ? payments[0] // Предполагаем, что платежи отсортированы по дате
-    : null;
+  const lastPayment = payments.length > 0 ? payments[0] : null;
 
   return (
     <div>
-      {/* Сводка */}
       <div className="paymentSummary">
         <div className="summaryItem">
           <span className="summaryLabel">Всего платежей</span>
@@ -78,7 +78,6 @@ function PaymentList({ payments }) {
         )}
       </div>
 
-      {/* Таблица */}
       <div className="paymentListContainer">
         <table className="paymentTable">
           <thead>
@@ -87,6 +86,7 @@ function PaymentList({ payments }) {
               <th className="tableHeader">Сумма</th>
               <th className="tableHeader">Описание</th>
               <th className="tableHeader">Добавлен</th>
+              <th className="tableHeader">Действия</th>
             </tr>
           </thead>
           <tbody>
@@ -107,6 +107,22 @@ function PaymentList({ payments }) {
                 </td>
                 <td className="tableCell dateCell">
                   {formatDate(payment.created_at)}
+                </td>
+                <td className="tableCell actionsCell">
+                  <button
+                    onClick={() => onEdit(payment)}
+                    className="actionButton editButton"
+                    title="Редактировать платеж"
+                  >
+                    ✏️
+                  </button>
+                  <button
+                    onClick={() => handleDelete(payment)}
+                    className="actionButton deleteButton"
+                    title="Удалить платеж"
+                  >
+                    🗑️
+                  </button>
                 </td>
               </tr>
             ))}

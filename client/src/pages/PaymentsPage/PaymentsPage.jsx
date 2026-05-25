@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import Layout from "../../components/Layout";
-import { getGoal, getPayments, createPayment } from "../../api/api";
+import { getGoal, getPayments, createPayment, updatePayment, deletePayment } from "../../api/api";
 import PaymentForm from "../../components/Payment/PaymentForm/PaymentForm";
+import PaymentEditForm from "../../components/Payment/PaymentEditForm/PaymentEditForm";
 import PaymentList from "../../components/Payment/PaymentList/PaymentList";
 import "./PaymentsPage.css";
 
@@ -15,6 +16,7 @@ function PaymentsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showForm, setShowForm] = useState(false);
+  const [editingPayment, setEditingPayment] = useState(null);
   const [totalAmount, setTotalAmount] = useState(0);
 
   useEffect(() => {
@@ -28,10 +30,9 @@ function PaymentsPage() {
       setLoading(true);
       setError("");
 
-      // Загружаем цель и платежи отдельно
       const [goalData, paymentsData] = await Promise.all([
-        getGoal(goalId), // Используем getGoal вместо getGoals
-        getPayments(goalId).catch(() => []) // Защита от ошибок
+        getGoal(goalId),
+        getPayments(goalId).catch(() => [])
       ]);
 
       if (!goalData) {
@@ -42,15 +43,12 @@ function PaymentsPage() {
       setGoal(goalData);
       setPayments(paymentsData);
 
-      // Рассчитываем общую сумму ТОЧНО как в таблице
       const total = paymentsData.reduce((sum, payment) => {
-        // Преобразуем amount в число для гарантии
         const amount = parseFloat(payment.amount) || 0;
         return sum + amount;
       }, 0);
 
       setTotalAmount(total);
-      console.log("Рассчитанная сумма платежей:", total, "Платежей:", paymentsData.length);
 
     } catch (error) {
       console.error("Ошибка загрузки данных:", error);
@@ -67,17 +65,7 @@ function PaymentsPage() {
         goal_id: parseInt(goalId)
       });
 
-      // Добавляем платеж в начало списка
-      setPayments(prev => [newPayment, ...prev]);
-
-      // Обновляем общую сумму с новым платежом
-      const paymentAmount = parseFloat(newPayment.amount) || 0;
-      setTotalAmount(prev => prev + paymentAmount);
-
-      // Обновляем данные цели
-      const updatedGoal = await getGoal(goalId);
-      setGoal(updatedGoal);
-
+      await loadData(); // Перезагружаем все данные
       setShowForm(false);
 
       alert("Платеж успешно добавлен!");
@@ -85,6 +73,29 @@ function PaymentsPage() {
     } catch (error) {
       console.error("Ошибка добавления платежа:", error);
       alert("Не удалось добавить платеж");
+    }
+  };
+
+  const handleEditPayment = async (paymentData) => {
+    try {
+      await updatePayment(editingPayment.payment_id, paymentData);
+      await loadData(); // Перезагружаем все данные
+      setEditingPayment(null);
+      alert("Платеж успешно обновлен!");
+    } catch (error) {
+      console.error("Ошибка обновления платежа:", error);
+      alert("Не удалось обновить платеж");
+    }
+  };
+
+  const handleDeletePayment = async (paymentId) => {
+    try {
+      await deletePayment(paymentId);
+      await loadData(); // Перезагружаем все данные
+      alert("Платеж успешно удален!");
+    } catch (error) {
+      console.error("Ошибка удаления платежа:", error);
+      alert("Не удалось удалить платеж");
     }
   };
 
@@ -97,11 +108,6 @@ function PaymentsPage() {
     return new Intl.NumberFormat('ru-RU').format(num);
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString) return "";
-    return new Date(dateString).toLocaleDateString('ru-RU');
-  };
-
   const getStatusText = (status) => {
     switch (status) {
       case "active": return "В процессе";
@@ -111,41 +117,12 @@ function PaymentsPage() {
     }
   };
 
-  // Расчет статистики
-  const calculateStats = () => {
-    if (!payments || payments.length === 0) {
-      return {
-        totalAmount: 0,
-        averagePayment: 0,
-        remainingAmount: goal ? Math.max(0, (parseFloat(goal.target_amount) || 0) - (parseFloat(goal.current_amount) || 0)) : 0
-      };
-    }
-
-    // Преобразуем все суммы в числа
-    const validPayments = payments.map(p => ({
-      ...p,
-      amount: parseFloat(p.amount) || 0
-    }));
-
-    const total = validPayments.reduce((sum, payment) => sum + payment.amount, 0);
-    const average = Math.round(total / validPayments.length);
-
-    const remaining = goal
-      ? Math.max(0, (parseFloat(goal.target_amount) || 0) - (parseFloat(goal.current_amount) || 0))
-      : 0;
-
-    console.log("Статистика:", {
-      total,
-      average,
-      remaining,
-      paymentsCount: validPayments.length,
-      payments: validPayments.map(p => ({ id: p.payment_id, amount: p.amount }))
-    });
-
-    return { totalAmount: total, averagePayment: average, remainingAmount: remaining };
+  const stats = {
+    totalAmount: totalAmount,
+    averagePayment: payments.length > 0 ? Math.round(totalAmount / payments.length) : 0,
+    remainingAmount: goal ? Math.max(0, (parseFloat(goal.target_amount) || 0) - (parseFloat(goal.current_amount) || 0)) : 0
   };
 
-  const stats = calculateStats();
   const progressPercent = goal?.target_amount > 0
     ? Math.round(((parseFloat(goal?.current_amount) || 0) / parseFloat(goal.target_amount)) * 100)
     : 0;
@@ -179,7 +156,6 @@ function PaymentsPage() {
   return (
     <Layout>
       <div className="paymentsContainer">
-        {/* Хлебные крошки */}
         <div className="breadcrumb">
           <Link to="/">Главная</Link>
           {" > "}
@@ -192,7 +168,6 @@ function PaymentsPage() {
           <span>Платежи</span>
         </div>
 
-        {/* Заголовок */}
         <div className="paymentsHeader">
           <div className="headerContent">
             <h1>Управление платежами</h1>
@@ -202,7 +177,6 @@ function PaymentsPage() {
           </div>
         </div>
 
-        {/* Информация о цели */}
         <div className="goalInfoCard">
           <div className="goalInfoRow">
             <div className="goalInfoLeft">
@@ -225,9 +199,6 @@ function PaymentsPage() {
           </div>
         </div>
 
-
-
-        {/* Статистика */}
         <div className="statsContainer">
           <div className="statCard">
             <h3>Всего платежей</h3>
@@ -247,25 +218,32 @@ function PaymentsPage() {
           </div>
         </div>
 
-        {/* Кнопка добавления платежа */}
         <div className="addPaymentContainer">
           <button
-            onClick={() => setShowForm(!showForm)}
+            onClick={() => {
+              setShowForm(!showForm);
+              setEditingPayment(null);
+            }}
             className={`addPaymentButton ${showForm ? 'addPaymentButtonActive' : ''}`}
           >
             {showForm ? "✖️ Скрыть форму" : "＋ Добавить платеж"}
           </button>
         </div>
         
-        {/* Основной контент */}
         <div className="contentGrid">
-          {/* Левая колонка: Форма или информация */}
           <div className="contentSection infoSection">
             <h2 className="sectionTitle">
-              {showForm ? "➕ Новый платеж" : "📋 Информация"}
+              {editingPayment ? "✏️ Редактирование платежа" : (showForm ? "➕ Новый платеж" : "📋 Информация")}
             </h2>
 
-            {showForm ? (
+            {editingPayment ? (
+              <PaymentEditForm
+                payment={editingPayment}
+                goal={goal}
+                onSubmit={handleEditPayment}
+                onCancel={() => setEditingPayment(null)}
+              />
+            ) : showForm ? (
               <PaymentForm
                 goal={goal}
                 onSubmit={handleAddPayment}
@@ -281,11 +259,11 @@ function PaymentsPage() {
                   <strong>💡 Подсказка:</strong> Платежи автоматически увеличивают текущую сумму цели.
 
                   <div style={{ marginTop: "15px" }}>
-                    <strong>Требования:</strong>
+                    <strong>Доступные действия:</strong>
                     <ul className="requirementsList">
-                      <li>Сумма платежа должна быть положительной</li>
-                      <li>Дата платежа не может быть в будущем</li>
-                      <li>Обязательно укажите описание платежа</li>
+                      <li>✏️ Нажмите на кнопку с карандашом, чтобы отредактировать платеж</li>
+                      <li>🗑️ Нажмите на корзину, чтобы удалить платеж</li>
+                      <li>При удалении сумма платежа вычитается из текущего прогресса цели</li>
                     </ul>
                   </div>
                 </div>
@@ -293,7 +271,6 @@ function PaymentsPage() {
             )}
           </div>
 
-          {/* Правая колонка: Список платежей */}
           <div className="contentSection">
             <div className="paymentsListHeader">
               <h2 className="sectionTitle">📋 История платежей</h2>
@@ -306,7 +283,11 @@ function PaymentsPage() {
             </div>
 
             {payments.length > 0 ? (
-              <PaymentList payments={payments} />
+              <PaymentList 
+                payments={payments} 
+                onEdit={setEditingPayment}
+                onDelete={handleDeletePayment}
+              />
             ) : (
               <div className="emptyState">
                 <h3 className="emptyStateTitle">Платежей пока нет</h3>
@@ -322,7 +303,6 @@ function PaymentsPage() {
           </div>
         </div>
 
-        {/* Кнопка возврата */}
         <div className="backButtonSection">
           <button
             onClick={handleBack}
