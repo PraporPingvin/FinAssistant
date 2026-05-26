@@ -177,7 +177,6 @@
 }
 
 .chartCard {
-  width: 50px;
   padding: 16px;
   border-radius: var(--radius-md);
   background: rgba(73, 86, 49, 0.03);
