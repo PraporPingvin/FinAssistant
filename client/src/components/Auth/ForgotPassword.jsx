@@ -76,8 +76,6 @@ function ForgotPassword({ onBackToLogin }) {
         <div className="successMessage">
           <div className="successIcon">✅</div>
           <h3>Пароль успешно изменен!</h3>
-          <p>Теперь вы можете войти с новым паролем.</p>
-          <p className="note">Перенаправление на страницу входа...</p>
         </div>
       </div>
     );

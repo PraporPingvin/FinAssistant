@@ -103,8 +103,6 @@ function ResetPassword() {
             <div className="successMessage">
               <div className="successIcon">✅</div>
               <h3>Пароль успешно изменен!</h3>
-              <p>Теперь вы можете войти в аккаунт с новым паролем.</p>
-              <p className="note">Через несколько секунд вы будете перенаправлены...</p>
             </div>
           </div>
         </div>
