@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Calendar, FileText, DollarSign, X, Save } from "lucide-react";
 import "./PaymentEditForm.css";
 
 function PaymentEditForm({ payment, goal, onSubmit, onCancel }) {
@@ -86,32 +87,30 @@ function PaymentEditForm({ payment, goal, onSubmit, onCancel }) {
 
   return (
     <form onSubmit={handleSubmit} className="paymentEditForm">
-      <h3 className="editFormTitle">✏️ Редактирование платежа</h3>
-
       <div className="formGroup">
         <label htmlFor="amount" className="formLabel">
+          <DollarSign size={14} />
           Сумма платежа (₽) <span className="required">*</span>
         </label>
         <input
           id="amount"
           name="amount"
           type="text"
-          placeholder="10000"
+          placeholder="10 000"
           value={formData.amount}
           onChange={handleChange}
           className={`formInput ${errors.amount ? 'formInputError' : ''}`}
           disabled={submitting}
         />
         {formData.amount && (
-          <div className="currencyPreview">
-            {formatCurrency(formData.amount)} ₽
-          </div>
+          <div className="currencyPreview">{formatCurrency(formData.amount)} ₽</div>
         )}
         {errors.amount && <div className="formError">{errors.amount}</div>}
       </div>
 
       <div className="formGroup">
         <label htmlFor="payment_date" className="formLabel">
+          <Calendar size={14} />
           Дата платежа <span className="required">*</span>
         </label>
         <input
@@ -129,24 +128,24 @@ function PaymentEditForm({ payment, goal, onSubmit, onCancel }) {
 
       <div className="formGroup">
         <label htmlFor="description" className="formLabel">
+          <FileText size={14} />
           Описание платежа <span className="required">*</span>
         </label>
         <textarea
           id="description"
           name="description"
-          placeholder="Например: Зарплата за март, премия, подарок и т.д."
+          placeholder="Например: Зарплата за март, премия, подарок..."
           value={formData.description}
           onChange={handleChange}
           className={`formTextarea ${errors.description ? 'formInputError' : ''}`}
           disabled={submitting}
+          rows="3"
         />
         {errors.description && <div className="formError">{errors.description}</div>}
       </div>
 
       {errors.submit && (
-        <div className="submitError">
-          ❌ {errors.submit}
-        </div>
+        <div className="submitError">{errors.submit}</div>
       )}
 
       <div className="formButtons">
@@ -156,6 +155,7 @@ function PaymentEditForm({ payment, goal, onSubmit, onCancel }) {
           className="formButton cancelButton"
           disabled={submitting}
         >
+          <X size={16} />
           Отмена
         </button>
         <button
@@ -163,6 +163,7 @@ function PaymentEditForm({ payment, goal, onSubmit, onCancel }) {
           className="formButton submitButton"
           disabled={submitting}
         >
+          <Save size={16} />
           {submitting ? "Сохранение..." : "Сохранить изменения"}
         </button>
       </div>

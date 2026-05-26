@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Calendar, FileText, DollarSign, X, Check } from "lucide-react";
 import "./PaymentForm.css";
 
 function PaymentForm({ goal, onSubmit, onCancel }) {
@@ -83,41 +84,32 @@ function PaymentForm({ goal, onSubmit, onCancel }) {
     return new Intl.NumberFormat('ru-RU').format(num);
   };
 
-  const calculateRemaining = () => {
-    const target = parseFloat(goal?.target_amount) || 0;
-    const current = parseFloat(goal?.current_amount) || 0;
-    return Math.max(0, target - current);
-  };
-
   return (
     <form onSubmit={handleSubmit} className="paymentForm">
-
-      {/* Сумма платежа */}
       <div className="formGroup">
         <label htmlFor="amount" className="formLabel">
+          <DollarSign size={14} />
           Сумма платежа (₽) <span className="required">*</span>
         </label>
         <input
           id="amount"
           name="amount"
           type="text"
-          placeholder="10000"
+          placeholder="10 000"
           value={formData.amount}
           onChange={handleChange}
           className={`formInput ${errors.amount ? 'formInputError' : ''}`}
           disabled={submitting}
         />
         {formData.amount && (
-          <div className="currencyPreview">
-            {formatCurrency(formData.amount)} ₽
-          </div>
+          <div className="currencyPreview">{formatCurrency(formData.amount)} ₽</div>
         )}
         {errors.amount && <div className="formError">{errors.amount}</div>}
       </div>
 
-      {/* Дата платежа */}
       <div className="formGroup">
         <label htmlFor="payment_date" className="formLabel">
+          <Calendar size={14} />
           Дата платежа <span className="required">*</span>
         </label>
         <input
@@ -133,31 +125,28 @@ function PaymentForm({ goal, onSubmit, onCancel }) {
         {errors.payment_date && <div className="formError">{errors.payment_date}</div>}
       </div>
 
-      {/* Описание */}
       <div className="formGroup">
         <label htmlFor="description" className="formLabel">
+          <FileText size={14} />
           Описание платежа <span className="required">*</span>
         </label>
         <textarea
           id="description"
           name="description"
-          placeholder="Например: Зарплата за март, премия, подарок и т.д."
+          placeholder="Например: Зарплата за март, премия, подарок..."
           value={formData.description}
           onChange={handleChange}
           className={`formTextarea ${errors.description ? 'formInputError' : ''}`}
           disabled={submitting}
+          rows="3"
         />
         {errors.description && <div className="formError">{errors.description}</div>}
       </div>
 
-      {/* Ошибка отправки */}
       {errors.submit && (
-        <div className="submitError">
-          ❌ {errors.submit}
-        </div>
+        <div className="submitError">{errors.submit}</div>
       )}
 
-      {/* Кнопки */}
       <div className="formButtons">
         <button
           type="button"
@@ -165,6 +154,7 @@ function PaymentForm({ goal, onSubmit, onCancel }) {
           className="formButton cancelButton"
           disabled={submitting}
         >
+          <X size={16} />
           Отмена
         </button>
         <button
@@ -172,6 +162,7 @@ function PaymentForm({ goal, onSubmit, onCancel }) {
           className="formButton submitButton"
           disabled={submitting}
         >
+          <Check size={16} />
           {submitting ? "Добавление..." : "Добавить платеж"}
         </button>
       </div>

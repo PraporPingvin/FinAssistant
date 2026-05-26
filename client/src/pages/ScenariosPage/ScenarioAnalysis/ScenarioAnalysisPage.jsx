@@ -1,5 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
+import {
+  ArrowLeft,
+  Home,
+  Target,
+  BarChart3,
+  Plus,
+  X,
+  RefreshCw,
+  TrendingUp,
+  DollarSign,
+  Calendar,
+  Clock,
+  Shield,
+  Zap,
+  Activity,
+  Star,
+  AlertCircle,
+  ChevronRight,
+} from "lucide-react";
 import Layout from "../../../components/Layout";
 import { 
   getGoal, 
@@ -53,7 +72,6 @@ function ScenarioAnalysisPage() {
       setScenarios(scenariosData);
       setForecast(forecastData);
       
-      // Автоматический анализ, если есть сценарии
       if (scenariosData.length > 0) {
         performAnalysis(scenariosData, goalData);
       }
@@ -73,62 +91,58 @@ function ScenarioAnalysisPage() {
     const currentAmount = parseFloat(goalData.current_amount) || 0;
     const remainingAmount = targetAmount - currentAmount;
     
-    // Анализируем каждый сценарий
     const analyzedScenarios = scenariosList.map(scenario => {
       const monthlyContribution = parseFloat(scenario.monthly_contribution) || 0;
       const expectedReturn = parseFloat(scenario.expected_return) || 0;
       const inflationRate = parseFloat(scenario.inflation_rate) || 0;
       
-      // Расчет месяцев до цели
-      const monthsToGoal = monthlyContribution > 0 
+      const monthsToGoal = monthlyContribution > 0 && remainingAmount > 0
         ? Math.ceil(remainingAmount / monthlyContribution)
         : Infinity;
       
-      // Расчет эффективной доходности (с учетом инфляции)
       const effectiveReturn = expectedReturn - inflationRate;
       
-      // Оценка риска
       let riskLevel = "Низкий";
-      let riskColor = "#4caf50";
+      let riskColor = "#2E7D32";
+      let riskIcon = <Shield size={14} />;
       if (expectedReturn > 15) {
         riskLevel = "Высокий";
-        riskColor = "#f44336";
+        riskColor = "#E35D5D";
+        riskIcon = <Zap size={14} />;
       } else if (expectedReturn > 8) {
         riskLevel = "Средний";
-        riskColor = "#ff9800";
+        riskColor = "#F5A623";
+        riskIcon = <Activity size={14} />;
       }
       
-      // Вероятность достижения цели (0-100%)
       let probability = 100;
-      if (monthsToGoal > 120) probability = 30; // Более 10 лет
-      else if (monthsToGoal > 60) probability = 60; // 5-10 лет
-      else if (monthsToGoal > 36) probability = 80; // 3-5 лет
+      if (monthsToGoal > 120) probability = 30;
+      else if (monthsToGoal > 60) probability = 60;
+      else if (monthsToGoal > 36) probability = 80;
       
-      // Оценка реалистичности
       let feasibility = "Высокая";
       if (expectedReturn > 20) feasibility = "Низкая";
       else if (expectedReturn > 12) feasibility = "Средняя";
       
       return {
         ...scenario,
-        monthsToGoal,
+        monthsToGoal: isFinite(monthsToGoal) ? monthsToGoal : 0,
         effectiveReturn,
         riskLevel,
         riskColor,
+        riskIcon,
         probability,
         feasibility,
         monthlyContribution
       };
     });
     
-    // Находим оптимальный сценарий (баланс срок/риск/вероятность)
     const optimalScenario = analyzedScenarios.reduce((best, current) => {
       if (!best) return current;
       
-      // Скоринг: меньше месяцев + выше вероятность + ниже риск
-      const bestScore = (1 / best.monthsToGoal) * best.probability / 
+      const bestScore = (1 / (best.monthsToGoal || 1)) * (best.probability / 100) / 
                        (best.riskLevel === "Высокий" ? 3 : best.riskLevel === "Средний" ? 2 : 1);
-      const currentScore = (1 / current.monthsToGoal) * current.probability / 
+      const currentScore = (1 / (current.monthsToGoal || 1)) * (current.probability / 100) / 
                           (current.riskLevel === "Высокий" ? 3 : current.riskLevel === "Средний" ? 2 : 1);
       
       return currentScore > bestScore ? current : best;
@@ -165,7 +179,6 @@ function ScenarioAnalysisPage() {
       
       await createScenario(scenarioData);
       
-      // Сброс формы
       setNewScenario({
         name: "",
         monthly_contribution: "",
@@ -173,8 +186,6 @@ function ScenarioAnalysisPage() {
         inflation_rate: "6.0"
       });
       setShowCreateForm(false);
-      
-      // Перезагрузка данных
       await loadData();
       
     } catch (error) {
@@ -190,21 +201,8 @@ function ScenarioAnalysisPage() {
     return new Intl.NumberFormat('ru-RU').format(num);
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString) return "—";
-    try {
-      return new Date(dateString).toLocaleDateString('ru-RU', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-      });
-    } catch {
-      return "—";
-    }
-  };
-
   const calculateTimeToGoal = (monthlyContribution) => {
-    if (!analysis || !monthlyContribution) return 0;
+    if (!analysis || !monthlyContribution) return { months: 0, years: 0, monthsRemainder: 0 };
     
     const months = analysis.remainingAmount > 0 && monthlyContribution > 0
       ? Math.ceil(analysis.remainingAmount / monthlyContribution)
@@ -221,7 +219,7 @@ function ScenarioAnalysisPage() {
     return (
       <Layout>
         <div className="loadingContainer">
-          <div className="loadingAnimation"></div>
+          <div className="loadingAnimation" />
           <p>Загружаем анализ сценариев...</p>
         </div>
       </Layout>
@@ -231,9 +229,10 @@ function ScenarioAnalysisPage() {
   if (error || !goal) {
     return (
       <Layout>
-        <div className="scenarioAnalysisContainer">
+        <div className="scenarioAnalysisPage">
           <div className="errorMessage">
-            <strong>Внимание:</strong> {error || "Цель не найдена"}
+            <AlertCircle size={18} />
+            <span>{error || "Цель не найдена"}</span>
           </div>
           <Link to="/goals" className="backButton">
             ← Вернуться к списку целей
@@ -245,69 +244,60 @@ function ScenarioAnalysisPage() {
 
   return (
     <Layout>
-      <div className="scenarioAnalysisContainer">
-        {/* Хлебные крошки */}
+      <div className="scenarioAnalysisPage">
         <div className="breadcrumb">
-          <Link to="/">Главная</Link>
-          {" > "}
-          <Link to="/goals">Цели</Link>
-          {" > "}
+          <Link to="/"><Home size={14} /> Главная</Link>
+          <span>/</span>
+          <Link to="/goals"><Target size={14} /> Цели</Link>
+          <span>/</span>
           <Link to={`/goals/${goalId}`}>{goal.title}</Link>
-          {" > "}
-          <span>Анализ сценариев</span>
+          <span>/</span>
+          <span className="current">Анализ сценариев</span>
         </div>
 
-        {/* Заголовок */}
-        <div className="pageHeader">
+        <div className="pageHeaderScenarioAnalysis">
           <div className="headerContent">
             <h1>Анализ сценариев достижения цели</h1>
             <p>Сравните различные стратегии и найдите оптимальный путь к вашей цели</p>
           </div>
           
           <div className="actionsContainer">
-            <button
-              onClick={() => navigate(`/goals/${goalId}`)}
-              className="actionButton secondaryButton"
-            >
-              ← К цели
+            <button onClick={() => navigate(`/goals/${goalId}`)} className="actionButton secondaryButton">
+              <ArrowLeft size={14} />
+              К цели
             </button>
-            <button
-              onClick={() => setShowCreateForm(!showCreateForm)}
-              className="actionButton primaryButton"
-            >
-              {showCreateForm ? "✖️ Скрыть форму" : "＋ Новый сценарий"}
+            <button onClick={() => setShowCreateForm(!showCreateForm)} className="actionButton primaryButton">
+              {showCreateForm ? <X size={14} /> : <Plus size={14} />}
+              {showCreateForm ? "Скрыть форму" : "Новый сценарий"}
             </button>
           </div>
         </div>
 
-        {/* Информация о цели */}
         <div className="goalInfoCard">
-          <h3>🎯 Цель: {goal.title}</h3>
+          <h3>
+            <Target size={20} />
+            Цель: {goal.title}
+          </h3>
           <div className="goalInfoGrid">
             <div className="infoItem">
-              <span className="infoLabel">Целевая сумма:</span>
+              <span className="infoLabel">Целевая сумма</span>
               <span className="infoValue">{formatCurrency(goal.target_amount)} ₽</span>
             </div>
             <div className="infoItem">
-              <span className="infoLabel">Текущая сумма:</span>
+              <span className="infoLabel">Текущая сумма</span>
               <span className="infoValue">{formatCurrency(goal.current_amount)} ₽</span>
             </div>
             <div className="infoItem">
-              <span className="infoLabel">Прогресс:</span>
-              <span className="infoValue">
-                {analysis ? analysis.progressPercentage.toFixed(1) : "0"}%
-              </span>
+              <span className="infoLabel">Прогресс</span>
+              <span className="infoValue">{analysis ? analysis.progressPercentage.toFixed(1) : "0"}%</span>
             </div>
             <div className="infoItem">
-              <span className="infoLabel">Осталось:</span>
-              <span className="infoValue highlight">
-                {analysis ? formatCurrency(analysis.remainingAmount) : "0"} ₽
-              </span>
+              <span className="infoLabel">Осталось накопить</span>
+              <span className="infoValue highlight">{analysis ? formatCurrency(analysis.remainingAmount) : "0"} ₽</span>
             </div>
           </div>
         </div>
 
-        {/* Форма создания сценария */}
         {showCreateForm && (
           <div className="createScenarioForm">
             <h3>Создать новый сценарий</h3>
@@ -324,12 +314,15 @@ function ScenarioAnalysisPage() {
                   />
                 </div>
                 <div className="formGroup">
-                  <label>Ежемесячный взнос (₽) *</label>
+                  <label>
+                    <DollarSign size={14} />
+                    Ежемесячный взнос (₽) *
+                  </label>
                   <input
                     type="number"
                     value={newScenario.monthly_contribution}
                     onChange={(e) => setNewScenario({...newScenario, monthly_contribution: e.target.value})}
-                    placeholder="15000"
+                    placeholder="15 000"
                     required
                     min="1000"
                   />
@@ -338,7 +331,10 @@ function ScenarioAnalysisPage() {
               
               <div className="formRow">
                 <div className="formGroup">
-                  <label>Ожидаемая доходность (%)</label>
+                  <label>
+                    <TrendingUp size={14} />
+                    Ожидаемая доходность (%)
+                  </label>
                   <input
                     type="number"
                     step="0.1"
@@ -350,7 +346,10 @@ function ScenarioAnalysisPage() {
                   />
                 </div>
                 <div className="formGroup">
-                  <label>Инфляция (%)</label>
+                  <label>
+                    <Activity size={14} />
+                    Инфляция (%)
+                  </label>
                   <input
                     type="number"
                     step="0.1"
@@ -364,18 +363,12 @@ function ScenarioAnalysisPage() {
               </div>
               
               <div className="formButtons">
-                <button
-                  type="button"
-                  onClick={() => setShowCreateForm(false)}
-                  className="secondaryButton"
-                >
+                <button type="button" onClick={() => setShowCreateForm(false)} className="actionButton secondaryButton">
+                  <X size={14} />
                   Отмена
                 </button>
-                <button
-                  type="submit"
-                  className="primaryButton"
-                  disabled={loading}
-                >
+                <button type="submit" className="actionButton primaryButton" disabled={loading}>
+                  <Plus size={14} />
                   {loading ? "Создание..." : "Создать сценарий"}
                 </button>
               </div>
@@ -383,22 +376,24 @@ function ScenarioAnalysisPage() {
           </div>
         )}
 
-        {/* Анализ сценариев */}
         {analysis && analysis.optimalScenario && (
           <div className="optimalScenarioCard">
-            <h3>⭐ Оптимальный сценарий</h3>
+            <h3>
+              <Star size={18} />
+              Оптимальный сценарий
+            </h3>
             <div className="optimalScenarioContent">
               <div className="scenarioName">
                 <h4>{analysis.optimalScenario.name}</h4>
-                <span className="scenarioTag" style={{backgroundColor: analysis.optimalScenario.riskColor}}>
-                  {analysis.optimalScenario.riskLevel} риск
+                <span className="scenarioTag" style={{ backgroundColor: analysis.optimalScenario.riskColor }}>
+                  {analysis.optimalScenario.riskIcon} {analysis.optimalScenario.riskLevel} риск
                 </span>
               </div>
               
               <div className="scenarioStats">
                 <div className="stat">
-                  <div className="statLabel">Месяцев до цели</div>
-                  <div className="statValue">{analysis.optimalScenario.monthsToGoal}</div>
+                  <div className="statLabel">Срок достижения</div>
+                  <div className="statValue">{analysis.optimalScenario.monthsToGoal} мес.</div>
                 </div>
                 <div className="stat">
                   <div className="statLabel">Вероятность</div>
@@ -423,9 +418,11 @@ function ScenarioAnalysisPage() {
           </div>
         )}
 
-        {/* Таблица сравнения сценариев */}
         <div className="scenariosComparison">
-          <h3>📊 Сравнение сценариев</h3>
+          <h3>
+            <BarChart3 size={18} />
+            Сравнение сценариев
+          </h3>
           
           {analysis && analysis.scenarios.length > 0 ? (
             <div className="comparisonTable">
@@ -433,12 +430,12 @@ function ScenarioAnalysisPage() {
                 <thead>
                   <tr>
                     <th>Сценарий</th>
-                    <th>Ежемесячный взнос</th>
+                    <th>Взнос</th>
                     <th>Доходность</th>
-                    <th>Месяцев до цели</th>
+                    <th>Срок</th>
                     <th>Вероятность</th>
-                    <th>Уровень риска</th>
-                    <th>Действия</th>
+                    <th>Риск</th>
+                    <th></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -450,13 +447,13 @@ function ScenarioAnalysisPage() {
                         <td>
                           <strong>{scenario.name}</strong>
                           {scenario.scenario_id === analysis.optimalScenario?.scenario_id && (
-                            <span className="optimalBadge">⭐ Оптимальный</span>
+                            <span className="optimalBadge">Оптимальный</span>
                           )}
                         </td>
                         <td>{formatCurrency(scenario.monthlyContribution)} ₽</td>
                         <td>{scenario.expected_return}%</td>
                         <td>
-                          <strong>{scenario.monthsToGoal}</strong>
+                          <strong>{scenario.monthsToGoal}</strong> мес.
                           <div className="subText">
                             {time.years > 0 && `${time.years} г. `}
                             {time.monthsRemainder > 0 && `${time.monthsRemainder} мес.`}
@@ -464,27 +461,22 @@ function ScenarioAnalysisPage() {
                         </td>
                         <td>
                           <div className="probabilityBar">
-                            <div 
-                              className="probabilityFill"
-                              style={{width: `${scenario.probability}%`}}
-                            />
+                            <div className="probabilityFill" style={{ width: `${scenario.probability}%` }} />
                             <span>{scenario.probability}%</span>
                           </div>
                         </td>
                         <td>
-                          <span 
-                            className="riskTag"
-                            style={{backgroundColor: scenario.riskColor}}
-                          >
-                            {scenario.riskLevel}
+                          <span className="riskTag" style={{ backgroundColor: scenario.riskColor }}>
+                            {scenario.riskIcon} {scenario.riskLevel}
                           </span>
                         </td>
                         <td>
                           <button
-                            className="actionButton smallButton"
+                            className="actionButton smallButton secondaryButton"
                             onClick={() => navigate(`/scenarios/${goalId}`)}
                           >
-                            📈 Детали
+                            <ChevronRight size={14} />
+                            Детали
                           </button>
                         </td>
                       </tr>
@@ -500,12 +492,14 @@ function ScenarioAnalysisPage() {
           )}
         </div>
 
-        {/* Рекомендации */}
         <div className="recommendationsSection">
-          <h3>💡 Рекомендации</h3>
+          <h3>Рекомендации</h3>
           <div className="recommendationsGrid">
             <div className="recommendationCard">
-              <h4>🎯 Фокус на цели</h4>
+              <h4>
+                <Target size={16} />
+                Фокус на цели
+              </h4>
               <p>
                 Текущий прогресс: <strong>{analysis?.progressPercentage.toFixed(1) || 0}%</strong><br/>
                 Для достижения цели осталось накопить: <strong>{formatCurrency(analysis?.remainingAmount || 0)} ₽</strong>
@@ -513,7 +507,10 @@ function ScenarioAnalysisPage() {
             </div>
             
             <div className="recommendationCard">
-              <h4>⏱️ Временные рамки</h4>
+              <h4>
+                <Clock size={16} />
+                Временные рамки
+              </h4>
               <p>
                 {analysis?.optimalScenario ? (
                   <>При оптимальном сценарии цель будет достигнута за <strong>{analysis.optimalScenario.monthsToGoal} месяцев</strong></>
@@ -524,10 +521,13 @@ function ScenarioAnalysisPage() {
             </div>
             
             <div className="recommendationCard">
-              <h4>📈 Стратегия</h4>
+              <h4>
+                <Shield size={16} />
+                Стратегия
+              </h4>
               <p>
                 {analysis?.optimalScenario ? (
-                  <>Рекомендуется <strong>{analysis.optimalScenario.name}</strong> с умеренным уровнем риска</>
+                  <>Рекомендуется <strong>{analysis.optimalScenario.name}</strong> с {analysis.optimalScenario.riskLevel.toLowerCase()} уровнем риска</>
                 ) : (
                   "Начните с консервативного сценария с низким уровнем риска"
                 )}
@@ -536,14 +536,10 @@ function ScenarioAnalysisPage() {
           </div>
         </div>
 
-        {/* Кнопка обновления */}
         <div className="refreshSection">
-          <button
-            onClick={loadData}
-            className="refreshButton"
-            disabled={loading}
-          >
-            ⟳ Обновить анализ
+          <button onClick={loadData} className="refreshButton" disabled={loading}>
+            <RefreshCw size={14} className={loading ? "spinning" : ""} />
+            Обновить анализ
           </button>
         </div>
       </div>

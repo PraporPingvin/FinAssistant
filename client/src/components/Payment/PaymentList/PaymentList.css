@@ -1,158 +1,74 @@
-/* PaymentList.css */
-
-/* Основные цвета новой палитры */
 :root {
   --primary-dark: #495631;
   --primary-accent: #EAED74;
   --primary-light: #EFF2DD;
-  --card-bg: #FFFFFF;
-  --border-color: #DDE0C5;
-  --text-muted: #717959;
-  --text-dark: #3A3F29;
-  --success-color: #2e7d32;
-  --table-header-bg: rgba(73, 86, 49, 0.05);
-  --table-row-hover: rgba(234, 237, 116, 0.1);
-  --table-border: rgba(221, 224, 197, 0.5);
+
+  --card-bg: rgba(255, 255, 255, 0.72);
+  --border-color: rgba(73, 86, 49, 0.08);
+
+  --text-main: #495631;
+  --text-muted: #7B8465;
+
+  --success-color: #2E7D32;
+  --danger-color: #E35D5D;
+
+  --radius-md: 16px;
+  --radius-sm: 12px;
+
+  --transition: all 0.2s ease;
 }
 
-/* Контейнер списка */
-.paymentListContainer {
-  max-height: 500px;
-  overflow-y: auto;
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
+.paymentList {
+  width: 100%;
 }
 
-/* Сводка */
 .paymentSummary {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
   padding: 16px 20px;
-  background-color: rgba(234, 237, 116, 0.1);
-  border-radius: 8px;
   margin-bottom: 20px;
-  border: 1px solid rgba(221, 224, 197, 0.5);
-  font-weight: 300;
+  border-radius: var(--radius-sm);
+  background: rgba(234, 237, 116, 0.12);
+  border: 1px solid rgba(234, 237, 116, 0.2);
 }
 
 .summaryItem {
   display: flex;
   flex-direction: column;
   align-items: center;
-  text-align: center;
+  gap: 4px;
 }
 
 .summaryLabel {
-  font-size: 0.85rem;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   color: var(--text-muted);
-  margin-bottom: 4px;
 }
 
 .summaryValue {
-  font-size: 1.2rem;
-  font-weight: 400;
-  color: var(--primary-dark);
-}
-
-.totalAmount {
-  font-size: 1.4rem;
-  font-weight: 400;
-  color: var(--success-color);
-}
-
-.currency {
-  color: var(--primary-dark);
-  margin-left: 2px;
-}
-
-/* Таблица */
-.paymentTable {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.9rem;
-  font-weight: 300;
-}
-
-.tableHeader {
-  text-align: left;
-  padding: 14px 16px;
-  background-color: var(--table-header-bg);
-  border-bottom: 2px solid var(--table-border);
-  color: var(--primary-dark);
-  font-weight: 400;
-  position: sticky;
-  top: 0;
-  backdrop-filter: blur(5px);
-  z-index: 10;
-}
-
-.tableCell {
-  padding: 14px 16px;
-  border-bottom: 1px solid var(--table-border);
-  color: var(--text-dark);
-}
-
-.tableRow {
-  transition: background-color 0.2s ease;
-}
-
-.tableRow:hover {
-  background-color: var(--table-row-hover);
-}
-
-/* Ячейки специфичные */
-.amountCell {
-  font-weight: 400;
-  color: var(--success-color);
-}
-
-.dateCell {
-  color: var(--text-muted);
-  white-space: nowrap;
-  min-width: 100px;
-}
-
-.descriptionCell {
-  max-width: 250px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.descriptionFull {
-  cursor: help;
-}
-
-.descriptionFull:hover::after {
-  content: attr(title);
-  position: absolute;
-  background-color: var(--primary-dark);
-  color: var(--primary-accent);
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-size: 0.8rem;
-  z-index: 100;
-  max-width: 300px;
-  word-wrap: break-word;
-  white-space: normal;
-}
-
-/* Пустое состояние */
-.emptyState {
-  text-align: center;
-  padding: 60px 20px;
-  color: var(--text-muted);
-  font-weight: 300;
-}
-
-.emptyState p {
   font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-main);
 }
 
-/* Скроллбар */
+.summaryValue.totalAmount {
+  color: var(--success-color);
+}
+
+.paymentListContainer {
+  max-height: 500px;
+  overflow-y: auto;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.5);
+}
+
 .paymentListContainer::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 .paymentListContainer::-webkit-scrollbar-track {
@@ -160,110 +76,164 @@
 }
 
 .paymentListContainer::-webkit-scrollbar-thumb {
-  background-color: var(--border-color);
-  border-radius: 4px;
+  background: var(--text-muted);
+  border-radius: 3px;
 }
 
-.paymentListContainer::-webkit-scrollbar-thumb:hover {
-  background-color: var(--text-muted);
+.paymentTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.tableHeader {
+  text-align: left;
+  padding: 14px 16px;
+  background: rgba(73, 86, 49, 0.05);
+  color: var(--text-main);
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  backdrop-filter: blur(8px);
+}
+
+.actionsHeader {
+  text-align: center;
+  width: 80px;
+}
+
+.tableCell {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-muted);
+  vertical-align: middle;
+}
+
+.tableRow:hover {
+  background: rgba(234, 237, 116, 0.08);
+}
+
+.dateCell {
+  white-space: nowrap;
+  color: var(--text-main);
+}
+
+.amountCell {
+  color: var(--success-color);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.descriptionCell {
+  max-width: 250px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-main);
+}
+
+.actionsCell {
+  text-align: center;
+  white-space: nowrap;
+}
+
+.actionButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin: 0 4px;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition);
+  background: transparent;
+}
+
+.editButton {
+  color: var(--text-muted);
+}
+
+.editButton:hover {
+  background: var(--primary-dark);
+  color: var(--primary-accent);
+  transform: translateY(-2px);
+}
+
+.deleteButton {
+  color: var(--text-muted);
+}
+
+.deleteButton:hover {
+  background: var(--danger-color);
+  color: white;
+  transform: translateY(-2px);
+}
+
+.emptyPaymentList {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--text-muted);
+}
+
+/* Иконки в заголовках (опционально, если хотите добавить) */
+.tableHeader {
+  position: relative;
 }
 
 /* Адаптивность */
-@media (max-width: 768px) {
-  .paymentListContainer {
-    max-height: 400px;
-  }
-  
-  .paymentSummary {
-    flex-direction: column;
-    gap: 15px;
-    text-align: center;
-  }
-  
-  .summaryItem {
-    width: 100%;
-  }
-  
-  .tableHeader,
-  .tableCell {
-    padding: 10px 12px;
-    font-size: 0.85rem;
-  }
-  
+@media (max-width: 900px) {
   .descriptionCell {
     max-width: 150px;
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
+  .paymentSummary {
+    flex-direction: column;
+    text-align: center;
+  }
+
   .paymentListContainer {
-    max-height: 350px;
+    overflow-x: auto;
   }
-  
+
   .paymentTable {
-    font-size: 0.8rem;
+    min-width: 600px;
   }
-  
-  .tableHeader,
-  .tableCell {
-    padding: 8px 10px;
-  }
-  
-  .dateCell {
-    min-width: 80px;
-  }
-  
+
   .descriptionCell {
     max-width: 120px;
   }
-}
 
-/* Добавьте в PaymentList.css */
-
-/* Ячейка с действиями */
-.actionsCell {
-  white-space: nowrap;
-  text-align: center;
-}
-
-/* Кнопки действий */
-.actionButton {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 1.2rem;
-  padding: 5px 8px;
-  margin: 0 2px;
-  border-radius: 6px;
-  transition: all 0.2s ease;
-}
-
-.editButton {
-  color: var(--primary-dark);
-}
-
-.editButton:hover {
-  background-color: rgba(234, 237, 116, 0.3);
-  transform: scale(1.1);
-}
-
-.deleteButton {
-  color: var(--danger-color);
-}
-
-.deleteButton:hover {
-  background-color: rgba(244, 67, 54, 0.1);
-  transform: scale(1.1);
-}
-
-/* Адаптивность для действий */
-@media (max-width: 768px) {
-  .actionButton {
-    font-size: 1rem;
-    padding: 3px 6px;
+  .tableHeader,
+  .tableCell {
+    padding: 10px 12px;
+    font-size: 0.75rem;
   }
-  
-  .actionsCell {
-    min-width: 60px;
+
+  .actionsHeader {
+    width: 70px;
+  }
+
+  .actionButton {
+    width: 28px;
+    height: 28px;
+  }
+
+  .actionButton svg {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .paymentTable {
+    min-width: 500px;
+  }
+
+  .descriptionCell {
+    max-width: 100px;
   }
 }

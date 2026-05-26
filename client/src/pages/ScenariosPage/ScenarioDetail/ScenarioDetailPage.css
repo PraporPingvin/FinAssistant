@@ -1,247 +1,318 @@
-.scenarioDetailContainer {
-  max-width: 1000px;
+:root {
+  --primary-dark: #495631;
+  --primary-accent: #EAED74;
+  --primary-light: #EFF2DD;
+
+  --card-bg: rgba(255, 255, 255, 0.72);
+  --border-color: rgba(73, 86, 49, 0.08);
+
+  --text-main: #495631;
+  --text-muted: #7B8465;
+
+  --success-color: #2E7D32;
+  --danger-color: #E35D5D;
+  --warning-color: #F5A623;
+
+  --shadow-sm: 0 8px 24px rgba(73, 86, 49, 0.06);
+  --shadow-md: 0 10px 30px rgba(73, 86, 49, 0.08);
+  --shadow-lg: 0 18px 40px rgba(73, 86, 49, 0.12);
+
+  --radius-sm: 12px;
+  --radius-md: 18px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --radius-full: 999px;
+
+  --transition: all 0.28s ease;
+}
+
+.scenarioDetailPage {
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 42px 24px 80px;
 }
 
-.breadcrumb {
-  margin-bottom: 20px;
-  font-size: 14px;
-  color: #666;
+.backButtonNav {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  margin-bottom: 24px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: var(--transition);
+  border-radius: var(--radius-full);
 }
 
-.breadcrumb a {
-  color: #495631;
-  text-decoration: none;
+.backButtonNav:hover {
+  background: rgba(73, 86, 49, 0.06);
+  color: var(--text-main);
 }
 
-.breadcrumb a:hover {
-  text-decoration: underline;
+.pageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
 }
 
-.pageHeaderScenarios {
-  padding: 30px;
-  border-radius: 12px;
-  margin-bottom: 30px;
-  color: white;
+.headerContentScenario {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   align-items: center;
 }
 
-.goalInfoStats{
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  margin-top: 10px;
+.headerContentScenario h1 {
+  margin: 0 0 8px;
+  color: var(--text-main);
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  font-weight: 300;
+  letter-spacing: -1px;
 }
 
-.headerTop {
-  margin-bottom: 15px;
-}
-
-.pageHeader h1 {
-  margin: 0 0 10px 0;
-  font-size: 28px;
-  color: white;
-}
-
-.editTitleInput {
+.titleInput {
   width: 100%;
-  padding: 10px;
-  font-size: 28px;
+  max-width: 500px;
+  padding: 8px 16px;
+  font-size: 1.8rem;
+  font-weight: 300;
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-sm);
   background: rgba(255, 255, 255, 0.9);
-  border: none;
-  border-radius: 6px;
-  color: #333;
+  color: var(--text-main);
 }
 
 .scenarioMeta {
   display: flex;
-  gap: 20px;
-  font-size: 14px;
-  opacity: 0.9;
+  gap: 16px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.metaItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
 }
 
 .headerSubtitle {
   margin: 0;
-  opacity: 0.9;
-  font-size: 16px;
+  color: var(--text-muted);
+  font-size: 0.95rem;
 }
 
-.actionsContainerDetail {
+.actionsContainer {
   display: flex;
-  gap: 10px;
-  margin-top: 20px;
+  gap: 12px;
   flex-wrap: wrap;
 }
 
-.actionButtonDetail {
+.actionButtonScenario {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   padding: 10px 20px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    white-space: nowrap;
-    width: 150px;
-    margin-top: 20px;
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: var(--transition);
 }
 
-.editButtonDetal:hover{
-  background-color: #e8f5e9;
+.editButtonScenario {
+  background: rgba(73, 86, 49, 0.08);
+  color: var(--text-main);
 }
 
-.forecastButtonDetail:hover{
-  background-color: #e8f5e9;
+.editButtonScenario:hover {
+  background: var(--primary-dark);
+  color: var(--primary-accent);
+  transform: translateY(-2px);
 }
 
-.deleteButtonDetail:hover{
-  background-color: #e8f5e9;
+.forecastButton {
+  background: rgba(46, 125, 50, 0.1);
+  color: var(--success-color);
 }
 
+.forecastButton:hover {
+  background: var(--success-color);
+  color: white;
+  transform: translateY(-2px);
+}
+
+.deleteButton {
+  background: rgba(227, 93, 93, 0.1);
+  color: var(--danger-color);
+}
+
+.deleteButton:hover {
+  background: var(--danger-color);
+  color: white;
+  transform: translateY(-2px);
+}
+
+.cancelButton {
+  background: rgba(73, 86, 49, 0.06);
+  color: var(--text-main);
+}
+
+.cancelButton:hover {
+  background: rgba(73, 86, 49, 0.12);
+}
+
+.saveButton {
+  background: var(--primary-dark);
+  color: var(--primary-accent);
+}
+
+.saveButton:hover {
+  transform: translateY(-2px);
+  background: var(--primary-accent);
+  color: var(--primary-dark);
+  box-shadow: var(--shadow-lg);
+}
 
 .scenarioMainInfo {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin-bottom: 20px;
-}
-
-.headerContentDetail{
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-}
-
-@media (max-width: 768px) {
-  .scenarioMainInfo {
-    grid-template-columns: 1fr;
-  }
-  
-  .actionsContainer {
-    flex-direction: column;
-  }
-  
-  .actionButton {
-    padding: 10px 20px;
-    border-radius: 6px;
-    border: none;
-    cursor: pointer;
-    font-size: 14px;
-    transition: all 0.3s ease;
-  }
+  /* display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 24px; */
+  margin-bottom: 32px;
 }
 
 .infoCard {
-  display: flex;
-  flex-direction: column;
-  background-color: white;
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  padding: 28px;
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
 }
 
 .infoCard h3 {
-  margin: 0 0 20px 0;
-  color: #333;
-  font-size: 18px;
-  border-bottom: 2px solid #f5f5f5;
-  padding-bottom: 10px;
+  margin: 0 0 20px;
+  color: var(--text-main);
+  font-size: 1.1rem;
+  font-weight: 500;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
 }
 
-.infoGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
+.infoGridScenarioDetail {
+  justify-content: space-between;
+  display: flex;
+  gap: 20px;
 }
 
 .infoItem {
   display: flex;
   flex-direction: column;
+  gap: 6px;
 }
 
 .infoLabel {
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .infoValue {
-  font-size: 16px;
-  font-weight: 500;
-  color: #333;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-main);
 }
 
 .infoValue.highlight {
-  color: #495631;
-  font-weight: bold;
+  color: var(--primary-dark);
 }
 
 .subText {
   display: block;
-  font-size: 12px;
-  color: #666;
+  font-size: 0.7rem;
+  font-weight: normal;
+  color: var(--text-muted);
   margin-top: 2px;
 }
 
 .warningText {
-  color: #f44336;
+  color: var(--danger-color);
   font-weight: 500;
-}
-
-.riskBadge {
-  display: inline-block;
-  padding: 6px 12px;
-  border-radius: 20px;
-  color: white;
-  font-size: 14px;
-  font-weight: bold;
 }
 
 .editInput {
   width: 100%;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 16px;
-  box-sizing: border-box;
+  padding: 8px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--text-main);
 }
 
 .editInput:focus {
   outline: none;
-  border-color: #495631;
+  border-color: var(--primary-accent);
+  box-shadow: 0 0 0 3px rgba(234, 237, 116, 0.2);
+}
+
+.riskBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: white;
 }
 
 .goalCard {
-  background-color: white;
-  padding: 25px;
-  border-radius: 12px;
-  margin-bottom: 20px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-  border-left: 4px solid #495631;
+  padding: 28px;
+  margin-bottom: 32px;
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+  border-left: 4px solid var(--primary-accent);
 }
 
 .goalCard h3 {
-  margin: 0 0 20px 0;
-  color: #333;
-  font-size: 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 20px;
+  color: var(--text-main);
+  font-size: 1.1rem;
+  font-weight: 500;
 }
 
 .goalInfo {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 12px;
+  margin-bottom: 20px;
 }
 
 .goalRow {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 0;
-  border-bottom: 1px solid #f5f5f5;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .goalRow:last-child {
@@ -249,217 +320,203 @@
 }
 
 .goalLabel {
-  font-size: 14px;
-  color: #666;
+  font-size: 0.85rem;
+  color: var(--text-muted);
 }
 
 .goalValue {
-  font-size: 16px;
-  font-weight: 500;
-  color: #333;
-  text-align: right;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-main);
 }
 
-.progressPercent {
-  display: block;
-  font-size: 12px;
-  color: #495631;
-  margin-top: 2px;
+.progressBar {
+  height: 6px;
+  background: rgba(73, 86, 49, 0.08);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-bottom: 20px;
 }
 
-.goalStatus {
-  padding: 4px 12px;
-  border-radius: 15px;
-  font-size: 12px;
-  font-weight: bold;
-  text-transform: uppercase;
-}
-
-.goalStatus.statusactive {
-  background-color: #e8f5e9;
-  color: #2e7d32;
-}
-
-.goalStatus.statuscompleted {
-  background-color: #e3f2fd;
-  color: #1565c0;
-}
-
-.goalStatus.statuspaused {
-  background-color: #fff3e0;
-  color: #ef6c00;
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary-accent), var(--primary-dark));
+  border-radius: var(--radius-full);
+  transition: width 0.5s ease;
 }
 
 .goalActions {
-  margin-top: 15px;
   display: flex;
   justify-content: flex-end;
 }
 
 .goalActionButton {
-  padding: 8px 16px;
-  background-color: #495631;
-  color: #EAED74;
+  padding: 10px 20px;
+  background: var(--primary-dark);
+  color: var(--primary-accent);
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius-full);
   cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.3s ease;
+  font-size: 0.85rem;
+  transition: var(--transition);
 }
 
 .goalActionButton:hover {
-  background-color: #3a4527;
-}
-
-.forecastCard {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-  padding: 25px;
-  border-radius: 12px;
-  margin-bottom: 20px;
-  color: white;
-}
-
-.forecastHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.forecastHeader h3 {
-  margin: 0;
-  font-size: 20px;
-  color: white;
-}
-
-.editForecastButton {
-  padding: 8px 16px;
-  background-color: rgba(255, 255, 255, 0.2);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.3s ease;
-}
-
-.editForecastButton:hover {
-  background-color: rgba(255, 255, 255, 0.3);
-}
-
-.forecastContent {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
-}
-
-.forecastItem {
-  background: rgba(255, 255, 255, 0.1);
-  padding: 15px;
-  border-radius: 8px;
-  backdrop-filter: blur(10px);
-}
-
-.forecastLabel {
-  display: block;
-  font-size: 14px;
-  opacity: 0.9;
-  margin-bottom: 8px;
-}
-
-.forecastValue {
-  display: block;
-  font-size: 18px;
-  font-weight: bold;
-}
-
-.forecastValue.highlight {
-  color: #FFD700;
+  transform: translateY(-2px);
+  background: var(--primary-accent);
+  color: var(--primary-dark);
 }
 
 .navigationSection {
   display: flex;
   justify-content: space-between;
-  margin-top: 30px;
-  gap: 15px;
+  gap: 16px;
+  margin-top: 16px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-color);
 }
 
-.navigationButton {
+.navButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   padding: 12px 24px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.3s ease;
-  flex: 1;
-  text-align: center;
-  text-decoration: none;
   border: none;
-  display: inline-block;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: var(--transition);
+  flex: 1;
 }
 
-.backButtonDetail{
-background-color: #f5f5f5;
-    color: #495631;
-    border: 1px solid #ddd;
+.backButtonDetail {
+  background: rgba(73, 86, 49, 0.06);
+  color: var(--text-main);
 }
 
-.forwardButtonDetail{
-  background-color: #495631;
-    color: #EAED74;  
+.backButtonDetail:hover {
+  background: rgba(73, 86, 49, 0.12);
 }
 
-.backButtonDetail:hover{
-  background-color: #e8f5e9;
+.compareButton {
+  background: var(--primary-dark);
+  color: var(--primary-accent);
 }
 
-.forwardButtonDetail:hover{
-  background-color: #3a4526;
+.compareButton:hover {
+  transform: translateY(-2px);
+  background: var(--primary-accent);
+  color: var(--primary-dark);
+  box-shadow: var(--shadow-lg);
 }
 
 .loadingContainer {
-  text-align: center;
-  padding: 50px;
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
 }
 
 .loadingSpinner {
-  display: inline-block;
-  width: 50px;
-  height: 50px;
-  border: 3px solid #f3f3f3;
-  border-top: 3px solid #495631;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 20px;
+  border: 3px solid rgba(73, 86, 49, 0.12);
+  border-top-color: var(--primary-dark);
+  animation: spin 0.9s linear infinite;
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-.errorMessage {
-  background-color: #ffebee;
-  color: #c62828;
-  padding: 15px;
-  border-radius: 6px;
-  margin-bottom: 20px;
-  border-left: 4px solid #c62828;
+.errorCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 48px;
+  border-radius: var(--radius-xl);
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+  text-align: center;
+}
+
+.errorCard h2 {
+  margin: 0;
+  color: var(--danger-color);
+}
+
+.errorCard p {
+  margin: 0;
+  color: var(--text-muted);
 }
 
 .backButton {
-  display: inline-block;
-  margin-top: 20px;
-  padding: 10px 20px;
-  background-color: #495631;
-  color: #EAED74;
-  text-decoration: none;
-  border-radius: 6px;
-  transition: background-color 0.3s ease;
+  padding: 12px 24px;
+  background: var(--primary-dark);
+  color: var(--primary-accent);
   border: none;
+  border-radius: var(--radius-full);
   cursor: pointer;
-  font-size: 14px;
+  transition: var(--transition);
 }
 
 .backButton:hover {
-  background-color: #3a4527;
+  transform: translateY(-2px);
+  background: var(--primary-accent);
+  color: var(--primary-dark);
+}
+
+@media (max-width: 900px) {
+  .scenarioMainInfo {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .scenarioDetailPage {
+    padding: 28px 18px 60px;
+  }
+
+  .pageHeader {
+    flex-direction: column;
+  }
+
+  .actionsContainer {
+    width: 100%;
+  }
+
+  .actionButton {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .infoGridScenarioDetail {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .infoCard {
+    padding: 20px;
+  }
+
+  .goalCard {
+    padding: 20px;
+  }
+
+  .navigationSection {
+    flex-direction: column;
+  }
+
+  .errorCard {
+    padding: 32px 24px;
+  }
 }

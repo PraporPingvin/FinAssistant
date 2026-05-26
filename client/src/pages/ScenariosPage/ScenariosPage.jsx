@@ -1,5 +1,25 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
+import {
+  ArrowLeft,
+  Home,
+  Target,
+  BarChart3,
+  Plus,
+  Trash2,
+  Edit2,
+  Eye,
+  RefreshCw,
+  TrendingUp,
+  DollarSign,
+  Activity,
+  Shield,
+  Zap,
+  Clock,
+  Calendar,
+  AlertCircle,
+  ChevronRight,
+} from "lucide-react";
 import Layout from "../../components/Layout";
 import { getGoal, getScenarios, deleteScenario } from "../../api/api";
 import "./ScenariosPage.css";
@@ -29,7 +49,6 @@ function ScenariosPage() {
       setLoading(true);
       setError("");
 
-      // Загружаем цель
       const goalData = await getGoal(goalId);
 
       if (!goalData) {
@@ -39,7 +58,6 @@ function ScenariosPage() {
 
       setGoal(goalData);
 
-      // Загружаем сценарии
       try {
         const scenariosData = await getScenarios(goalId);
         setScenarios(scenariosData || []);
@@ -56,16 +74,13 @@ function ScenariosPage() {
     }
   };
 
-  // Фильтрация и сортировка сценариев
   const getFilteredScenarios = () => {
     let filtered = [...scenarios];
 
-    // Фильтрация по статусу (если в будущем добавите статусы)
     if (filterStatus !== "all") {
       filtered = filtered.filter(scenario => scenario.status === filterStatus);
     }
 
-    // Сортировка
     filtered.sort((a, b) => {
       switch (sortBy) {
         case "created_at":
@@ -88,11 +103,6 @@ function ScenariosPage() {
     navigate(`/scenarios/new/${goalId}`);
   };
 
-  const handleRunForecast = (scenarioId) => {
-    alert(`Запуск прогноза для сценария ${scenarioId}`);
-    // В реальном приложении здесь будет вызов API
-  };
-
   const handleCompareScenarios = () => {
     if (scenarios.length < 2) {
       alert("Для сравнения нужно как минимум 2 сценария");
@@ -105,7 +115,13 @@ function ScenariosPage() {
     navigate(`/scenarios/detail/${scenario.scenario_id}`);
   };
 
-  const handleDeleteScenario = async (scenarioId, scenarioName) => {
+  const handleEditScenario = (scenarioId, e) => {
+    e.stopPropagation();
+    navigate(`/scenarios/edit/${scenarioId}`);
+  };
+
+  const handleDeleteScenario = async (scenarioId, scenarioName, e) => {
+    e.stopPropagation();
     if (!window.confirm(`Вы уверены, что хотите удалить сценарий "${scenarioName}"?`)) {
       return;
     }
@@ -113,8 +129,7 @@ function ScenariosPage() {
     try {
       setLoading(true);
       await deleteScenario(scenarioId);
-      alert(`Сценарий "${scenarioName}" успешно удален!`);
-      loadData(); // Перезагружаем список
+      await loadData();
     } catch (error) {
       console.error("Ошибка удаления сценария:", error);
       alert(`Не удалось удалить сценарий: ${error.message}`);
@@ -156,21 +171,14 @@ function ScenariosPage() {
 
   const calculateRiskLevel = (expectedReturn) => {
     const returnValue = parseFloat(expectedReturn) || 0;
-    if (returnValue < 5) return { level: "Низкий", color: "#4caf50", description: "Минимальный риск" };
-    if (returnValue < 10) return { level: "Средний", color: "#ff9800", description: "Умеренный риск" };
-    return { level: "Высокий", color: "#f44336", description: "Высокий риск" };
+    if (returnValue < 5) return { level: "Низкий", color: "#2E7D32", icon: <Shield size={12} />, description: "Минимальный риск" };
+    if (returnValue < 10) return { level: "Средний", color: "#F5A623", icon: <Activity size={12} />, description: "Умеренный риск" };
+    return { level: "Высокий", color: "#E35D5D", icon: <Zap size={12} />, description: "Высокий риск" };
   };
 
-  // Рассчитываем статистику по всем сценариям
   const calculateStats = () => {
     if (scenarios.length === 0) {
-      return {
-        total: 0,
-        avgMonthly: 0,
-        avgReturn: 0,
-        minMonths: 0,
-        maxMonths: 0
-      };
+      return { total: 0, avgMonthly: 0, avgReturn: 0, minMonths: 0, maxMonths: 0 };
     }
 
     const monthlyContributions = scenarios.map(s => parseFloat(s.monthly_contribution) || 0);
@@ -193,7 +201,7 @@ function ScenariosPage() {
     return (
       <Layout>
         <div className="loadingContainer">
-          <div className="loadingAnimation"></div>
+          <div className="loadingSpinner" />
           <p>Загружаем сценарии...</p>
         </div>
       </Layout>
@@ -203,13 +211,13 @@ function ScenariosPage() {
   if (error || !goal) {
     return (
       <Layout>
-        <div className="scenariosContainer">
-          <div className="errorMessage">
-            <strong>Внимание:</strong> {error || "Цель не найдена"}
+        <div className="scenariosPage">
+          <div className="errorCard">
+            <AlertCircle size={48} />
+            <h2>Ошибка</h2>
+            <p>{error || "Цель не найдена"}</p>
+            <Link to="/goals" className="backButtonLink">← Вернуться к списку целей</Link>
           </div>
-          <Link to="/goals" className="backButton">
-            ← Вернуться к списку целей
-          </Link>
         </div>
       </Layout>
     );
@@ -217,57 +225,45 @@ function ScenariosPage() {
 
   return (
     <Layout>
-      <div className="scenariosContainer">
-        {/* Хлебные крошки */}
+      <div className="scenariosPage">
         <div className="breadcrumb">
-          <Link to="/">Главная</Link>
-          <span className="separator">›</span>
-          <Link to="/goals">Цели</Link>
-          <span className="separator">›</span>
+          <Link to="/"><Home size={14} /> Главная</Link>
+          <span>/</span>
+          <Link to="/goals"><Target size={14} /> Цели</Link>
+          <span>/</span>
           <Link to={`/goals/${goalId}`}>{goal.title}</Link>
-          <span className="separator">›</span>
-          <span>Сценарии</span>
+          <span>/</span>
+          <span className="current">Сценарии</span>
         </div>
 
-        {/* Заголовок */}
-        <div className="pageHeaderScenarios">
+        <div className="pageHeaderScenario">
           <div className="headerContent">
             <h1>Сценарии достижения цели</h1>
-            <p>
-              Создавайте и сравнивайте различные стратегии достижения вашей финансовой цели.
-              Каждый сценарий представляет собой уникальный план с разными параметрами.
-            </p>
+            <p>Создавайте и сравнивайте различные стратегии достижения вашей финансовой цели</p>
           </div>
 
-          <div className="actionsContainerScenariosPage">
-            <button
-              onClick={() => navigate(`/goals/${goalId}`)}
-              className="actionButtonScenarios secondaryButtonScenarios"
-            >
-              ← К цели
+          <div className="actionsContainer">
+            <button onClick={() => navigate(`/goals/${goalId}`)} className="actionButton secondaryButton">
+              <ArrowLeft size={14} />
+              К цели
             </button>
-            <button
-              onClick={handleCreateScenario}
-              className="actionButtonScenarios primaryButtonScenarios"
-            >
-              ＋ Новый сценарий
+            <button onClick={handleCreateScenario} className="actionButton primaryButton">
+              <Plus size={14} />
+              Новый сценарий
             </button>
             {scenarios.length >= 2 && (
-              <button
-                onClick={handleCompareScenarios}
-                className="actionButtonScenarios compareButtonScenarios"
-              >
-                📊 Сравнить сценарии
+              <button onClick={handleCompareScenarios} className="actionButton compareButton">
+                <BarChart3 size={14} />
+                Сравнить
               </button>
             )}
           </div>
         </div>
 
-        {/* Информация о цели */}
         <div className="goalInfoCard">
           <div className="goalInfoContent">
             <h3 className="goalInfoTitle">
-              <span className="goalIcon">🎯</span>
+              <Target size={18} />
               {goal.title}
             </h3>
             <div className="goalInfoStats">
@@ -279,8 +275,14 @@ function ScenariosPage() {
                 <div className="goalInfoLabel">Текущая сумма</div>
                 <div className="goalInfoValue">{formatCurrency(goal.current_amount)} ₽</div>
               </div>
+              
               <div className="goalInfoStat">
-                <div className="goalInfoLabel">Прогресс</div>
+                <div className="goalInfoLabel">Сценариев</div>
+                <div className="goalInfoValue highlight">{scenarios.length}</div>
+              </div>
+            </div>
+          </div>
+          <div className="goalInfoStat">
                 <div className="goalInfoValue progressValue">
                   <div className="miniProgressBar">
                     <div
@@ -291,243 +293,147 @@ function ScenariosPage() {
                   <span>{Math.round((parseFloat(goal.current_amount) / parseFloat(goal.target_amount)) * 100)}%</span>
                 </div>
               </div>
-              <div className="goalInfoStat">
-                <div className="goalInfoLabel">Сценариев</div>
-                <div className="goalInfoValue highlight">{scenarios.length}</div>
-              </div>
-            </div>
-          </div>
         </div>
 
-        {/* Статистика по сценариям - показываем только если есть сценарии */}
         {scenarios.length > 0 && (
           <div className="scenariosStats">
             <h3 className="statsTitle">
-              <span>📈</span>
+              <BarChart3 size={16} />
               Статистика сценариев
             </h3>
             <div className="statsGrid">
               <div className="statCard">
-                <div className="statIcon">📊</div>
                 <div className="statValue">{stats.total}</div>
                 <div className="statLabel">Всего сценариев</div>
               </div>
               <div className="statCard">
-                <div className="statIcon">💰</div>
                 <div className="statValue">{formatCurrency(stats.avgMonthly)} ₽</div>
-                <div className="statLabel">Средний взнос в месяц</div>
+                <div className="statLabel">Средний взнос</div>
               </div>
               <div className="statCard">
-                <div className="statIcon">📈</div>
                 <div className="statValue">{stats.avgReturn}%</div>
                 <div className="statLabel">Средняя доходность</div>
               </div>
               <div className="statCard">
-                <div className="statIcon">⏱️</div>
-                <div className="statValue">
-                  {stats.minMonths}-{stats.maxMonths} мес
-                </div>
+                <div className="statValue">{stats.minMonths}-{stats.maxMonths} мес</div>
                 <div className="statLabel">Диапазон сроков</div>
               </div>
             </div>
           </div>
         )}
 
-        {/* Фильтры и сортировка - показываем только если есть сценарии */}
         {scenarios.length > 0 && (
           <div className="filtersContainer">
             <div className="filterGroup">
               <span className="filterLabel">Сортировка:</span>
-              <select
-                className="filterSelect"
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-              >
-                <option value="created_at">По дате создания (новые)</option>
-                <option value="name">По названию (А-Я)</option>
-                <option value="expected_return">По доходности (высокая)</option>
-                <option value="monthly_contribution">По взносу (большой)</option>
+              <select className="filterSelect" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+                <option value="created_at">По дате (новые)</option>
+                <option value="name">По названию</option>
+                <option value="expected_return">По доходности</option>
+                <option value="monthly_contribution">По взносу</option>
               </select>
             </div>
-
             <div className="refreshButtonContainer">
-              <button
-                onClick={loadData}
-                className="refreshButton"
-                title="Обновить список"
-              >
-                ⟳ Обновить
+              <button onClick={loadData} className="refreshButton" title="Обновить">
+                <RefreshCw size={14} />
+                Обновить
               </button>
             </div>
           </div>
         )}
 
-        {/* Сообщение об ошибке */}
-        {error && (
-          <div className="errorMessage">
-            <strong>Внимание:</strong> {error}
-          </div>
-        )}
-
-        {/* Список сценариев или пустое состояние */}
         {scenarios.length > 0 ? (
-          <div className="scenariosListAll">
-            <h3 className="listTitle">
-              <span>📋</span>
-              Список созданных сценариев
-
-            </h3>
-
+          <div className="scenariosList">
             <div className="scenariosGrid">
               {filteredScenarios.map((scenario, index) => {
                 const monthsToGoal = calculateMonthsToGoal(scenario);
                 const risk = calculateRiskLevel(scenario.expected_return);
+                const effectiveReturn = (parseFloat(scenario.expected_return || 0) - parseFloat(scenario.inflation_rate || 0)).toFixed(1);
 
                 return (
-                  <div
-                    key={scenario.scenario_id || index}
-                    className="scenarioCard"
-                    onClick={() => handleViewDetails(scenario)}
-                  >
+                  <div key={scenario.scenario_id || index} className="scenarioCard" onClick={() => handleViewDetails(scenario)}>
                     <div className="scenarioCardHeader">
                       <div className="scenarioTitleSection">
-                        <h4 className="scenarioCardTitle">
-                          {scenario.name || `Сценарий ${index + 1}`}
-                        </h4>
-
+                        <h4 className="scenarioCardTitle">{scenario.name || `Сценарий ${index + 1}`}</h4>
+                        <div className="scenarioMeta">
+                          <span className="scenarioDate">
+                            <Calendar size={12} />
+                            {formatDate(scenario.created_at)}
+                          </span>
+                        </div>
                       </div>
                       <div className="scenarioActions">
-                        <button
-                          className="scenarioActionButton smallButton"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/scenarios/edit/${scenario.scenario_id}`);
-                          }}
-                          title="Редактировать сценарий"
-                        >
-                          ✏️
+                        <button className="scenarioActionButton" onClick={(e) => handleEditScenario(scenario.scenario_id, e)} title="Редактировать">
+                          <Edit2 size={14} />
                         </button>
-                        <button
-                          className="scenarioActionButton smallButton"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/scenarios/detail/${scenario.scenario_id}`);
-                          }}
-                          title="Просмотреть детали"
-                        >
-                          👁️
+                        <button className="scenarioActionButton" onClick={(e) => handleViewDetails(scenario)} title="Просмотреть">
+                          <Eye size={14} />
                         </button>
-                        <button
-                          className="scenarioActionButton smallButton deleteButton"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteScenario(scenario.scenario_id, scenario.name);
-                          }}
-                          title="Удалить сценарий"
-                        >
-                          🗑️
+                        <button className="scenarioActionButton deleteButton" onClick={(e) => handleDeleteScenario(scenario.scenario_id, scenario.name, e)} title="Удалить">
+                          <Trash2 size={14} />
                         </button>
                       </div>
                     </div>
 
                     <div className="scenarioContent">
-                      <div className="scenarioMainInfoPage">
+                      <div className="scenarioMainInfo">
                         <div className="infoRow">
-                          <span className="infoLabel">Ежемесячный взнос:</span>
-                          <span className="infoValue highlight">
-                            {formatCurrency(scenario.monthly_contribution)} ₽
+                          <span className="infoLabel">
+                            <DollarSign size={12} />
+                            Ежемесячный взнос
                           </span>
+                          <span className="infoValue highlight">{formatCurrency(scenario.monthly_contribution)} ₽</span>
                         </div>
                         <div className="infoRow">
-                          <span className="infoLabel">Ожидаемая доходность:</span>
-                          <span className="infoValue">
-                            {scenario.expected_return}%
+                          <span className="infoLabel">
+                            <TrendingUp size={12} />
+                            Ожидаемая доходность
                           </span>
+                          <span className="infoValue">{scenario.expected_return}%</span>
                         </div>
                         <div className="infoRow">
-                          <span className="infoLabel">Инфляция:</span>
-                          <span className="infoValue">
-                            {scenario.inflation_rate}%
+                          <span className="infoLabel">
+                            <Activity size={12} />
+                            Инфляция
                           </span>
+                          <span className="infoValue">{scenario.inflation_rate}%</span>
                         </div>
                       </div>
 
                       <div className="scenarioCalculations">
                         <div className="calculationRow">
-                          <span className="calculationLabel">Срок достижения:</span>
+                          <span className="calculationLabel">
+                            <Clock size={12} />
+                            Срок достижения
+                          </span>
                           <span className="calculationValue">
-                            {isFinite(monthsToGoal) ? (
-                              <>
-                                <strong>{monthsToGoal}</strong> месяцев
-                                <span className="subText">
-                                  ({Math.floor(monthsToGoal / 12)} г. {monthsToGoal % 12} мес.)
-                                </span>
-                              </>
-                            ) : (
-                              <span className="warningText">Недостижимо</span>
-                            )}
+                            {isFinite(monthsToGoal) && monthsToGoal > 0 ? (
+                              <strong>{monthsToGoal} мес.</strong>
+                            ) : <span className="warningText">Недостижимо</span>}
                           </span>
                         </div>
-
                         <div className="calculationRow">
-                          <span className="calculationLabel">Уровень риска:</span>
+                          <span className="calculationLabel">
+                            {risk.icon}
+                            Уровень риска
+                          </span>
                           <span className="calculationValue">
-                            <span
-                              className="riskBadge"
-                              style={{ backgroundColor: risk.color }}
-                            >
+                            <span className="riskBadge" style={{ backgroundColor: risk.color }}>
                               {risk.level}
                             </span>
-                            <span className="riskDescription">{risk.description}</span>
                           </span>
                         </div>
-
                         <div className="calculationRow">
-                          <span className="calculationLabel">Эффективная доходность:</span>
-                          <span className="calculationValue">
-                            <strong>
-                              {(parseFloat(scenario.expected_return || 0) - parseFloat(scenario.inflation_rate || 0)).toFixed(1)}%
-                            </strong>
-                            <span className="subText">(с учетом инфляции)</span>
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="scenarioMeta">
-                        <div className="metaRow">
-                          <span className="metaLabel">Создан:</span>
-                          <span className="metaValue">
-                            {formatDate(scenario.created_at)}
-                          </span>
-                        </div>
-                        <div className="metaRow">
-                          <span className="metaLabel">Целевая сумма:</span>
-                          <span className="metaValue">
-                            {formatCurrency(scenario.target_amount || goal.target_amount)} ₽
-                          </span>
+                          <span className="calculationLabel">Эффективная доходность</span>
+                          <span className="calculationValue"><strong>{effectiveReturn}%</strong></span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="scenarioProgress">
-                      <div className="progressLabel">Прогресс через 12 месяцев:</div>
-                      <div className="progressBar">
-                        <div
-                          className="progressFill"
-                          style={{
-                            width: `${Math.min(100,
-                              ((parseFloat(goal.current_amount || 0) +
-                                (parseFloat(scenario.monthly_contribution || 0) * 12)) /
-                                parseFloat(goal.target_amount || 1)) * 100)}%`
-                          }}
-                        />
-                      </div>
-                      <div className="progressText">
-                        {formatCurrency(
-                          parseFloat(goal.current_amount || 0) +
-                          (parseFloat(scenario.monthly_contribution || 0) * 12)
-                        )} ₽
-                      </div>
+                    <div className="scenarioFooter">
+                      <button className="detailsButton" onClick={() => navigate(`/scenarios/detail/${scenario.scenario_id}`)}>
+                        Подробнее <ChevronRight size={14} />
+                      </button>
                     </div>
                   </div>
                 );
@@ -536,42 +442,23 @@ function ScenariosPage() {
           </div>
         ) : (
           <div className="emptyState">
-            <div className="emptyStateIcon">📋</div>
+            <BarChart3 size={48} />
             <h3>Сценариев пока нет</h3>
-            <p>
-              Создайте первый сценарий для анализа различных стратегий
-              достижения вашей финансовой цели. Сценарий поможет определить
-              оптимальный план накоплений.
-            </p>
-            <button
-              onClick={handleCreateScenario}
-              className="actionButtonScenarios createFirstButton"
-            >
-              ＋ Создать первый сценарий
+            <p>Создайте первый сценарий для анализа различных стратегий достижения вашей финансовой цели.</p>
+            <button onClick={handleCreateScenario} className="createFirstButton">
+              <Plus size={14} />
+              Создать первый сценарий
             </button>
-
-            {/* Подсказки показываем ТОЛЬКО когда нет сценариев */}
             <div className="emptyStateTips">
-              <h4>💡 Советы по созданию сценариев:</h4>
+              <h4>Советы по созданию сценариев:</h4>
               <ul>
-                <li>
-                  <span className="tipBadge conservative">Консервативный</span>
-                  Низкий риск (5-7%), стабильный доход
-                </li>
-                <li>
-                  <span className="tipBadge moderate">Умеренный</span>
-                  Средний риск (7-10%), баланс доходности и безопасности
-                </li>
-                <li>
-                  <span className="tipBadge aggressive">Агрессивный</span>
-                  Высокий риск (10%+), максимальная доходность
-                </li>
+                <li><span className="tipBadge conservative">Консервативный</span> Низкий риск (5-7%), стабильный доход</li>
+                <li><span className="tipBadge moderate">Умеренный</span> Средний риск (7-10%), баланс доходности</li>
+                <li><span className="tipBadge aggressive">Агрессивный</span> Высокий риск (10%+), максимальная доходность</li>
               </ul>
             </div>
           </div>
         )}
-
-
       </div>
     </Layout>
   );

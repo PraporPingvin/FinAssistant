@@ -1,58 +1,278 @@
-/* Добавьте эти стили в существующий CSS файл */
+:root {
+  --primary-dark: #495631;
+  --primary-accent: #EAED74;
+  --primary-light: #EFF2DD;
 
-.scenariosStats {
-  background-color: white;
-  padding: 25px;
-  border-radius: 12px;
-  margin-bottom: 30px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --card-bg: rgba(255, 255, 255, 0.72);
+  --border-color: rgba(73, 86, 49, 0.08);
+
+  --text-main: #495631;
+  --text-muted: #7B8465;
+
+  --success-color: #2E7D32;
+  --danger-color: #E35D5D;
+  --warning-color: #F5A623;
+
+  --shadow-sm: 0 8px 24px rgba(73, 86, 49, 0.06);
+  --shadow-md: 0 10px 30px rgba(73, 86, 49, 0.08);
+  --shadow-lg: 0 18px 40px rgba(73, 86, 49, 0.12);
+
+  --radius-sm: 12px;
+  --radius-md: 18px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --radius-full: 999px;
+
+  --transition: all 0.28s ease;
 }
 
-.scenariosStats h3 {
-  margin: 0 0 20px 0;
-  color: #333;
+.scenariosPage {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 42px 24px 80px;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 36px;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+}
+
+.breadcrumb a {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.breadcrumb a:hover {
+  color: var(--primary-dark);
+}
+
+.breadcrumb .current {
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+.pageHeaderScenario {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+.pageHeaderScenario h1 {
+  margin: 0 0 8px;
+  color: var(--text-main);
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  font-weight: 300;
+  letter-spacing: -1px;
+}
+
+.pageHeaderScenario p {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.actionsContainer {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.actionButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: var(--transition);
+  border: none;
+}
+
+.secondaryButton {
+  background: rgba(73, 86, 49, 0.06);
+  color: var(--text-main);
+}
+
+.secondaryButton:hover {
+  background: rgba(73, 86, 49, 0.12);
+}
+
+.primaryButton {
+  background: var(--primary-dark);
+  color: var(--primary-accent);
+}
+
+.primaryButton:hover {
+  transform: translateY(-2px);
+  background: var(--primary-accent);
+  color: var(--primary-dark);
+  box-shadow: var(--shadow-md);
+}
+
+.compareButton {
+  background: rgba(46, 125, 50, 0.1);
+  color: var(--success-color);
+}
+
+.compareButton:hover {
+  background: var(--success-color);
+  color: white;
+}
+
+.goalInfoCard {
+  padding: 24px;
+  margin-bottom: 32px;
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.goalInfoContent {
+  margin-bottom: 16px;
+}
+
+.goalInfoTitle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 16px;
+  color: var(--text-main);
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+.goalInfoStats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+}
+
+.goalInfoStat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.goalInfoLabel {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.goalInfoValue {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.goalInfoValue.highlight {
+  color: var(--primary-dark);
+}
+
+.progressValue {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.miniProgressBar {
+  flex: 1;
+  height: 4px;
+  background: rgba(73, 86, 49, 0.08);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.miniProgressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary-accent), var(--primary-dark));
+  border-radius: var(--radius-full);
+}
+
+.progressBar {
+  height: 6px;
+  background: rgba(73, 86, 49, 0.08);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary-accent), var(--primary-dark));
+  border-radius: var(--radius-full);
+  transition: width 0.5s ease;
+}
+
+.scenariosStats {
+  padding: 24px;
+  margin-bottom: 24px;
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+}
+
+.statsTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 20px;
+  color: var(--text-main);
+  font-size: 1rem;
 }
 
 .statsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
 }
 
 .statCard {
-  background-color: #f8f9fa;
-  padding: 20px;
-  border-radius: 8px;
   text-align: center;
-  border: 1px solid #dee2e6;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  background: rgba(73, 86, 49, 0.03);
 }
 
-.statIcon {
-  font-size: 32px;
-  margin-bottom: 10px;
+.statCard .statValue {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--primary-dark);
 }
 
-.statValue {
-  font-size: 24px;
-  font-weight: bold;
-  color: #495631;
-  margin-bottom: 5px;
-}
-
-.statLabel {
-  font-size: 14px;
-  color: #666;
+.statCard .statLabel {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: 4px;
 }
 
 .filtersContainer {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  margin-bottom: 20px;
-  background-color: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 16px 20px;
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
 }
 
 .filterGroup {
@@ -62,90 +282,68 @@
 }
 
 .filterLabel {
-  font-weight: 500;
-  color: #333;
+  color: var(--text-muted);
+  font-size: 0.85rem;
 }
 
 .filterSelect {
   padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 14px;
-  background-color: white;
-}
-
-.refreshButtonContainer {
-  display: flex;
-  gap: 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.75);
+  color: var(--text-main);
+  cursor: pointer;
 }
 
 .refreshButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   padding: 8px 16px;
-  background-color: #f5f5f5;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  border-radius: var(--radius-full);
+  background: rgba(73, 86, 49, 0.06);
+  border: none;
+  color: var(--text-main);
   cursor: pointer;
-  font-size: 14px;
-  transition: all 0.3s ease;
+  transition: var(--transition);
 }
 
 .refreshButton:hover {
-  background-color: #e9ecef;
+  background: rgba(73, 86, 49, 0.12);
 }
 
-.scenariosListAll {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  background-color: white;
-  padding: 25px;
-  border-radius: 12px;
-  margin-bottom: 30px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.scenariosList h3 {
-  margin: 0 0 20px 0;
-  color: #333;
-}
+/* .scenariosList {
+  margin-top: 8px;
+} */
 
 .scenariosGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 20px;
-}
-
-.scenarioDetailCard {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 16px;
-  border-radius: 8px;
-  border: 1px solid #b6b6b6;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 24px;
 }
 
 .scenarioCard {
-  background-color: #f8f9fa;
-  border: 1px solid #dee2e6;
-  border-radius: 10px;
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
   overflow: hidden;
-  transition: all 0.3s ease;
+  transition: var(--transition);
+  cursor: pointer;
 }
 
 .scenarioCard:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-  border-color: #495631;
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
 }
 
 .scenarioCardHeader {
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  flex-direction: column;
-  padding: 20px 20px 15px;
-  background-color: #fff;
-  border-bottom: 1px solid #eee;
+  padding: 20px 20px 12px;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .scenarioTitleSection {
@@ -153,349 +351,358 @@
 }
 
 .scenarioCardTitle {
-  margin: 0 0 5px 0;
-  color: #333;
-  font-size: 18px;
+  margin: 0 0 6px;
+  color: var(--text-main);
+  font-size: 1rem;
+  font-weight: 600;
 }
 
-.scenarioIndex {
-  font-size: 12px;
-  color: #666;
-  background-color: #f1f1f1;
-  padding: 2px 8px;
-  border-radius: 10px;
+.scenarioMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.scenarioDate {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .scenarioActions {
   display: flex;
-  gap: 5px;
+  gap: 6px;
 }
 
 .scenarioActionButton {
-  padding: 6px 10px;
-  border: 1px solid #ddd;
-  background-color: white;
-  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: rgba(73, 86, 49, 0.06);
+  border: none;
+  color: var(--text-muted);
   cursor: pointer;
-  font-size: 14px;
-  transition: all 0.3s ease;
+  transition: var(--transition);
 }
 
 .scenarioActionButton:hover {
-  background-color: #f5f5f5;
+  background: var(--primary-dark);
+  color: var(--primary-accent);
 }
 
-.scenarioActionButton.smallButton {
-  padding: 4px 8px;
-  font-size: 12px;
+.scenarioActionButton.deleteButton:hover {
+  background: var(--danger-color);
+  color: white;
 }
 
 .scenarioContent {
-  padding: 15px 20px;
+  padding: 16px 20px;
 }
 
-.scenarioMainInfoPage {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 15px;
+.scenarioMainInfo {
+  margin-bottom: 16px;
 }
 
 .infoRow {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
-  padding-bottom: 8px;
-  border-bottom: 1px dashed #eee;
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--border-color);
+}
+
+.infoRow:last-child {
+  border-bottom: none;
 }
 
 .infoLabel {
-  color: #666;
-  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
 }
 
 .infoValue {
-  font-weight: 500;
-  color: #333;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-main);
 }
 
 .infoValue.highlight {
-  color: #495631;
-  font-weight: bold;
+  color: var(--primary-dark);
 }
 
 .scenarioCalculations {
-  background-color: white;
-  padding: 15px;
-  border-radius: 8px;
-  margin-bottom: 15px;
-  border: 1px solid #eee;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  background: rgba(73, 86, 49, 0.03);
 }
 
 .calculationRow {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  padding: 6px 0;
 }
 
 .calculationLabel {
-  color: #333;
-  font-weight: 500;
-  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
 }
 
 .calculationValue {
-  text-align: right;
-  font-size: 14px;
-}
-
-.subText {
-  display: block;
-  font-size: 12px;
-  color: #666;
-  margin-top: 2px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-main);
 }
 
 .warningText {
-  color: #f44336;
-  font-weight: 500;
+  color: var(--danger-color);
 }
 
 .riskBadge {
   display: inline-block;
-  padding: 4px 10px;
-  border-radius: 15px;
-  color: #495631;
-  font-size: 12px;
-  font-weight: bold;
-  margin-right: 8px;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: white;
 }
 
-.riskDescription {
-  font-size: 12px;
-  color: #666;
+.scenarioFooter {
+  padding: 12px 20px 20px;
+  border-top: 1px solid var(--border-color);
 }
 
-.scenarioMeta {
+.detailsButton {
   display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  color: #666;
-  margin-top: 15px;
-  padding-top: 15px;
-  border-top: 1px solid #eee;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 10px;
+  border-radius: var(--radius-full);
+  background: rgba(73, 86, 49, 0.06);
+  border: none;
+  color: var(--text-main);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: var(--transition);
 }
 
-.metaRow {
-  display: flex;
-  flex-direction: column;
-}
-
-.metaLabel {
-  margin-bottom: 3px;
-}
-
-.metaValue {
-  font-weight: 500;
-}
-
-.scenarioProgress {
-  padding: 15px 20px;
-  background-color: #fff;
-  border-top: 1px solid #eee;
-}
-
-.progressLabel {
-  font-size: 14px;
-  color: #333;
-  margin-bottom: 8px;
-}
-
-.progressBar {
-  height: 8px;
-  background-color: #e9ecef;
-  border-radius: 4px;
-  overflow: hidden;
-  margin-bottom: 8px;
-}
-
-.progressFill {
-  height: 100%;
-  background: linear-gradient(90deg, #4CAF50, #8BC34A);
-  border-radius: 4px;
-  transition: width 0.5s ease;
-}
-
-.progressText {
-  font-size: 12px;
-  color: #666;
-  text-align: center;
+.detailsButton:hover {
+  background: var(--primary-dark);
+  color: var(--primary-accent);
 }
 
 .emptyState {
-  background-color: white;
-  padding: 40px;
-  border-radius: 12px;
   text-align: center;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  margin-bottom: 30px;
-}
-
-.emptyStateIcon {
-  font-size: 48px;
-  margin-bottom: 20px;
+  padding: 60px 40px;
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
 }
 
 .emptyState h3 {
-  margin: 0 0 15px 0;
-  color: #333;
+  margin: 16px 0 8px;
+  color: var(--text-main);
+  font-size: 1.3rem;
+  font-weight: 300;
 }
 
 .emptyState p {
-  color: #666;
-  max-width: 600px;
-  margin: 0 auto 20px;
-  line-height: 1.6;
+  margin: 0 0 24px;
+  color: var(--text-muted);
+}
+
+.createFirstButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: var(--radius-full);
+  background: var(--primary-dark);
+  color: var(--primary-accent);
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.createFirstButton:hover {
+  transform: translateY(-2px);
+  background: var(--primary-accent);
+  color: var(--primary-dark);
+  box-shadow: var(--shadow-md);
 }
 
 .emptyStateTips {
-  background-color: #f9f9f9;
+  margin-top: 32px;
   padding: 20px;
-  border-radius: 8px;
-  margin-top: 30px;
+  border-radius: var(--radius-md);
+  background: rgba(73, 86, 49, 0.03);
   text-align: left;
 }
 
 .emptyStateTips h4 {
-  margin: 0 0 15px 0;
-  color: #333;
+  margin: 0 0 12px;
+  color: var(--text-main);
+  font-size: 0.9rem;
 }
 
 .emptyStateTips ul {
   margin: 0;
   padding-left: 20px;
-  color: #666;
+  color: var(--text-muted);
+  font-size: 0.85rem;
 }
 
 .emptyStateTips li {
   margin-bottom: 8px;
-  line-height: 1.5;
 }
 
-.infoPanel {
-  background-color: white;
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+.tipBadge {
+  display: inline-block;
+  padding: 2px 8px;
+  margin-right: 8px;
+  border-radius: var(--radius-full);
+  font-size: 0.7rem;
+  font-weight: 600;
 }
 
-.infoPanel h4 {
-  margin: 0 0 20px 0;
-  color: #333;
+.tipBadge.conservative {
+  background: rgba(46, 125, 50, 0.15);
+  color: var(--success-color);
 }
 
-.infoContent {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+.tipBadge.moderate {
+  background: rgba(245, 166, 35, 0.15);
+  color: var(--warning-color);
+}
+
+.tipBadge.aggressive {
+  background: rgba(227, 93, 93, 0.15);
+  color: var(--danger-color);
+}
+
+.loadingContainer {
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   gap: 20px;
 }
 
-.infoItem {
+.loadingSpinner {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 3px solid rgba(73, 86, 49, 0.12);
+  border-top-color: var(--primary-dark);
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.errorCard {
   display: flex;
-  align-items: flex-start;
-  gap: 15px;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 48px;
+  border-radius: var(--radius-xl);
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+  text-align: center;
 }
 
-.infoIcon {
-  font-size: 24px;
-  flex-shrink: 0;
+.errorCard h2 {
+  margin: 0;
+  color: var(--danger-color);
 }
 
-.compareButtonScenarios {
-  background-color: #f5f5f5;
-  color: #333;
-  border: 1px solid #ddd;
+.errorCard p {
+  margin: 0;
+  color: var(--text-muted);
 }
 
-.primaryButtonScenarios {
-  background-color: #f5f5f5;
-  color: #333;
-  border: 1px solid #ddd;
+.backButtonLink {
+  display: inline-block;
+  padding: 12px 24px;
+  background: var(--primary-dark);
+  color: var(--primary-accent);
+  text-decoration: none;
+  border-radius: var(--radius-full);
+  transition: var(--transition);
 }
 
-.secondaryButtonScenarios {
-  background-color: #f5f5f5;
-  color: #333;
-  border: 1px solid #ddd;
+.backButtonLink:hover {
+  transform: translateY(-2px);
+  background: var(--primary-accent);
+  color: var(--primary-dark);
 }
 
-.actionButtonScenarios {
-  padding: 10px 20px;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.3s ease;
-  width: 200px;
-}
-
-.compareButtonScenarios:hover {
-  background-color: #dee2e6;
-}
-
-.primaryButtonScenarios:hover {
-  background-color: #dee2e6;
-}
-
-.secondaryButtonScenarios:hover {
-  background-color: #dee2e6;
-}
-
-.actionsContainerScenariosPage {
-  display: flex;
-  flex-direction: row;
-  gap: 20px;
-  margin-top: 20px;
-}
-
-.createFirstButton {
-  background-color: #f5f5f5;
-  color: #333;
-  border: 1px solid #ddd;
-}
-
-.createFirstButton:hover {
-  background-color: #dee2e6;
-}
-
-/* Адаптивность */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .scenariosGrid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .scenariosPage {
+    padding: 28px 18px 60px;
+  }
+
+  .pageHeaderScenario {
+    flex-direction: column;
+  }
+
+  .actionsContainer {
+    width: 100%;
+  }
+
+  .actionButton {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .goalInfoStats {
+    grid-template-columns: 1fr;
+  }
+
+  .statsGrid {
+    grid-template-columns: 1fr 1fr;
   }
 
   .filtersContainer {
     flex-direction: column;
-    gap: 15px;
     align-items: stretch;
   }
 
   .filterGroup {
-    flex-direction: column;
-    align-items: flex-start;
+    justify-content: space-between;
   }
 
-  .refreshButtonContainer {
-    justify-content: center;
+  .filterSelect {
+    flex: 1;
   }
 
-  .scenarioCardHeader {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .scenarioActions {
-    align-self: flex-end;
+  .errorCard {
+    padding: 32px 24px;
   }
 }

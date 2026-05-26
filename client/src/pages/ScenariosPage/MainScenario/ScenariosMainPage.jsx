@@ -1,5 +1,25 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import {
+  Home,
+  Target,
+  BarChart3,
+  Plus,
+  RefreshCw,
+  Search,
+  Filter,
+  ChevronDown,
+  ChevronRight,
+  Calendar,
+  DollarSign,
+  TrendingUp,
+  Activity,
+  Shield,
+  Zap,
+  Eye,
+  ArrowRight,
+  AlertCircle,
+} from "lucide-react";
 import Layout from "../../../components/Layout";
 import { getGoals, getScenarios } from "../../../api/api";
 import { useAuth } from "../../../context/AuthContext";
@@ -15,8 +35,6 @@ function ScenariosMainPage() {
   const [filterStatus, setFilterStatus] = useState("all");
   const [sortBy, setSortBy] = useState("progress");
   const [searchTerm, setSearchTerm] = useState("");
-  const [expandedGoal, setExpandedGoal] = useState(null);
-  // Состояние для открытия/закрытия секции со сценариями
   const [isScenariosExpanded, setIsScenariosExpanded] = useState(false);
 
   const { user } = useAuth();
@@ -30,18 +48,15 @@ function ScenariosMainPage() {
       setLoading(true);
       setError("");
 
-      // Загружаем все цели
       const goalsData = await getGoals();
       setGoals(goalsData);
 
-      // Загружаем сценарии для всех целей
       const scenariosPromises = goalsData.map(goal =>
         getScenarios(goal.goal_id).catch(() => [])
       );
 
       const scenariosResults = await Promise.all(scenariosPromises);
 
-      // Собираем все сценарии с информацией о цели
       const allScenariosWithGoal = [];
       goalsData.forEach((goal, index) => {
         const goalScenarios = scenariosResults[index] || [];
@@ -50,7 +65,11 @@ function ScenariosMainPage() {
             ...scenario,
             goal_id: goal.goal_id,
             goal_title: goal.title,
-            goal_progress: Math.round((parseFloat(goal.current_amount) / parseFloat(goal.target_amount)) * 100)
+            goal_target: goal.target_amount,
+            goal_current: goal.current_amount,
+            goal_progress: goal.target_amount > 0 
+              ? Math.round((parseFloat(goal.current_amount) / parseFloat(goal.target_amount)) * 100) 
+              : 0
           });
         });
       });
@@ -65,16 +84,13 @@ function ScenariosMainPage() {
     }
   };
 
-  // Фильтрация целей
   const getFilteredGoals = () => {
     let filtered = [...goals];
 
-    // Фильтрация по статусу
     if (filterStatus !== "all") {
       filtered = filtered.filter(goal => goal.status === filterStatus);
     }
 
-    // Поиск
     if (searchTerm.trim()) {
       const term = searchTerm.toLowerCase();
       filtered = filtered.filter(goal =>
@@ -83,7 +99,6 @@ function ScenariosMainPage() {
       );
     }
 
-    // Сортировка
     filtered.sort((a, b) => {
       switch (sortBy) {
         case "progress":
@@ -104,7 +119,6 @@ function ScenariosMainPage() {
     return filtered;
   };
 
-  // Фильтрация всех сценариев
   const getFilteredScenarios = () => {
     let filtered = [...allScenarios];
 
@@ -119,11 +133,7 @@ function ScenariosMainPage() {
     return filtered;
   };
 
-  const handleGoalClick = (goalId) => {
-    setExpandedGoal(expandedGoal === goalId ? null : goalId);
-  };
-
-  const handleViewScenarios = (goalId, goalTitle) => {
+  const handleViewScenarios = (goalId) => {
     navigate(`/scenarios/${goalId}`);
   };
 
@@ -141,7 +151,6 @@ function ScenariosMainPage() {
     setSearchTerm("");
   };
 
-  // Функция для переключения секции сценариев
   const toggleScenariosSection = () => {
     setIsScenariosExpanded(!isScenariosExpanded);
   };
@@ -157,16 +166,9 @@ function ScenariosMainPage() {
 
   const calculateRiskLevel = (expectedReturn) => {
     const returnValue = parseFloat(expectedReturn) || 0;
-    if (returnValue < 5) return "riskLow";
-    if (returnValue < 10) return "riskMedium";
-    return "riskHigh";
-  };
-
-  const getRiskText = (expectedReturn) => {
-    const returnValue = parseFloat(expectedReturn) || 0;
-    if (returnValue < 5) return "Низкий";
-    if (returnValue < 10) return "Средний";
-    return "Высокий";
+    if (returnValue < 5) return { class: "riskLow", text: "Низкий", icon: <Shield size={12} /> };
+    if (returnValue < 10) return { class: "riskMedium", text: "Средний", icon: <Activity size={12} /> };
+    return { class: "riskHigh", text: "Высокий", icon: <Zap size={12} /> };
   };
 
   const getStatusText = (status) => {
@@ -178,11 +180,20 @@ function ScenariosMainPage() {
     }
   };
 
+  const getStatusClass = (status) => {
+    switch (status) {
+      case "active": return "statusActive";
+      case "completed": return "statusCompleted";
+      case "paused": return "statusPaused";
+      default: return "";
+    }
+  };
+
   if (loading) {
     return (
       <Layout>
         <div className="loadingContainer">
-          <div className="loadingAnimation"></div>
+          <div className="loadingSpinner" />
           <p>Загружаем данные...</p>
         </div>
       </Layout>
@@ -195,38 +206,40 @@ function ScenariosMainPage() {
 
   return (
     <Layout>
-      <div className="scenariosMainContainer">
-        {/* Шапка */}
-        <div className="scenariosHeader">
-          <h1>Сценарии финансовых целей</h1>
-          <p>
-            Управляйте и анализируйте различные стратегии достижения ваших финансовых целей.
-            Каждый сценарий представляет собой уникальный план накоплений.
-          </p>
+      <div className="scenariosMainPage">
+        <div className="breadcrumb">
+          <Link to="/"><Home size={14} /> Главная</Link>
+          <span>/</span>
+          <span className="current">Сценарии</span>
         </div>
 
-        {/* Сообщение об ошибке */}
+        <div className="pageHeaderScenarioMain">
+          <div className="headerContent">
+            <h1>Сценарии финансовых целей</h1>
+            <p>
+              Управляйте и анализируйте различные стратегии достижения ваших финансовых целей.
+              Каждый сценарий представляет собой уникальный план накоплений.
+            </p>
+          </div>
+        </div>
+
         {error && (
           <div className="errorMessage">
-            <strong>Внимание:</strong> {error}
+            <AlertCircle size={18} />
+            <span>{error}</span>
           </div>
         )}
 
-        {/* Фильтры */}
         <div className="filtersSection">
           <h3 className="filtersTitle">
-            <span>🔍</span>
+            <Filter size={16} />
             Фильтры и сортировка
           </h3>
 
           <div className="filterGrid">
             <div className="filterGroup">
               <label className="filterLabel">Статус цели</label>
-              <select
-                className="filterSelect"
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-              >
+              <select className="filterSelect" value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
                 <option value="all">Все статусы</option>
                 <option value="active">Только активные</option>
                 <option value="completed">Только выполненные</option>
@@ -236,11 +249,7 @@ function ScenariosMainPage() {
 
             <div className="filterGroup">
               <label className="filterLabel">Сортировка</label>
-              <select
-                className="filterSelect"
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-              >
+              <select className="filterSelect" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
                 <option value="progress">По прогрессу</option>
                 <option value="target_amount">По сумме цели</option>
                 <option value="created_at">По дате создания</option>
@@ -249,10 +258,13 @@ function ScenariosMainPage() {
             </div>
 
             <div className="filterGroup">
-              <label className="filterLabel">Поиск</label>
+              <label className="filterLabel">
+                <Search size={12} />
+                Поиск
+              </label>
               <input
                 type="text"
-                className="filterSelect"
+                className="filterInput"
                 placeholder="Поиск по названию..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -260,27 +272,23 @@ function ScenariosMainPage() {
             </div>
 
             <div className="filterGroup filterActions">
-              <button
-                className="clearFiltersButton"
-                onClick={handleClearFilters}
-              >
+              <button className="clearFiltersButton" onClick={handleClearFilters}>
                 Сбросить фильтры
               </button>
             </div>
           </div>
         </div>
 
-        {/* Секция с целями */}
         <div className="goalsSection">
           <h3 className="sectionTitle">
-            <span>🎯</span>
+            <Target size={18} />
             Ваши финансовые цели
             <span className="sectionSubtitle">({filteredGoals.length})</span>
           </h3>
 
           {filteredGoals.length === 0 ? (
             <div className="emptyState">
-              <div className="emptyStateIcon">📋</div>
+              <Target size={48} />
               <h3>Цели не найдены</h3>
               <p>
                 {searchTerm || filterStatus !== "all"
@@ -288,11 +296,8 @@ function ScenariosMainPage() {
                   : "У вас еще нет финансовых целей. Создайте первую цель для начала планирования."}
               </p>
               {!searchTerm && filterStatus === "all" && (
-                <button
-                  onClick={handleCreateGoal}
-                  className="emptyStateButton"
-                >
-                  <span>+</span>
+                <button onClick={handleCreateGoal} className="emptyStateButton">
+                  <Plus size={14} />
                   Создать первую цель
                 </button>
               )}
@@ -304,30 +309,27 @@ function ScenariosMainPage() {
                 const scenariosCount = getScenariosCount(goal.goal_id);
 
                 return (
-                  <div
-                    key={goal.goal_id}
-                    className="goalCard"
-                    onClick={() => handleGoalClick(goal.goal_id)}
-                  >
-                    <div className="goalCardHeader">
+                  <div key={goal.goal_id} className="goalCard">
+                    <div className="goalCardHeaderScenario">
                       <h4 className="goalTitle">{goal.title}</h4>
                       <div className="goalMeta">
-                        <span className={`goalStatus status${goal.status}`}>
+                        <span className={`goalStatus ${getStatusClass(goal.status)}`}>
                           {getStatusText(goal.status)}
                         </span>
                         <span className="scenariosCountBadge">
-                          📊 {scenariosCount} сценариев
+                          <BarChart3 size={12} />
+                          {scenariosCount} сценариев
                         </span>
                       </div>
                     </div>
 
                     <div className="goalStats">
                       <div className="goalStatRow">
-                        <span className="goalStatLabel">Целевая сумма:</span>
+                        <span className="goalStatLabel">Целевая сумма</span>
                         <span className="goalStatValue">{formatCurrency(goal.target_amount)} ₽</span>
                       </div>
                       <div className="goalStatRow">
-                        <span className="goalStatLabel">Текущая сумма:</span>
+                        <span className="goalStatLabel">Текущая сумма</span>
                         <span className="goalStatValue">{formatCurrency(goal.current_amount)} ₽</span>
                       </div>
 
@@ -337,25 +339,17 @@ function ScenariosMainPage() {
                           <span>{progress}%</span>
                         </div>
                         <div className="progressBar">
-                          <div
-                            className="progressFill"
-                            style={{ width: `${progress}%` }}
-                          />
+                          <div className="progressFill" style={{ width: `${progress}%` }} />
                         </div>
                       </div>
                     </div>
 
                     <div className="scenariosInfo">
-                      <button
-                        className="scenariosButton"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleViewScenarios(goal.goal_id, goal.title);
-                        }}
-                      >
-                        <span>📈</span>
+                      <button className="scenariosButton" onClick={() => handleViewScenarios(goal.goal_id)}>
+                        <BarChart3 size={16} />
                         Управление сценариями
                         {scenariosCount > 0 && ` (${scenariosCount})`}
+                        <ArrowRight size={14} />
                       </button>
                     </div>
                   </div>
@@ -365,89 +359,80 @@ function ScenariosMainPage() {
           )}
         </div>
 
-        {/* Секция со всеми сценариями - ВЫКАТНОЙ СПИСОК */}
         {hasScenarios && (
           <div className="allScenariosSection">
-            {/* ИЗМЕНЕНО: теперь кликабельный заголовок открывает список */}
-            <div 
-              className="allScenariosHeader clickable" 
-              onClick={toggleScenariosSection}
-            >
+            <div className="allScenariosHeader" onClick={toggleScenariosSection}>
               <h3 className="allScenariosTitle">
-                <span>📋</span>
+                <BarChart3 size={18} />
                 Все сценарии
                 <span className="allScenariosCount">{allScenarios.length}</span>
               </h3>
-              <span className={`expandIcon ${isScenariosExpanded ? 'expanded' : ''}`}>
-                {isScenariosExpanded ? '▼' : '▶'}
+              <span className="expandIcon">
+                {isScenariosExpanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
               </span>
             </div>
 
-            {/* Контейнер с анимацией */}
-            <div className={`scenariosCollapse ${isScenariosExpanded ? 'expanded' : ''}`}>
+            <div className={`scenariosCollapse ${isScenariosExpanded ? "expanded" : ""}`}>
               {filteredScenarios.length === 0 ? (
                 <div className="emptyState small">
                   <p>Нет сценариев, соответствующих фильтрам</p>
                 </div>
               ) : (
-                <div className="scenariosList">
-                  {filteredScenarios.map((scenario, index) => {
-                    const riskClass = calculateRiskLevel(scenario.expected_return);
-                    const riskText = getRiskText(scenario.expected_return);
-
+                <div className="scenariosListMain">
+                  {filteredScenarios.map((scenario) => {
+                    const risk = calculateRiskLevel(scenario.expected_return);
+                    
                     return (
-                      <div
-                        key={scenario.scenario_id || index}
-                        className="scenarioItem"
-                        onClick={() => handleViewScenarioDetails(scenario.scenario_id)}
-                      >
+                      <div key={scenario.scenario_id} className="scenarioItem" onClick={() => handleViewScenarioDetails(scenario.scenario_id)}>
                         <div className="scenarioHeader">
                           <div className="scenarioGoal">
-                            <span>🎯</span>
+                            <Target size={12} />
                             {scenario.goal_title}
                           </div>
-                          <h4 className="scenarioName">{scenario.name || `Сценарий ${index + 1}`}</h4>
+                          <h4 className="scenarioName">{scenario.name || "Без названия"}</h4>
                           <div className="scenarioMeta">
-                            <span>📅 {new Date(scenario.created_at).toLocaleDateString('ru-RU')}</span>
-                            <span className={`scenarioRisk ${riskClass}`}>
-                              {riskText} риск
+                            <span className="scenarioDate">
+                              <Calendar size={12} />
+                              {new Date(scenario.created_at).toLocaleDateString('ru-RU')}
+                            </span>
+                            <span className={`scenarioRisk ${risk.class}`}>
+                              {risk.icon} {risk.text} риск
                             </span>
                           </div>
                         </div>
 
                         <div className="scenarioContent">
                           <div className="scenarioRow">
-                            <span className="scenarioLabel">Ежемесячный взнос:</span>
+                            <span className="scenarioLabel">
+                              <DollarSign size={12} />
+                              Ежемесячный взнос
+                            </span>
                             <span className="scenarioValue">{formatCurrency(scenario.monthly_contribution)} ₽</span>
                           </div>
                           <div className="scenarioRow">
-                            <span className="scenarioLabel">Ожидаемая доходность:</span>
+                            <span className="scenarioLabel">
+                              <TrendingUp size={12} />
+                              Ожидаемая доходность
+                            </span>
                             <span className="scenarioValue">{scenario.expected_return}%</span>
                           </div>
                           <div className="scenarioRow">
-                            <span className="scenarioLabel">Инфляция:</span>
+                            <span className="scenarioLabel">
+                              <Activity size={12} />
+                              Инфляция
+                            </span>
                             <span className="scenarioValue">{scenario.inflation_rate}%</span>
                           </div>
                         </div>
 
                         <div className="scenarioActions">
-                          <button
-                            className="scenarioActionButton"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleViewScenarioDetails(scenario.scenario_id);
-                            }}
-                          >
-                            👁️ Просмотр
+                          <button className="scenarioActionButton" onClick={(e) => { e.stopPropagation(); handleViewScenarioDetails(scenario.scenario_id); }}>
+                            <Eye size={14} />
+                            Просмотр
                           </button>
-                          <button
-                            className="scenarioActionButton"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              navigate(`/scenarios/${scenario.goal_id}`);
-                            }}
-                          >
-                            📊 Анализ
+                          <button className="scenarioActionButton" onClick={(e) => { e.stopPropagation(); handleViewScenarios(scenario.goal_id); }}>
+                            <BarChart3 size={14} />
+                            Анализ
                           </button>
                         </div>
                       </div>
@@ -459,13 +444,10 @@ function ScenariosMainPage() {
           </div>
         )}
 
-        {/* Кнопка обновления */}
         <div className="refreshSection">
-          <button
-            onClick={loadData}
-            className="refreshButton"
-          >
-            ⟳ Обновить данные
+          <button onClick={loadData} className="refreshButton">
+            <RefreshCw size={14} />
+            Обновить данные
           </button>
         </div>
       </div>

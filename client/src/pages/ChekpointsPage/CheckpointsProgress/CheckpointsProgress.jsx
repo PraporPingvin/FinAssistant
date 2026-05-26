@@ -1,6 +1,17 @@
-// client/src/pages/CheckpointsPage/CheckpointsProgress.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  Target,
+  TrendingUp,
+  DollarSign,
+  Calendar,
+  Eye,
+  BarChart3,
+  Clock,
+  AlertCircle,
+  ChevronDown,
+  ChevronRight,
+} from "lucide-react";
 import { getGoals, getCheckpoints } from "../../../api/api";
 import "./CheckpointsProgress.css";
 
@@ -22,7 +33,6 @@ function CheckpointsProgress() {
         getGoals(),
         getCheckpoints().catch(() => [])
       ]);
-      
       setGoals(goalsData);
       setCheckpoints(checkpointsData || []);
     } catch (error) {
@@ -76,18 +86,36 @@ function CheckpointsProgress() {
     return { months, date };
   };
 
+  const getStatusClass = (status) => {
+    switch (status) {
+      case "active": return "statusActive";
+      case "completed": return "statusCompleted";
+      case "paused": return "statusPaused";
+      default: return "";
+    }
+  };
+
+  const getStatusText = (status) => {
+    switch (status) {
+      case "active": return "Активна";
+      case "completed": return "Выполнена";
+      case "paused": return "Приостановлена";
+      default: return status;
+    }
+  };
+
   if (loading) {
     return (
-      <div className="progress-loading">
-        <div className="loading-spinner"></div>
+      <div className="progressLoading">
+        <div className="loadingSpinner" />
         <p>Загрузка прогресса...</p>
       </div>
     );
   }
 
   return (
-    <div className="progress-page">
-      <div className="goals-progress-grid">
+    <div className="progressPage">
+      <div className="goalsProgressGrid">
         {goals.map(goal => {
           const progress = calculateProgress(goal);
           const stats = getCheckpointsStats(goal.goal_id);
@@ -95,57 +123,52 @@ function CheckpointsProgress() {
           const isExpanded = expandedGoal === goal.goal_id;
           
           return (
-            <div key={goal.goal_id} className="goal-progress-card">
+            <div key={goal.goal_id} className="goalProgressCard">
               <div 
-                className="goal-progress-header"
+                className="goalProgressHeader"
                 onClick={() => setExpandedGoal(isExpanded ? null : goal.goal_id)}
               >
-                <div className="goal-title-section">
-                  <h3 className="goal-title">{goal.title}</h3>
-                  <span className={`goal-status status-${goal.status}`}>
-                    {goal.status === "active" ? "Активна" : 
-                     goal.status === "completed" ? "Выполнена" : "Приостановлена"}
+                <div className="goalTitleSection">
+                  <h3 className="goalTitle">{goal.title}</h3>
+                  <span className={`goalStatus ${getStatusClass(goal.status)}`}>
+                    {getStatusText(goal.status)}
                   </span>
                 </div>
-                
-                <div className="goal-progress-preview">
-                  <div className="progress-percent">{progress}%</div>
-                  <span className="expand-icon">{isExpanded ? "▼" : "▶"}</span>
+                <div className="goalProgressPreview">
+                  <div className="progressPercent">{progress}%</div>
+                  {isExpanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
                 </div>
               </div>
 
-              <div className="progress-bar-container">
-                <div 
-                  className="progress-bar-fill"
-                  style={{ width: `${progress}%` }}
-                />
+              <div className="progressBarContainer">
+                <div className="progressBarFill" style={{ width: `${progress}%` }} />
               </div>
 
-              <div className="goal-stats">
-                <div className="stat-row">
-                  <span className="stat-label">Цель:</span>
-                  <span className="stat-value">{formatCurrency(goal.target_amount)} ₽</span>
+              <div className="goalStatsChekpoint">
+                <div className="statRow">
+                  <span className="statLabel">Цель</span>
+                  <span className="statValue">{formatCurrency(goal.target_amount)} ₽</span>
                 </div>
-                <div className="stat-row">
-                  <span className="stat-label">Накоплено:</span>
-                  <span className="stat-value highlight">{formatCurrency(goal.current_amount)} ₽</span>
+                <div className="statRow">
+                  <span className="statLabel">Накоплено</span>
+                  <span className="statValue highlight">{formatCurrency(goal.current_amount)} ₽</span>
                 </div>
-                <div className="stat-row">
-                  <span className="stat-label">Осталось:</span>
-                  <span className="stat-value">{formatCurrency(goal.target_amount - goal.current_amount)} ₽</span>
+                <div className="statRow">
+                  <span className="statLabel">Осталось</span>
+                  <span className="statValue">{formatCurrency(goal.target_amount - goal.current_amount)} ₽</span>
                 </div>
               </div>
 
               {forecast && (
-                <div className="forecast-info">
-                  <div className="forecast-icon">🔮</div>
-                  <div className="forecast-text">
+                <div className="forecastInfo">
+                  <div className="forecastIcon">📈</div>
+                  <div className="forecastText">
                     {forecast.months === 0 ? (
                       "Цель достигнута!"
                     ) : (
                       <>
                         Прогноз: <strong>{forecast.months} месяцев</strong>
-                        <span className="forecast-date">
+                        <span className="forecastDate">
                           (до {forecast.date.toLocaleDateString('ru-RU')})
                         </span>
                       </>
@@ -155,12 +178,12 @@ function CheckpointsProgress() {
               )}
 
               {stats.total > 0 && (
-                <div className="checkpoints-preview">
-                  <div className="checkpoints-stats">
-                    <span className="checkpoints-count">
+                <div className="checkpointsPreview">
+                  <div className="checkpointsStats">
+                    <span className="checkpointsCount">
                       📌 Контрольных точек: {stats.total}
                     </span>
-                    <div className="checkpoints-breakdown">
+                    <div className="checkpointsBreakdown">
                       {stats.completed > 0 && <span className="completed">✅ {stats.completed}</span>}
                       {stats.pending > 0 && <span className="pending">⏳ {stats.pending}</span>}
                       {stats.overdue > 0 && <span className="overdue">⚠️ {stats.overdue}</span>}
@@ -170,18 +193,17 @@ function CheckpointsProgress() {
               )}
 
               {isExpanded && stats.total > 0 && (
-                <div className="goal-checkpoints-list">
+                <div className="goalCheckpointsList">
                   <h4>Контрольные точки</h4>
                   {getGoalCheckpoints(goal.goal_id).map(cp => (
-                    <div key={cp.checkpoint_id} className="checkpoint-mini-item">
-                      <div className="checkpoint-mini-header">
-                        <span className="checkpoint-mini-title">{cp.title}</span>
-                        <span className={`checkpoint-mini-status status-${cp.status}`}>
-                          {cp.status === "completed" ? "✅" : 
-                           cp.status === "pending" ? "⏳" : "⚠️"}
+                    <div key={cp.checkpoint_id} className="checkpointMiniItem">
+                      <div className="checkpointMiniHeader">
+                        <span className="checkpointMiniTitle">{cp.title}</span>
+                        <span className="checkpointMiniStatus">
+                          {cp.status === "completed" ? "✅" : cp.status === "pending" ? "⏳" : "⚠️"}
                         </span>
                       </div>
-                      <div className="checkpoint-mini-details">
+                      <div className="checkpointMiniDetails">
                         <span>{formatCurrency(cp.target_amount)} ₽</span>
                         {cp.target_date && (
                           <span>{new Date(cp.target_date).toLocaleDateString('ru-RU')}</span>
@@ -192,18 +214,12 @@ function CheckpointsProgress() {
                 </div>
               )}
 
-              <div className="goal-actions">
-                <button 
-                  className="action-button"
-                  onClick={() => navigate(`/goals/${goal.goal_id}`)}
-                >
-                  👁️ Детали цели
+              <div className="goalActions">
+                <button className="actionButton" onClick={() => navigate(`/goals/${goal.goal_id}`)}>
+                  <Eye size={14} /> Детали цели
                 </button>
-                <button 
-                  className="action-button primary"
-                  onClick={() => navigate(`/scenarios/${goal.goal_id}`)}
-                >
-                  📈 Сценарии
+                <button className="actionButton primary" onClick={() => navigate(`/scenarios/${goal.goal_id}`)}>
+                  <BarChart3 size={14} /> Сценарии
                 </button>
               </div>
             </div>

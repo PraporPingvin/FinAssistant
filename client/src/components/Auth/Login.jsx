@@ -1,6 +1,6 @@
-// src/components/Auth/Login.jsx
 import React, { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
+import { Mail, Lock, Eye, EyeOff, LogIn } from "lucide-react";
 import "./Auth.css";
 
 function Login({ onToggleMode, onForgotPassword }) {
@@ -52,13 +52,24 @@ function Login({ onToggleMode, onForgotPassword }) {
   };
 
   return (
-    <form onSubmit={handleLogin} className="auth-form">
-      <h2>Вход в FinRoad</h2>
+    <form onSubmit={handleLogin} className="authForm">
+      <div className="authHeader">
+        <div className="authLogo">💰</div>
+        <h2>Добро пожаловать</h2>
+        <p>Войдите в свой аккаунт финансового ассистента</p>
+      </div>
 
-      {error && <div className="auth-error">{error}</div>}
+      {error && (
+        <div className="authError">
+          {error}
+        </div>
+      )}
 
-      <div className="form-group">
-        <label htmlFor="email">Email</label>
+      <div className="formGroup">
+        <label htmlFor="email" className="formLabel">
+          <Mail size={16} />
+          Email
+        </label>
         <input
           id="email"
           type="email"
@@ -67,13 +78,17 @@ function Login({ onToggleMode, onForgotPassword }) {
           onChange={(e) => setEmail(e.target.value)}
           disabled={loading}
           autoComplete="email"
+          className="formInput"
           required
         />
       </div>
 
-      <div className="form-group">
-        <label htmlFor="password">Пароль</label>
-        <div className="password-input-wrapper">
+      <div className="formGroup">
+        <label htmlFor="password" className="formLabel">
+          <Lock size={16} />
+          Пароль
+        </label>
+        <div className="passwordWrapper">
           <input
             id="password"
             type={showPassword ? "text" : "password"}
@@ -82,46 +97,40 @@ function Login({ onToggleMode, onForgotPassword }) {
             onChange={(e) => setPassword(e.target.value)}
             disabled={loading}
             autoComplete="current-password"
+            className="formInput"
             required
           />
           <button
             type="button"
-            className="password-toggle"
+            className="passwordToggle"
             onClick={() => setShowPassword(!showPassword)}
             tabIndex="-1"
           >
-            {showPassword ? "👁️" : "👁️‍🗨️"}
+            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
         </div>
       </div>
 
-      <button
-        type="submit"
-        disabled={loading}
-        className="auth-button"
-      >
+      <div className="forgotPasswordLink">
+        <button
+          type="button"
+          onClick={onForgotPassword}
+          className="forgotLink"
+        >
+          Забыли пароль?
+        </button>
+      </div>
+
+      <button type="submit" disabled={loading} className="authButton">
+        <LogIn size={18} />
         {loading ? "Вход..." : "Войти"}
       </button>
 
-      <div className="auth-switch">
+      <div className="authSwitch">
         Нет аккаунта?{" "}
-        <button
-          type="button"
-          onClick={onToggleMode}
-          className="switch-button"
-          disabled={loading}
-        >
+        <button type="button" onClick={onToggleMode} className="switchButton" disabled={loading}>
           Зарегистрироваться
         </button>
-        <div className="forgot-password-link">
-          <button
-            type="button"
-            onClick={onForgotPassword}
-            className="forgot-link"
-          >
-            Забыли пароль?
-          </button>
-        </div>
       </div>
     </form>
   );

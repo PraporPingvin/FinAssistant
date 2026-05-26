@@ -1,111 +1,247 @@
-.checkpoint-form {
-  background: white;
-  border-radius: 16px;
-  padding: 25px;
-  margin-bottom: 30px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+:root {
+  --primary-dark: #495631;
+  --primary-accent: #EAED74;
+  --primary-light: #EFF2DD;
+
+  --card-bg: rgba(255, 255, 255, 0.72);
+  --border-color: rgba(73, 86, 49, 0.08);
+
+  --text-main: #495631;
+  --text-muted: #7B8465;
+
+  --success-color: #2E7D32;
+  --danger-color: #E35D5D;
+  --warning-color: #F5A623;
+
+  --priority-high: #E35D5D;
+  --priority-medium: #F5A623;
+  --priority-low: #2E7D32;
+
+  --shadow-sm: 0 8px 24px rgba(73, 86, 49, 0.06);
+  --shadow-md: 0 10px 30px rgba(73, 86, 49, 0.08);
+
+  --radius-sm: 12px;
+  --radius-md: 18px;
+  --radius-lg: 24px;
+  --radius-full: 999px;
+
+  --transition: all 0.28s ease;
 }
 
-.checkpoint-form h3 {
-  margin: 0 0 5px 0;
-  color: #333;
+.checkpointForm {
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  margin-bottom: 32px;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
 }
 
-.form-goal-info {
-  color: #666;
-  font-size: 14px;
+.formHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 20px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
 }
 
-.checkpoint-form .form-row {
+.formHeader h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  color: var(--text-main);
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+.closeButton {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+}
+
+.closeButton:hover {
+  background: rgba(73, 86, 49, 0.08);
+  color: var(--danger-color);
+}
+
+.formGoalInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  margin-bottom: 24px;
+  border-radius: var(--radius-sm);
+  background: rgba(234, 237, 116, 0.12);
+  color: var(--text-main);
+  font-size: 0.85rem;
+}
+
+.formGroup {
+  margin-bottom: 20px;
+}
+
+.formRow {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
+  margin-bottom: 4px;
 }
 
-.checkpoint-form .form-group {
-  margin-bottom: 20px;
-}
-
-.checkpoint-form .form-group label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 500;
-  color: #333;
-}
-
-.checkpoint-form .form-group input,
-.checkpoint-form .form-group select,
-.checkpoint-form .form-group textarea {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 14px;
-  transition: border-color 0.2s;
-}
-
-.checkpoint-form .form-group input:focus,
-.checkpoint-form .form-group select:focus,
-.checkpoint-form .form-group textarea:focus {
-  outline: none;
-  border-color: #495631;
-}
-
-.checkpoint-form .preview {
-  font-size: 12px;
-  color: #666;
-  margin-top: 5px;
-}
-
-.checkpoint-form .error {
-  color: #c62828;
-  font-size: 12px;
-  margin-top: 5px;
-}
-
-.checkpoint-form .submit-error {
-  background: #ffebee;
-  padding: 10px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-.checkpoint-form .form-buttons {
+.formLabel {
   display: flex;
-  gap: 15px;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.required {
+  color: var(--danger-color);
+}
+
+.formInput,
+.formSelect,
+.formTextarea {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.75);
+  color: var(--text-main);
+  font-size: 0.95rem;
+  transition: var(--transition);
+  box-sizing: border-box;
+}
+
+.formTextarea {
+  resize: vertical;
+  font-family: inherit;
+}
+
+.formInput:focus,
+.formSelect:focus,
+.formTextarea:focus {
+  outline: none;
+  border-color: var(--primary-accent);
+  box-shadow: 0 0 0 4px rgba(234, 237, 116, 0.18);
+}
+
+.formInput.error {
+  border-color: var(--danger-color);
+}
+
+.error {
+  margin-top: 6px;
+  color: var(--danger-color);
+  font-size: 0.75rem;
+}
+
+.preview {
+  margin-top: 6px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.submitError {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  border-radius: var(--radius-sm);
+  background: rgba(227, 93, 93, 0.1);
+  color: var(--danger-color);
+  font-size: 0.85rem;
+}
+
+.formButtons {
+  display: flex;
   justify-content: flex-end;
-  margin-top: 10px;
+  gap: 12px;
+  margin-top: 8px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
 }
 
-.checkpoint-form .cancel-btn {
-  padding: 12px 24px;
-  background: #f5f5f5;
+.cancelBtn,
+.submitBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 24px;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-full);
   cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: var(--transition);
 }
 
-.checkpoint-form .submit-btn {
-  padding: 12px 24px;
-  background: #495631;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
+.cancelBtn {
+  background: rgba(73, 86, 49, 0.06);
+  color: var(--text-main);
 }
 
-.checkpoint-form .submit-btn:hover,
-.checkpoint-form .cancel-btn:hover {
-  opacity: 0.9;
+.cancelBtn:hover:not(:disabled) {
+  background: rgba(73, 86, 49, 0.12);
+}
+
+.submitBtn {
+  background: var(--primary-dark);
+  color: var(--primary-accent);
+}
+
+.submitBtn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  background: var(--primary-accent);
+  color: var(--primary-dark);
+  box-shadow: var(--shadow-md);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.priorityHigh {
+  color: var(--priority-high);
+}
+
+.priorityMedium {
+  color: var(--priority-medium);
+}
+
+.priorityLow {
+  color: var(--priority-low);
 }
 
 @media (max-width: 768px) {
-  .checkpoint-form .form-row {
+  .checkpointForm {
+    padding: 20px;
+  }
+
+  .formRow {
     grid-template-columns: 1fr;
-    gap: 0;
+    gap: 16px;
+  }
+
+  .formButtons {
+    flex-direction: column;
+  }
+
+  .cancelBtn,
+  .submitBtn {
+    width: 100%;
   }
 }

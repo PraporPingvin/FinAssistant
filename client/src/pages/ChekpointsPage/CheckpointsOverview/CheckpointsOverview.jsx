@@ -1,7 +1,30 @@
-// client/src/pages/CheckpointsPage/CheckpointsOverview.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getCheckpoints, getGoals, updateCheckpoint, deleteCheckpoint, createCheckpoint } from "../../../api/api";
+import {
+  Target,
+  CheckCircle,
+  Clock,
+  AlertCircle,
+  Plus,
+  Edit2,
+  Trash2,
+  Eye,
+  X,
+  Calendar,
+  DollarSign,
+  Flag,
+  BarChart3,
+  PieChart as PieChartIcon,
+  ChevronDown,
+  ChevronUp,
+  Search,
+  Filter,
+  List,
+  LayoutGrid,
+  Circle,
+  CircleDot,
+  CircleCheck,
+} from "lucide-react";
 import {
   Chart as ChartJS,
   ArcElement,
@@ -11,9 +34,10 @@ import {
   LinearScale,
   BarElement,
   Title,
-  Filler
+  Filler,
 } from 'chart.js';
-import { Pie, Bar, Doughnut } from 'react-chartjs-2';
+import { Pie, Doughnut, Bar } from 'react-chartjs-2';
+import { getCheckpoints, getGoals, updateCheckpoint, deleteCheckpoint, createCheckpoint } from "../../../api/api";
 import "./CheckpointsOverview.css";
 
 ChartJS.register(
@@ -27,61 +51,53 @@ ChartJS.register(
   Filler
 );
 
-// ==================== МОДАЛЬНОЕ ОКНО ВЫБОРА ЦЕЛИ ====================
 function GoalSelectorModal({ goals, onSelectGoal, onClose, formatCurrency }) {
   if (!goals.length) {
     return (
-      <div className="modal-overlay" onClick={onClose}>
-        <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-          <h3>⚠️ Нет целей</h3>
+      <div className="modalOverlay" onClick={onClose}>
+        <div className="modalContent" onClick={(e) => e.stopPropagation()}>
+          <div className="modalHeader">
+            <h3>Нет целей</h3>
+            <button className="modalClose" onClick={onClose}><X size={18} /></button>
+          </div>
           <p>Сначала создайте финансовую цель, чтобы добавить контрольные точки.</p>
-          <button onClick={onClose} className="modal-close-btn">Закрыть</button>
+          <button onClick={onClose} className="modalCloseBtn">Закрыть</button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <h3>🎯 Выберите цель</h3>
-        <p className="modal-subtitle">Для какой цели добавить контрольную точку?</p>
-        <div className="modal-goal-list">
+    <div className="modalOverlay" onClick={onClose}>
+      <div className="modalContent" onClick={(e) => e.stopPropagation()}>
+        <div className="modalHeader">
+          <h3><Target size={18} /> Выберите цель</h3>
+          <button className="modalClose" onClick={onClose}><X size={18} /></button>
+        </div>
+        <p className="modalSubtitle">Для какой цели добавить контрольную точку?</p>
+        <div className="modalGoalList">
           {goals.map(goal => (
-            <div 
-              key={goal.goal_id} 
-              className="modal-goal-item"
-              onClick={() => onSelectGoal(goal)}
-            >
-              <div className="modal-goal-info">
-                <span className="modal-goal-title">{goal.title}</span>
-                <span className="modal-goal-status">
-                  {goal.status === "active" ? "🟢 Активна" : goal.status === "completed" ? "✅ Выполнена" : "⏸ Приостановлена"}
+            <div key={goal.goal_id} className="modalGoalItem" onClick={() => onSelectGoal(goal)}>
+              <div className="modalGoalInfo">
+                <span className="modalGoalTitle">{goal.title}</span>
+                <span className={`modalGoalStatus status-${goal.status}`}>
+                  {goal.status === "active" ? "Активна" : goal.status === "completed" ? "Выполнена" : "Приостановлена"}
                 </span>
               </div>
-              <div className="modal-goal-amount">
-                {formatCurrency(goal.target_amount)} ₽
-              </div>
-              <div className="modal-goal-progress">
+              <div className="modalGoalAmount">{formatCurrency(goal.target_amount)} ₽</div>
+              <div className="modalGoalProgress">
                 Прогресс: {Math.round((parseFloat(goal.current_amount) / parseFloat(goal.target_amount)) * 100)}%
               </div>
             </div>
           ))}
         </div>
-        <button onClick={onClose} className="modal-close-btn">Отмена</button>
+        <button onClick={onClose} className="modalCloseBtn">Отмена</button>
       </div>
     </div>
   );
 }
 
-// ==================== ФОРМА СОЗДАНИЯ/РЕДАКТИРОВАНИЯ (МОДАЛЬНАЯ) ====================
-function CheckpointFormModal({ 
-  goal, 
-  initialData, 
-  onSubmit, 
-  onClose, 
-  isEdit = false 
-}) {
+function CheckpointFormModal({ goal, initialData, onSubmit, onClose, isEdit = false }) {
   const [formData, setFormData] = useState({
     title: initialData?.title || "",
     target_amount: initialData?.target_amount || "",
@@ -135,13 +151,7 @@ function CheckpointFormModal({
         status: initialData?.status || "pending"
       });
       if (!isEdit) {
-        setFormData({
-          title: "",
-          target_amount: "",
-          target_date: "",
-          priority: "medium",
-          description: "",
-        });
+        setFormData({ title: "", target_amount: "", target_date: "", priority: "medium", description: "" });
       }
     } catch (error) {
       setErrors({ submit: error.message });
@@ -151,53 +161,53 @@ function CheckpointFormModal({
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content form-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <h3>{isEdit ? "✏️ Редактирование" : "➕ Новая контрольная точка"}</h3>
-          <button className="modal-close-x" onClick={onClose}>✕</button>
+    <div className="modalOverlay" onClick={onClose}>
+      <div className="modalContent formModal" onClick={(e) => e.stopPropagation()}>
+        <div className="modalHeader">
+          <h3>{isEdit ? <Edit2 size={18} /> : <Plus size={18} />} {isEdit ? "Редактирование" : "Новая контрольная точка"}</h3>
+          <button className="modalClose" onClick={onClose}><X size={18} /></button>
         </div>
-        <p className="modal-subtitle">🎯 Цель: {goal.title} ({formatCurrency(goal.target_amount)} ₽)</p>
+        <p className="modalSubtitle"><Target size={14} /> Цель: {goal.title} ({formatCurrency(goal.target_amount)} ₽)</p>
 
         <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>Название *</label>
+          <div className="formGroup">
+            <label>Название <span className="required">*</span></label>
             <input type="text" name="title" value={formData.title} onChange={handleChange} placeholder="Например: Накопить 50%" disabled={submitting} />
-            {errors.title && <div className="error">{errors.title}</div>}
+            {errors.title && <div className="formError">{errors.title}</div>}
           </div>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label>Сумма *</label>
+          <div className="formRow">
+            <div className="formGroup">
+              <label><DollarSign size={14} /> Сумма <span className="required">*</span></label>
               <input type="number" name="target_amount" value={formData.target_amount} onChange={handleChange} min="0" step="1000" disabled={submitting} />
               {formData.target_amount && <div className="preview">{formatCurrency(formData.target_amount)} ₽</div>}
-              {errors.target_amount && <div className="error">{errors.target_amount}</div>}
+              {errors.target_amount && <div className="formError">{errors.target_amount}</div>}
             </div>
-            <div className="form-group">
-              <label>Дата выполнения</label>
+            <div className="formGroup">
+              <label><Calendar size={14} /> Дата выполнения</label>
               <input type="date" name="target_date" value={formData.target_date} onChange={handleChange} disabled={submitting} />
             </div>
           </div>
 
-          <div className="form-group">
-            <label>Приоритет</label>
+          <div className="formGroup">
+            <label><Flag size={14} /> Приоритет</label>
             <select name="priority" value={formData.priority} onChange={handleChange} disabled={submitting}>
-              <option value="high">🔴 Высокий</option>
-              <option value="medium">🟡 Средний</option>
-              <option value="low">🟢 Низкий</option>
+              <option value="high">Высокий</option>
+              <option value="medium">Средний</option>
+              <option value="low">Низкий</option>
             </select>
           </div>
 
-          <div className="form-group">
+          <div className="formGroup">
             <label>Описание</label>
             <textarea name="description" value={formData.description} onChange={handleChange} rows="3" placeholder="Дополнительная информация..." disabled={submitting} />
           </div>
 
-          {errors.submit && <div className="error submit-error">{errors.submit}</div>}
+          {errors.submit && <div className="submitError">{errors.submit}</div>}
 
-          <div className="form-buttons">
-            <button type="button" onClick={onClose} className="cancel-btn" disabled={submitting}>Отмена</button>
-            <button type="submit" className="submit-btn" disabled={submitting}>
+          <div className="formButtons">
+            <button type="button" onClick={onClose} className="cancelBtn" disabled={submitting}>Отмена</button>
+            <button type="submit" className="submitBtn" disabled={submitting}>
               {submitting ? (isEdit ? "Сохранение..." : "Создание...") : (isEdit ? "Сохранить" : "Создать")}
             </button>
           </div>
@@ -207,7 +217,6 @@ function CheckpointFormModal({
   );
 }
 
-// ==================== ОСНОВНОЙ КОМПОНЕНТ ====================
 function CheckpointsOverview() {
   const navigate = useNavigate();
   const [checkpoints, setCheckpoints] = useState([]);
@@ -220,7 +229,6 @@ function CheckpointsOverview() {
   const [sortOrder, setSortOrder] = useState("asc");
   const [showCharts, setShowCharts] = useState(true);
   
-  // Состояния для модальных окон
   const [showGoalSelector, setShowGoalSelector] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -247,7 +255,6 @@ function CheckpointsOverview() {
     }
   };
 
-  // Проверка, просрочена ли контрольная точка
   const isCheckpointOverdue = (checkpoint) => {
     if (checkpoint.status !== "pending") return false;
     if (!checkpoint.target_date) return false;
@@ -258,30 +265,22 @@ function CheckpointsOverview() {
     return targetDate < today;
   };
 
-  // Обновление статуса просроченных точек (автоматически при загрузке)
   const updateOverdueStatus = async () => {
     const overdueCheckpoints = checkpoints.filter(cp => isCheckpointOverdue(cp));
     for (const cp of overdueCheckpoints) {
       try {
         await updateCheckpoint(cp.checkpoint_id, { status: "overdue" });
-        console.log(`✅ Обновлена просроченная точка: ${cp.title}`);
       } catch (error) {
         console.error(`Ошибка обновления точки ${cp.title}:`, error);
       }
     }
-    if (overdueCheckpoints.length > 0) {
-      await loadData(); // Перезагружаем данные после обновления
-    }
+    if (overdueCheckpoints.length > 0) await loadData();
   };
 
-  // Запускаем проверку просроченных точек после загрузки
   useEffect(() => {
-    if (!loading && checkpoints.length > 0) {
-      updateOverdueStatus();
-    }
+    if (!loading && checkpoints.length > 0) updateOverdueStatus();
   }, [loading, checkpoints]);
 
-  // Обработчики действий
   const handleMarkComplete = async (checkpointId) => {
     try {
       await updateCheckpoint(checkpointId, { status: "completed" });
@@ -307,9 +306,8 @@ function CheckpointsOverview() {
       await loadData();
       setShowCreateModal(false);
       setSelectedGoal(null);
-      alert("✅ Контрольная точка создана!");
     } catch (error) {
-      alert("❌ Ошибка: " + error.message);
+      alert("Ошибка: " + error.message);
     }
   };
 
@@ -325,9 +323,8 @@ function CheckpointsOverview() {
       await loadData();
       setShowEditModal(false);
       setEditingCheckpoint(null);
-      alert("✅ Контрольная точка обновлена!");
     } catch (error) {
-      alert("❌ Ошибка: " + error.message);
+      alert("Ошибка: " + error.message);
     }
   };
 
@@ -362,9 +359,9 @@ function CheckpointsOverview() {
 
   const getStatusClass = (status) => {
     switch (status) {
-      case "pending": return "status-pending";
-      case "completed": return "status-completed";
-      case "overdue": return "status-overdue";
+      case "pending": return "statusPending";
+      case "completed": return "statusCompleted";
+      case "overdue": return "statusOverdue";
       default: return "";
     }
   };
@@ -380,14 +377,22 @@ function CheckpointsOverview() {
 
   const getPriorityIcon = (priority) => {
     switch (priority) {
-      case "high": return "🔴";
-      case "medium": return "🟡";
-      case "low": return "🟢";
-      default: return "⚪";
+      case "high": return <CircleDot size={14} color="#E35D5D" />;
+      case "medium": return <Circle size={14} color="#F5A623" />;
+      case "low": return <CircleCheck size={14} color="#2E7D32" />;
+      default: return <Circle size={14} />;
     }
   };
 
-  // Фильтрация и сортировка
+  const getPriorityText = (priority) => {
+    switch (priority) {
+      case "high": return "Высокий";
+      case "medium": return "Средний";
+      case "low": return "Низкий";
+      default: return "";
+    }
+  };
+
   const filteredCheckpoints = checkpoints.filter(cp => {
     if (filter !== "all" && cp.status !== filter) return false;
     if (searchQuery) {
@@ -418,7 +423,6 @@ function CheckpointsOverview() {
     return sortOrder === "asc" ? comparison : -comparison;
   });
 
-  // Статистика для графиков (с учётом просроченных)
   const stats = {
     total: checkpoints.length,
     completed: checkpoints.filter(cp => cp.status === "completed").length,
@@ -430,137 +434,153 @@ function CheckpointsOverview() {
     completionRate: checkpoints.length > 0 ? Math.round((checkpoints.filter(cp => cp.status === "completed").length / checkpoints.length) * 100) : 0
   };
 
+  // Данные для диаграмм
   const statusChartData = {
     labels: ['Выполнено', 'В процессе', 'Просрочено'],
-    datasets: [{ data: [stats.completed, stats.pending, stats.overdue], backgroundColor: ['#4caf50', '#2196f3', '#f44336'] }]
+    datasets: [{
+      data: [stats.completed, stats.pending, stats.overdue],
+      backgroundColor: ['#2E7D32', '#F5A623', '#E35D5D'],
+      borderWidth: 0,
+    }]
   };
 
   const priorityChartData = {
     labels: ['Высокий', 'Средний', 'Низкий'],
-    datasets: [{ data: [stats.highPriority, stats.mediumPriority, stats.lowPriority], backgroundColor: ['#f44336', '#ff9800', '#4caf50'] }]
+    datasets: [{
+      data: [stats.highPriority, stats.mediumPriority, stats.lowPriority],
+      backgroundColor: ['#E35D5D', '#F5A623', '#2E7D32'],
+      borderWidth: 0,
+    }]
+  };
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: { usePointStyle: true, boxWidth: 10, font: { size: 11 } }
+      },
+      tooltip: { callbacks: { label: (ctx) => `${ctx.label}: ${ctx.raw}` } }
+    }
   };
 
   if (loading) {
-    return <div className="overview-loading"><div className="loading-spinner"></div><p>Загрузка...</p></div>;
+    return <div className="loadingContainer"><div className="loadingSpinner" /><p>Загрузка...</p></div>;
   }
 
   return (
-    <div className="checkpoints-overview">
-      {/* МОДАЛЬНОЕ ОКНО ВЫБОРА ЦЕЛИ */}
+    <div className="checkpointsOverview">
       {showGoalSelector && (
-        <GoalSelectorModal
-          goals={goals}
-          onSelectGoal={handleSelectGoal}
-          onClose={() => setShowGoalSelector(false)}
-          formatCurrency={formatCurrency}
-        />
+        <GoalSelectorModal goals={goals} onSelectGoal={handleSelectGoal} onClose={() => setShowGoalSelector(false)} formatCurrency={formatCurrency} />
       )}
-
-      {/* МОДАЛЬНОЕ ОКНО СОЗДАНИЯ */}
       {showCreateModal && selectedGoal && (
-        <CheckpointFormModal
-          goal={selectedGoal}
-          onSubmit={handleCreateCheckpoint}
-          onClose={() => {
-            setShowCreateModal(false);
-            setSelectedGoal(null);
-          }}
-          isEdit={false}
-        />
+        <CheckpointFormModal goal={selectedGoal} onSubmit={handleCreateCheckpoint} onClose={() => { setShowCreateModal(false); setSelectedGoal(null); }} isEdit={false} />
       )}
-
-      {/* МОДАЛЬНОЕ ОКНО РЕДАКТИРОВАНИЯ */}
       {showEditModal && editingCheckpoint && selectedGoal && (
-        <CheckpointFormModal
-          goal={selectedGoal}
-          initialData={{
-            title: editingCheckpoint.title,
-            target_amount: editingCheckpoint.target_amount,
-            target_date: editingCheckpoint.target_date,
-            priority: editingCheckpoint.priority,
-            description: editingCheckpoint.description
-          }}
-          onSubmit={handleUpdateCheckpoint}
-          onClose={() => {
-            setShowEditModal(false);
-            setEditingCheckpoint(null);
-            setSelectedGoal(null);
-          }}
-          isEdit={true}
-        />
+        <CheckpointFormModal goal={selectedGoal} initialData={{ title: editingCheckpoint.title, target_amount: editingCheckpoint.target_amount, target_date: editingCheckpoint.target_date, priority: editingCheckpoint.priority, description: editingCheckpoint.description }} onSubmit={handleUpdateCheckpoint} onClose={() => { setShowEditModal(false); setEditingCheckpoint(null); setSelectedGoal(null); }} isEdit={true} />
       )}
 
-      {/* СТАТИСТИКА */}
-      <div className="stats-cards">
-        <div className="stat-card"><div className="stat-icon">📋</div><div className="stat-content"><div className="stat-value">{stats.total}</div><div className="stat-label">Всего точек</div></div></div>
-        <div className="stat-card"><div className="stat-icon">✅</div><div className="stat-content"><div className="stat-value">{stats.completed}</div><div className="stat-label">Выполнено</div></div></div>
-        <div className="stat-card"><div className="stat-icon">⏳</div><div className="stat-content"><div className="stat-value">{stats.pending}</div><div className="stat-label">В процессе</div></div></div>
-        <div className="stat-card warning"><div className="stat-icon">⚠️</div><div className="stat-content"><div className="stat-value">{stats.overdue}</div><div className="stat-label">Просрочено</div></div></div>
+      {/* Статистика */}
+      <div className="statsCards">
+        <div className="statCard">
+          <div className="statIcon"><List size={24} /></div>
+          <div className="statValue">{stats.total}</div>
+          <div className="statLabel">Всего точек</div>
+        </div>
+        <div className="statCard">
+          <div className="statIcon"><CheckCircle size={24} /></div>
+          <div className="statValue">{stats.completed}</div>
+          <div className="statLabel">Выполнено</div>
+        </div>
+        <div className="statCard">
+          <div className="statIcon"><Clock size={24} /></div>
+          <div className="statValue">{stats.pending}</div>
+          <div className="statLabel">В процессе</div>
+        </div>
+        <div className="statCard warning">
+          <div className="statIcon"><AlertCircle size={24} /></div>
+          <div className="statValue">{stats.overdue}</div>
+          <div className="statLabel">Просрочено</div>
+        </div>
       </div>
 
-      {/* ПРОГРЕСС */}
-      <div className="overall-progress">
-        <div className="progress-label"><span>Общий прогресс выполнения</span><span className="progress-percent">{stats.completionRate}%</span></div>
-        <div className="progress-bar"><div className="progress-fill" style={{ width: `${stats.completionRate}%` }} /></div>
+      {/* Общий прогресс */}
+      <div className="overallProgress">
+        <div className="progressLabel">
+          <span>Общий прогресс выполнения</span>
+          <span className="progressPercent">{stats.completionRate}%</span>
+        </div>
+        <div className="progressBar">
+          <div className="progressFill" style={{ width: `${stats.completionRate}%` }} />
+        </div>
       </div>
 
-      {/* ГРАФИКИ (АНАЛИТИКА) */}
+      {/* Диаграммы */}
       {showCharts && checkpoints.length > 0 && (
-        <div className="charts-section">
-          <div className="charts-header"><h3>📊 Аналитика контрольных точек</h3><button className="toggle-charts" onClick={() => setShowCharts(false)}>Скрыть</button></div>
-          <div className="charts-grid">
-            <div className="chart-card"><h4>По статусам</h4><div className="chart-container"><Pie data={statusChartData} options={{ plugins: { legend: { position: 'bottom' } } }} /></div></div>
-            <div className="chart-card"><h4>По приоритетам</h4><div className="chart-container"><Doughnut data={priorityChartData} options={{ plugins: { legend: { position: 'bottom' } } }} /></div></div>
+        <div className="chartsSection">
+          <div className="chartsHeader">
+            <h3><BarChart3 size={16} /> Аналитика контрольных точек</h3>
+            <button className="toggleCharts" onClick={() => setShowCharts(false)}>Скрыть</button>
+          </div>
+          <div className="chartsGrid">
+            <div className="chartCard">
+              <h4>По статусам</h4>
+              <div className="chartContainer">
+                <Doughnut data={statusChartData} options={chartOptions} />
+              </div>
+            </div>
+            <div className="chartCard">
+              <h4>По приоритетам</h4>
+              <div className="chartContainer">
+                <Pie data={priorityChartData} options={chartOptions} />
+              </div>
+            </div>
           </div>
         </div>
       )}
 
       {!showCharts && checkpoints.length > 0 && (
-        <button className="show-charts-button" onClick={() => setShowCharts(true)}>📊 Показать графики</button>
+        <button className="showChartsButton" onClick={() => setShowCharts(true)}>
+          <BarChart3 size={14} /> Показать графики
+        </button>
       )}
 
-      {/* ФИЛЬТРЫ И КНОПКА СОЗДАНИЯ */}
-      <div className="filters-bar">
-        <div className="filter-group">
-          <select value={filter} onChange={(e) => setFilter(e.target.value)} className="filter-select">
+      {/* Фильтры */}
+      <div className="filtersBar">
+        <div className="filterGroup">
+          <select value={filter} onChange={(e) => setFilter(e.target.value)} className="filterSelect">
             <option value="all">Все статусы</option>
             <option value="pending">В процессе</option>
             <option value="completed">Выполнено</option>
             <option value="overdue">Просрочено</option>
           </select>
         </div>
-
-        <div className="filter-group">
-          <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="filter-select">
+        <div className="filterGroup">
+          <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="filterSelect">
             <option value="date">По дате</option>
             <option value="status">По статусу</option>
             <option value="priority">По приоритету</option>
           </select>
         </div>
-
-        <button className="sort-order-button" onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}>
+        <button className="sortOrderButton" onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}>
           {sortOrder === "asc" ? "↑" : "↓"}
         </button>
-
-        <div className="search-group">
-          <input type="text" placeholder="🔍 Поиск..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="search-input" />
-          {searchQuery && <button className="clear-search" onClick={() => setSearchQuery("")}>✕</button>}
+        <div className="searchGroup">
+          <input type="text" placeholder="Поиск..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="searchInput" />
+          {searchQuery && <button className="clearSearch" onClick={() => setSearchQuery("")}>✕</button>}
         </div>
-
-        {/* КНОПКА СОЗДАНИЯ НОВОЙ ТОЧКИ */}
-        <button className="create-button" onClick={() => setShowGoalSelector(true)}>
-          ➕ Новая точка
-        </button>
-
-        <button className={`view-mode-button ${viewMode === "table" ? "active" : ""}`} onClick={() => setViewMode(viewMode === "cards" ? "table" : "cards")}>
-          {viewMode === "cards" ? "📋 Таблица" : "🃏 Карточки"}
+        <button className="createButton" onClick={() => setShowGoalSelector(true)}><Plus size={14} /> Новая точка</button>
+        <button className={`viewModeButton ${viewMode === "table" ? "active" : ""}`} onClick={() => setViewMode(viewMode === "cards" ? "table" : "cards")}>
+          {viewMode === "cards" ? <LayoutGrid size={14} /> : <List size={14} />}
+          {viewMode === "cards" ? "Карточки" : "Таблица"}
         </button>
       </div>
 
-      {/* ТАБЛИЦА */}
+      {/* Таблица */}
       {viewMode === "table" && sortedCheckpoints.length > 0 && (
-        <div className="table-container">
-          <table className="checkpoints-table">
+        <div className="tableContainer">
+          <table className="checkpointsTable">
             <thead>
               <tr><th>Название</th><th>Цель</th><th>Сумма</th><th>Срок</th><th>Статус</th><th>Приоритет</th><th>Действия</th></tr>
             </thead>
@@ -568,21 +588,18 @@ function CheckpointsOverview() {
               {sortedCheckpoints.map(cp => {
                 const isOverdue = isCheckpointOverdue(cp);
                 return (
-                  <tr key={cp.checkpoint_id} className={isOverdue || cp.status === "overdue" ? "overdue-row" : ""}>
-                    <td><strong>{cp.title}</strong>{cp.description && <div className="checkpoint-desc">{cp.description}</div>}</td>
+                  <tr key={cp.checkpoint_id} className={isOverdue || cp.status === "overdue" ? "overdueRow" : ""}>
+                    <td><strong>{cp.title}</strong>{cp.description && <div className="checkpointDesc">{cp.description}</div>}</td>
                     <td>{getGoalTitle(cp.goal_id)}</td>
-                    <td className="amount-cell">{formatCurrency(cp.target_amount)} ₽</td>
+                    <td className="amountCell">{formatCurrency(cp.target_amount)} ₽</td>
                     <td>{formatDate(cp.target_date)}</td>
-                    <td><span className={`table-status-badge ${getStatusClass(cp.status)}`}>
-                      {getStatusText(cp.status)}
-                      {(isOverdue || cp.status === "overdue") && <span className="overdue-badge"> ⚠️</span>}
-                    </span></td>
-                    <td><span className="table-priority-badge">{getPriorityIcon(cp.priority)}</span></td>
-                    <td className="table-actions">
-                      {cp.status === "pending" && !isOverdue && <button className="table-action complete" onClick={() => handleMarkComplete(cp.checkpoint_id)} title="Выполнено">✅</button>}
-                      <button className="table-action edit" onClick={() => handleEditClick(cp)} title="Редактировать">✏️</button>
-                      <button className="table-action view" onClick={() => navigate(`/goals/${cp.goal_id}`)} title="К цели">👁️</button>
-                      <button className="table-action delete" onClick={() => handleDelete(cp.checkpoint_id, cp.title)} title="Удалить">🗑️</button>
+                    <td><span className={`tableStatusBadge ${getStatusClass(cp.status)}`}>{getStatusText(cp.status)}</span></td>
+                    <td>{getPriorityIcon(cp.priority)} {getPriorityText(cp.priority)}</td>
+                    <td className="tableActions">
+                      {cp.status === "pending" && !isOverdue && <button className="tableAction complete" onClick={() => handleMarkComplete(cp.checkpoint_id)} title="Выполнено"><CheckCircle size={14} /></button>}
+                      <button className="tableAction edit" onClick={() => handleEditClick(cp)} title="Редактировать"><Edit2 size={14} /></button>
+                      <button className="tableAction view" onClick={() => navigate(`/goals/${cp.goal_id}`)} title="К цели"><Eye size={14} /></button>
+                      <button className="tableAction delete" onClick={() => handleDelete(cp.checkpoint_id, cp.title)} title="Удалить"><Trash2 size={14} /></button>
                     </td>
                   </tr>
                 );
@@ -592,38 +609,35 @@ function CheckpointsOverview() {
         </div>
       )}
 
-      {/* КАРТОЧКИ */}
+      {/* Карточки */}
       {viewMode === "cards" && sortedCheckpoints.length > 0 && (
-        <div className="checkpoints-list">
+        <div className="checkpointsList">
           {sortedCheckpoints.map(cp => {
             const isOverdue = isCheckpointOverdue(cp);
             return (
-              <div key={cp.checkpoint_id} className={`checkpoint-card ${isOverdue || cp.status === "overdue" ? "overdue-card" : ""}`}>
-                <div className="checkpoint-header">
-                  <div className="checkpoint-title-section">
-                    <h3 className="checkpoint-title">{cp.title}</h3>
-                    <div className="checkpoint-badges">
-                      <span className={`status-badge ${getStatusClass(cp.status)}`}>
-                        {getStatusText(cp.status)}
-                        {(isOverdue || cp.status === "overdue") && <span className="overdue-badge"> ⚠️</span>}
-                      </span>
-                      <span className="priority-badge">{getPriorityIcon(cp.priority)} {cp.priority === "high" ? "Высокий" : cp.priority === "medium" ? "Средний" : "Низкий"}</span>
+              <div key={cp.checkpoint_id} className={`checkpointCard ${isOverdue || cp.status === "overdue" ? "overdueCard" : ""}`}>
+                <div className="checkpointHeader">
+                  <div className="checkpointTitleSection">
+                    <h3 className="checkpointTitle">{cp.title}</h3>
+                    <div className="checkpointBadges">
+                      <span className={`statusBadge ${getStatusClass(cp.status)}`}>{getStatusText(cp.status)}</span>
+                      <span className="priorityBadge">{getPriorityIcon(cp.priority)} {getPriorityText(cp.priority)}</span>
                     </div>
                   </div>
                 </div>
-                <div className="checkpoint-content">
-                  <div className="checkpoint-goal"><span className="goal-icon">🎯</span><span className="goal-title">{getGoalTitle(cp.goal_id)}</span></div>
-                  <div className="checkpoint-details">
-                    <div className="detail-item"><span className="detail-label">Сумма:</span><span className="detail-value highlight">{formatCurrency(cp.target_amount)} ₽</span></div>
-                    {cp.target_date && <div className="detail-item"><span className="detail-label">Срок:</span><span className={`detail-value ${isOverdue || cp.status === "overdue" ? "overdue-text" : ""}`}>{formatDate(cp.target_date)}</span></div>}
-                    {cp.description && <div className="detail-item description"><span className="detail-label">📝</span><span className="detail-value">{cp.description}</span></div>}
+                <div className="checkpointContent">
+                  <div className="checkpointGoal"><Target size={14} /><span className="goalTitle">{getGoalTitle(cp.goal_id)}</span></div>
+                  <div className="checkpointDetails">
+                    <div className="detailItem"><span className="detailLabel"><DollarSign size={12} /> Сумма:</span><span className="detailValue highlight">{formatCurrency(cp.target_amount)} ₽</span></div>
+                    {cp.target_date && <div className="detailItem"><span className="detailLabel"><Calendar size={12} /> Срок:</span><span className={`detailValue ${isOverdue || cp.status === "overdue" ? "overdueText" : ""}`}>{formatDate(cp.target_date)}</span></div>}
+                    {cp.description && <div className="detailItem description"><span className="detailLabel">📝</span><span className="detailValue">{cp.description}</span></div>}
                   </div>
                 </div>
-                <div className="checkpoint-actions">
-                  {cp.status === "pending" && !isOverdue && <button className="action-button complete" onClick={() => handleMarkComplete(cp.checkpoint_id)}>✅ Выполнено</button>}
-                  <button className="action-button edit" onClick={() => handleEditClick(cp)}>✏️ Редактировать</button>
-                  <button className="action-button view" onClick={() => navigate(`/goals/${cp.goal_id}`)}>👁️ Цель</button>
-                  <button className="action-button delete" onClick={() => handleDelete(cp.checkpoint_id, cp.title)}>🗑️</button>
+                <div className="checkpointActions">
+                  {cp.status === "pending" && !isOverdue && <button className="actionButton complete" onClick={() => handleMarkComplete(cp.checkpoint_id)}><CheckCircle size={14} /> Выполнено</button>}
+                  <button className="actionButton edit" onClick={() => handleEditClick(cp)}><Edit2 size={14} /> Редактировать</button>
+                  <button className="actionButton view" onClick={() => navigate(`/goals/${cp.goal_id}`)}><Eye size={14} /> Цель</button>
+                  <button className="actionButton delete" onClick={() => handleDelete(cp.checkpoint_id, cp.title)}><Trash2 size={14} /> Удалить</button>
                 </div>
               </div>
             );
@@ -633,11 +647,11 @@ function CheckpointsOverview() {
 
       {/* Пустое состояние */}
       {viewMode === "cards" && sortedCheckpoints.length === 0 && (
-        <div className="empty-state">
-          <div className="empty-icon">📌</div>
+        <div className="emptyState">
+          <div className="emptyIcon">📌</div>
           <h3>Контрольных точек пока нет</h3>
           <p>Нажмите кнопку «Новая точка» и выберите цель для добавления первой контрольной точки</p>
-          <button className="create-first-button" onClick={() => setShowGoalSelector(true)}>➕ Создать первую точку</button>
+          <button className="createFirstButton" onClick={() => setShowGoalSelector(true)}><Plus size={14} /> Создать первую точку</button>
         </div>
       )}
     </div>

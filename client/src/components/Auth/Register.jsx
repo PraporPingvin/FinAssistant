@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
+import { Mail, Lock, User, Eye, EyeOff, UserPlus } from "lucide-react";
 import "./Auth.css";
 
 function Register({ onToggleMode }) {
@@ -22,7 +23,6 @@ function Register({ onToggleMode }) {
       ...formData,
       [e.target.name]: e.target.value
     });
-    // Очищаем ошибку при изменении полей
     if (error) setError("");
   };
 
@@ -83,13 +83,20 @@ function Register({ onToggleMode }) {
   };
 
   return (
-    <form onSubmit={handleRegister} className="auth-form">
-      <h2>Регистрация в FinRoad</h2>
+    <form onSubmit={handleRegister} className="authForm">
+      <div className="authHeader">
+        <div className="authLogo">🚀</div>
+        <h2>Создание аккаунта</h2>
+        <p>Присоединяйтесь к финансовому ассистенту</p>
+      </div>
       
-      {error && <div className="auth-error">{error}</div>}
+      {error && <div className="authError">{error}</div>}
       
-      <div className="form-group">
-        <label htmlFor="email">Email *</label>
+      <div className="formGroup">
+        <label htmlFor="email" className="formLabel">
+          <Mail size={16} />
+          Email <span className="required">*</span>
+        </label>
         <input
           id="email"
           type="email"
@@ -99,13 +106,17 @@ function Register({ onToggleMode }) {
           onChange={handleChange}
           disabled={loading}
           autoComplete="email"
+          className="formInput"
           required
         />
       </div>
       
-      <div className="form-row">
-        <div className="form-group">
-          <label htmlFor="first_name">Имя</label>
+      <div className="formRow">
+        <div className="formGroup">
+          <label htmlFor="first_name" className="formLabel">
+            <User size={16} />
+            Имя
+          </label>
           <input
             id="first_name"
             type="text"
@@ -115,11 +126,15 @@ function Register({ onToggleMode }) {
             onChange={handleChange}
             disabled={loading}
             autoComplete="given-name"
+            className="formInput"
           />
         </div>
         
-        <div className="form-group">
-          <label htmlFor="last_name">Фамилия</label>
+        <div className="formGroup">
+          <label htmlFor="last_name" className="formLabel">
+            <User size={16} />
+            Фамилия
+          </label>
           <input
             id="last_name"
             type="text"
@@ -129,13 +144,17 @@ function Register({ onToggleMode }) {
             onChange={handleChange}
             disabled={loading}
             autoComplete="family-name"
+            className="formInput"
           />
         </div>
       </div>
       
-      <div className="form-group">
-        <label htmlFor="password">Пароль *</label>
-        <div className="password-input-wrapper">
+      <div className="formGroup">
+        <label htmlFor="password" className="formLabel">
+          <Lock size={16} />
+          Пароль <span className="required">*</span>
+        </label>
+        <div className="passwordWrapper">
           <input
             id="password"
             type={showPassword ? "text" : "password"}
@@ -145,22 +164,26 @@ function Register({ onToggleMode }) {
             onChange={handleChange}
             disabled={loading}
             autoComplete="new-password"
+            className="formInput"
             required
           />
           <button
             type="button"
-            className="password-toggle"
+            className="passwordToggle"
             onClick={() => setShowPassword(!showPassword)}
             tabIndex="-1"
           >
-            {showPassword ? "👁️" : "👁️‍🗨️"}
+            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
         </div>
       </div>
       
-      <div className="form-group">
-        <label htmlFor="confirmPassword">Подтверждение пароля *</label>
-        <div className="password-input-wrapper">
+      <div className="formGroup">
+        <label htmlFor="confirmPassword" className="formLabel">
+          <Lock size={16} />
+          Подтверждение пароля <span className="required">*</span>
+        </label>
+        <div className="passwordWrapper">
           <input
             id="confirmPassword"
             type={showConfirmPassword ? "text" : "password"}
@@ -170,35 +193,30 @@ function Register({ onToggleMode }) {
             onChange={handleChange}
             disabled={loading}
             autoComplete="new-password"
+            className="formInput"
             required
           />
           <button
             type="button"
-            className="password-toggle"
+            className="passwordToggle"
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
             tabIndex="-1"
           >
-            {showConfirmPassword ? "👁️" : "👁️‍🗨️"}
+            {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
         </div>
       </div>
       
-      <button 
-        type="submit" 
-        disabled={loading}
-        className="auth-button"
-      >
+      <p className="formHint">Пароль должен содержать не менее 6 символов</p>
+      
+      <button type="submit" disabled={loading} className="authButton">
+        <UserPlus size={18} />
         {loading ? "Регистрация..." : "Зарегистрироваться"}
       </button>
       
-      <div className="auth-switch">
+      <div className="authSwitch">
         Уже есть аккаунт?{" "}
-        <button 
-          type="button" 
-          onClick={onToggleMode} 
-          className="switch-button"
-          disabled={loading}
-        >
+        <button type="button" onClick={onToggleMode} className="switchButton" disabled={loading}>
           Войти
         </button>
       </div>

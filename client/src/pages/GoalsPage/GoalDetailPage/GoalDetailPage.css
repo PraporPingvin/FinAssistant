@@ -1,627 +1,791 @@
-/* src/pages/GoalsPage/GoalDetailPage/GoalDetailPage.css */
+/* client/src/pages/GoalsPage/GoalDetailPage/GoalDetailPage.css */
 
-/* ============ ОСНОВНЫЕ СТИЛИ ============ */
-.goalDetailContainer {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 24px 20px;
-  min-height: calc(100vh - 80px);
+:root {
+  --primary-dark: #495631;
+  --primary-accent: #EAED74;
+  --primary-light: #EFF2DD;
+
+  --card-bg: rgba(255, 255, 255, 0.72);
+
+  --border-color: rgba(73, 86, 49, 0.08);
+
+  --text-main: #495631;
+  --text-muted: #7B8465;
+
+  --success-color: #2E7D32;
+  --danger-color: #E35D5D;
+
+  --shadow-sm:
+    0 8px 24px rgba(73, 86, 49, 0.06);
+
+  --shadow-lg:
+    0 18px 40px rgba(73, 86, 49, 0.12);
+
+  --radius-xl: 32px;
+  --radius-lg: 24px;
+  --radius-md: 18px;
+
+  --transition: all 0.28s ease;
 }
 
-/* ============ ХЛЕБНЫЕ КРОШКИ ============ */
+/* PAGE */
+
+.goalDetailPage {
+  max-width: 1240px;
+
+  margin: 0 auto;
+
+  padding: 42px 24px 80px;
+}
+
+/* BREADCRUMB */
+
 .breadcrumb {
-  margin-bottom: 24px;
-  font-size: 14px;
-  color: #717959;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+
+  gap: 12px;
+
+  margin-bottom: 36px;
+
+  color: var(--text-muted);
+
+  font-size: 0.92rem;
 }
 
 .breadcrumb a {
-  color: #495631;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  color: var(--text-muted);
+
   text-decoration: none;
-  transition: color 0.3s ease;
+
+  transition: var(--transition);
 }
 
 .breadcrumb a:hover {
-  color: #EAED74;
-  text-decoration: underline;
-}
-
-.breadcrumb .separator {
-  margin: 0 8px;
-  color: #DDE0C5;
+  color: var(--primary-dark);
 }
 
 .breadcrumb .current {
-  color: #495631;
-  font-weight: 500;
+  color: var(--text-main);
+
+  font-weight: 600;
 }
 
-/* ============ ЗАГОЛОВОК ============ */
-.detailHeader {
+/* HERO */
+
+.goalHero {
+  margin-bottom: 32px;
+
+  padding: 38px;
+
+  border-radius: var(--radius-xl);
+
+  background: var(--card-bg);
+
+  backdrop-filter: blur(18px);
+
+  border: 1px solid var(--border-color);
+
+  box-shadow: var(--shadow-sm);
+
+  overflow: hidden;
+
+  position: relative;
+}
+
+.goalHero::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 3px;
+
+  background: linear-gradient(90deg,
+      var(--primary-accent),
+      var(--primary-dark));
+}
+
+.goalHeroTop {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 30px;
-  flex-wrap: wrap;
-  gap: 20px;
+
+  gap: 24px;
+
+  margin-bottom: 36px;
 }
 
-.headerLeft {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-.headerLeft h1 {
-  margin: 0;
-  font-size: 2rem;
-  font-weight: 400;
-  color: #3A3F29;
-}
+/* STATUS */
 
 .statusBadge {
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  font-weight: 400;
-  white-space: nowrap;
-}
-
-.statusBadge.active {
-  background-color: rgba(46, 125, 50, 0.1);
-  color: #2e7d32;
-}
-
-.statusBadge.completed {
-  background-color: rgba(21, 101, 192, 0.1);
-  color: #1565c0;
-}
-
-.statusBadge.paused {
-  background-color: rgba(245, 124, 0, 0.1);
-  color: #ef6c00;
-}
-
-.headerActions {
-  display: flex;
-  gap: 12px;
-}
-
-.editButton, .deleteButton {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 400;
-  transition: all 0.3s ease;
-  text-decoration: none;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+
+  padding: 8px 16px;
+
+  border-radius: 999px;
+
+  margin-bottom: 18px;
+
+  font-size: 0.72rem;
+  font-weight: 700;
+
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.editButton {
-  background-color: #EFF2DD;
-  color: #495631;
+.status-active {
+  background:
+    rgba(234, 237, 116, 0.24);
+
+  color: #6B7400;
 }
 
-.editButton:hover {
-  background-color: #EAED74;
+.status-completed {
+  background:
+    rgba(76, 175, 80, 0.14);
+
+  color: var(--success-color);
+}
+
+/* TITLE */
+
+.goalTitle {
+  margin: 0 0 14px;
+
+  color: var(--text-main);
+
+  font-size: clamp(2.4rem, 4vw, 4rem);
+
+  font-weight: 300;
+
+  letter-spacing: -2px;
+
+  line-height: 1;
+}
+
+.goalDescription {
+  max-width: 760px;
+
+  margin: 0;
+
+  color: var(--text-muted);
+
+  font-size: 1.05rem;
+
+  line-height: 1.7;
+}
+
+/* ACTIONS */
+
+.heroActions {
+  display: flex;
+  gap: 14px;
+
+  flex-shrink: 0;
+}
+
+.heroButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 14px 22px;
+
+  border: none;
+  border-radius: 999px;
+
+  cursor: pointer;
+
+  text-decoration: none;
+
+  font-size: 0.94rem;
+  font-weight: 600;
+
+  transition: var(--transition);
+}
+
+.primaryButton {
+  background: var(--primary-dark);
+
+  color: var(--primary-accent);
+}
+
+.primaryButton:hover {
   transform: translateY(-2px);
+
+  background: var(--primary-accent);
+
+  color: var(--primary-dark);
+
+  box-shadow: var(--shadow-lg);
 }
 
-.deleteButton {
-  background-color: rgba(244, 67, 54, 0.1);
-  color: #f44336;
+.dangerButton {
+  background:
+    rgba(227, 93, 93, 0.1);
+
+  color: var(--danger-color);
 }
 
-.deleteButton:hover {
-  background-color: #f44336;
+.dangerButton:hover {
+  transform: translateY(-2px);
+
+  background: var(--danger-color);
+
   color: white;
-  transform: translateY(-2px);
 }
 
-/* ============ СЕКЦИЯ ПРОГРЕССА ============ */
-.progressSection {
-  background: white;
-  border-radius: 16px;
-  padding: 24px;
-  margin-bottom: 30px;
-  box-shadow: 0 2px 8px rgba(73, 86, 49, 0.08);
-  border: 1px solid #DDE0C5;
+/* PROGRESS */
+
+.progressCard {
+  padding: 28px;
+
+  border-radius: var(--radius-lg);
+
+  background:
+    rgba(255, 255, 255, 0.52);
+
+  border:
+    1px solid rgba(73, 86, 49, 0.06);
 }
 
 .progressHeader {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-  font-weight: 400;
-  color: #717959;
+  align-items: flex-start;
+
+  gap: 20px;
+
+  margin-bottom: 24px;
+}
+
+.progressLabel {
+  margin-bottom: 8px;
+
+  color: var(--text-muted);
+
+  font-size: 0.92rem;
 }
 
 .progressPercent {
-  font-weight: 600;
-  color: #495631;
-  font-size: 1.1rem;
+  color: var(--text-main);
+
+  font-size: clamp(2.4rem, 4vw, 4rem);
+
+  font-weight: 300;
+
+  letter-spacing: -2px;
+
+  line-height: 1;
 }
 
+.progressAmounts {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  color: var(--text-main);
+
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.divider {
+  opacity: 0.4;
+}
+
+/* BAR */
+
 .progressBar {
+  position: relative;
+
+  width: 100%;
   height: 12px;
-  background-color: #EFF2DD;
-  border-radius: 6px;
+
   overflow: hidden;
-  margin-bottom: 20px;
+
+  border-radius: 999px;
+
+  margin-bottom: 28px;
+
+  background:
+    rgba(73, 86, 49, 0.08);
 }
 
 .progressFill {
   height: 100%;
-  background: linear-gradient(90deg, #495631, #EAED74);
-  border-radius: 6px;
-  transition: width 0.5s ease;
+
+  border-radius: 999px;
+
+  background: linear-gradient(90deg,
+      var(--primary-accent),
+      var(--primary-dark));
+
+  transition:
+    width 1s cubic-bezier(0.22,
+      1,
+      0.36,
+      1);
 }
+
+/* STATS */
 
 .progressStats {
-  display: flex;
-  justify-content: space-around;
-  gap: 20px;
-  flex-wrap: wrap;
+  display: grid;
+
+  grid-template-columns:
+    repeat(auto-fit, minmax(220px, 1fr));
+
+  gap: 18px;
 }
 
-.statItem {
-  flex: 1;
-  text-align: center;
-  min-width: 120px;
+.statCard {
+  padding: 22px;
+
+  border-radius: var(--radius-md);
+
+  background:
+    rgba(255, 255, 255, 0.55);
+
+  border:
+    1px solid rgba(73, 86, 49, 0.05);
+
+  transition: var(--transition);
+}
+
+.statCard:hover {
+  transform: translateY(-2px);
+
+  background:
+    rgba(255, 255, 255, 0.72);
+
+  box-shadow: var(--shadow-sm);
 }
 
 .statLabel {
-  display: block;
-  font-size: 0.85rem;
-  color: #717959;
-  margin-bottom: 6px;
+  margin-bottom: 10px;
+
+  color: var(--text-muted);
+
+  font-size: 0.82rem;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.5px;
 }
 
 .statValue {
-  font-size: 1.3rem;
-  font-weight: 500;
-  color: #3A3F29;
+  color: var(--text-main);
+
+  font-size: 1.15rem;
+  font-weight: 700;
+
+  line-height: 1.4;
 }
 
-.statValue.highlight {
-  color: #495631;
-  font-weight: 600;
-}
+/* INFO GRID */
 
-/* ============ СЕТКА ИНФОРМАЦИИ ============ */
-.infoGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+.infoGridGoalDetail {
+  display: flex;
+  padding: 28px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(73, 86, 49, 0.06);
   gap: 20px;
-  margin-bottom: 30px;
+  margin-bottom: 32px;
+  justify-content: space-between;
 }
 
-.infoCard {
-  background: white;
-  border-radius: 12px;
-  padding: 20px;
+.infoCardGoalDetail {
   display: flex;
   align-items: center;
-  gap: 16px;
-  box-shadow: 0 2px 8px rgba(73, 86, 49, 0.08);
-  border: 1px solid #DDE0C5;
-  transition: transform 0.3s ease;
+  width: 100%;
+  gap: 18px;
+
+  padding: 24px;
+
+  border-radius: var(--radius-lg);
+
+  background: var(--card-bg);
+
+  backdrop-filter: blur(16px);
+
+  border:
+    1px solid var(--border-color);
+
+  box-shadow: var(--shadow-sm);
+
+  transition: var(--transition);
 }
 
-.infoCard:hover {
+.infoCardGoalDetail:hover {
   transform: translateY(-3px);
+
+  box-shadow: var(--shadow-lg);
 }
 
-.infoIcon {
-  font-size: 2rem;
-}
+.infoCardGoalDetail svg {
+  flex-shrink: 0;
 
-.infoContent {
-  flex: 1;
+  color: var(--primary-dark);
 }
 
 .infoLabel {
-  font-size: 0.8rem;
-  color: #717959;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
+
+  color: var(--text-muted);
+
+  font-size: 0.84rem;
 }
 
 .infoValue {
-  font-size: 1.1rem;
-  font-weight: 500;
-  color: #3A3F29;
+  color: var(--text-main);
+
+  font-size: 1rem;
+  font-weight: 600;
 }
 
-/* ============ КНОПКИ ДЕЙСТВИЙ ============ */
-.actionButtons {
+/* ACTIONS */
+
+.actionSection {
+  display: grid;
+
+  grid-template-columns:
+    repeat(auto-fit, minmax(260px, 1fr));
+
+  gap: 20px;
+}
+
+.actionCard {
   display: flex;
-  gap: 16px;
-  margin-bottom: 30px;
-  flex-wrap: wrap;
-}
+  align-items: flex-start;
 
-.actionButton {
-  padding: 12px 24px;
-  border-radius: 8px;
+  gap: 18px;
+
+  padding: 28px;
+
+  border-radius: var(--radius-lg);
+
+  background: var(--card-bg);
+
+  backdrop-filter: blur(16px);
+
+  border:
+    1px solid var(--border-color);
+
+  box-shadow: var(--shadow-sm);
+
   text-decoration: none;
-  font-size: 0.95rem;
-  font-weight: 400;
-  transition: all 0.3s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
+
+  transition: var(--transition);
 }
 
-.actionButton.primary {
-  background-color: #495631;
-  color: #EAED74;
+.actionCard:hover {
+  transform: translateY(-4px);
+  background: rgba(73, 86, 49, 0.03);
+  box-shadow: var(--shadow-lg);
 }
 
-.actionButton.primary:hover {
-  background-color: #3a4527;
-  transform: translateY(-2px);
+.actionCard svg {
+  color: var(--primary-dark);
+
+  flex-shrink: 0;
 }
 
-.actionButton.secondary {
-  background-color: #EFF2DD;
-  color: #495631;
+.actionCard h3 {
+  margin: 0 0 10px;
+
+  color: var(--text-main);
+
+  font-size: 1.08rem;
+  font-weight: 600;
 }
 
-.actionButton.secondary:hover {
-  background-color: #EAED74;
-  transform: translateY(-2px);
+.actionCard p {
+  margin: 0;
+
+  color: var(--text-muted);
+
+  line-height: 1.6;
 }
 
-/* ============ МОДАЛЬНОЕ ОКНО ============ */
+/* MODAL */
+
 .modalOverlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  inset: 0;
+
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+
+  background:
+    rgba(73, 86, 49, 0.18);
+
+  backdrop-filter: blur(10px);
+
   z-index: 1000;
 }
 
-.modalContent {
-  background: white;
-  border-radius: 16px;
-  width: 90%;
-  max-width: 500px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-  animation: modalFadeIn 0.3s ease;
+.modalCard {
+  width: 100%;
+  max-width: 460px;
+
+  padding: 34px;
+
+  border-radius: var(--radius-xl);
+
+  background:
+    rgba(255, 255, 255, 0.92);
+
+  box-shadow: var(--shadow-lg);
+
+  animation: modalAppear 0.28s ease;
 }
 
-@keyframes modalFadeIn {
+@keyframes modalAppear {
   from {
     opacity: 0;
-    transform: scale(0.95);
+    transform:
+      translateY(12px) scale(0.98);
   }
+
   to {
     opacity: 1;
-    transform: scale(1);
+    transform:
+      translateY(0) scale(1);
   }
 }
 
-.modalHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 24px;
-  border-bottom: 1px solid #DDE0C5;
+.modalCard h3 {
+  margin: 0 0 14px;
+
+  color: var(--text-main);
+
+  font-size: 1.4rem;
 }
 
-.modalHeader h3 {
+.modalCard p {
   margin: 0;
-  font-size: 1.2rem;
-  font-weight: 500;
-  color: #3A3F29;
+
+  color: var(--text-muted);
+
+  line-height: 1.7;
 }
 
-.closeButton {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: #717959;
-  transition: color 0.3s ease;
-}
-
-.closeButton:hover {
-  color: #f44336;
-}
-
-.modalBody {
-  padding: 24px;
-}
-
-.modalBody p {
-  margin: 0 0 12px 0;
-  color: #3A3F29;
-  line-height: 1.5;
-}
-
-.warningText {
-  color: #f44336;
-  font-size: 0.9rem;
-}
-
-.modalFooter {
+.modalActions {
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
-  padding: 20px 24px;
-  border-top: 1px solid #DDE0C5;
-}
 
-.cancelButton {
-  padding: 10px 20px;
-  background: #EFF2DD;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  color: #495631;
-  transition: all 0.3s ease;
-}
+  gap: 14px;
 
-.cancelButton:hover {
-  background: #DDE0C5;
-}
-
-.confirmDeleteButton {
-  padding: 10px 20px;
-  background: #f44336;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  color: white;
-  transition: all 0.3s ease;
-}
-
-.confirmDeleteButton:hover {
-  background: #d32f2f;
-}
-
-.confirmDeleteButton:disabled,
-.cancelButton:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* ============ ЗАГРУЗКА ============ */
-.loadingContainer {
-  text-align: center;
-  padding: 60px 20px;
-}
-
-.loadingAnimation {
-  display: inline-block;
-  width: 50px;
-  height: 50px;
-  border: 3px solid #DDE0C5;
-  border-radius: 50%;
-  border-top-color: #495631;
-  animation: spin 1s ease-in-out infinite;
-  margin-bottom: 20px;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.loadingContainer p {
-  color: #717959;
-  font-size: 1rem;
-}
-
-/* ============ ОШИБКИ ============ */
-.errorContainer {
-  text-align: center;
-  padding: 60px 20px;
-}
-
-.errorMessage {
-  background-color: rgba(244, 67, 54, 0.1);
-  color: #f44336;
-  padding: 16px 20px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  border-left: 4px solid #f44336;
-  display: inline-block;
-}
-
-.backButton {
-  display: inline-block;
-  padding: 12px 24px;
-  background-color: #495631;
-  color: #EAED74;
-  text-decoration: none;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-}
-
-.backButton:hover {
-  background-color: #3a4527;
-  transform: translateY(-2px);
-}
-
-/* ============ АДАПТИВНОСТЬ ============ */
-@media (max-width: 768px) {
-  .goalDetailContainer {
-    padding: 16px;
-  }
-  
-  .detailHeader {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  
-  .headerLeft {
-    width: 100%;
-    justify-content: space-between;
-  }
-  
-  .headerLeft h1 {
-    font-size: 1.5rem;
-  }
-  
-  .headerActions {
-    width: 100%;
-  }
-  
-  .editButton, .deleteButton {
-    flex: 1;
-    justify-content: center;
-  }
-  
-  .progressStats {
-    flex-direction: column;
-    gap: 12px;
-  }
-  
-  .statItem {
-    text-align: left;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .statLabel {
-    margin-bottom: 0;
-  }
-  
-  .infoGrid {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .actionButtons {
-    flex-direction: column;
-  }
-  
-  .actionButton {
-    justify-content: center;
-  }
-  
-  .modalContent {
-    width: 95%;
-    margin: 20px;
-  }
-  
-  .modalFooter {
-    flex-direction: column;
-  }
-  
-  .cancelButton, .confirmDeleteButton {
-    width: 100%;
-    text-align: center;
-  }
-}
-
-@media (max-width: 480px) {
-  .headerLeft {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-  
-  .progressSection {
-    padding: 16px;
-  }
-  
-  .statValue {
-    font-size: 1.1rem;
-  }
-  
-  .infoCard {
-    padding: 16px;
-  }
-  
-  .infoIcon {
-    font-size: 1.5rem;
-  }
-  
-  .infoValue {
-    font-size: 1rem;
-  }
-}
-
-/* ============ КОНТРОЛЬНЫЕ ТОЧКИ (если нужны) ============ */
-.checkpointsSection {
   margin-top: 30px;
 }
 
-.sectionTitle {
-  font-size: 1.2rem;
-  font-weight: 500;
-  color: #3A3F29;
-  margin-bottom: 20px;
-  padding-bottom: 10px;
-  border-bottom: 2px solid #DDE0C5;
+.modalButton {
+  padding: 14px 22px;
+
+  border: none;
+  border-radius: 999px;
+
+  cursor: pointer;
+
+  font-size: 0.94rem;
+  font-weight: 600;
+
+  transition: var(--transition);
 }
 
-.checkpointsList {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+.cancelModalButton {
+  background:
+    rgba(73, 86, 49, 0.06);
+
+  color: var(--text-main);
 }
 
-.checkpointItem {
-  background: white;
-  border-radius: 8px;
-  padding: 16px;
+.cancelModalButton:hover {
+  background:
+    rgba(73, 86, 49, 0.12);
+}
+
+.deleteModalButton {
+  background: var(--danger-color);
+
+  color: white;
+}
+
+.deleteModalButton:hover {
+  transform: translateY(-2px);
+
+  box-shadow: var(--shadow-lg);
+}
+
+/* LOADING */
+
+.loadingContainer,
+.errorContainer {
+  min-height: 70vh;
+
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  border: 1px solid #DDE0C5;
-  transition: all 0.3s ease;
+  justify-content: center;
+
+  padding: 24px;
 }
 
-.checkpointItem:hover {
-  box-shadow: 0 2px 8px rgba(73, 86, 49, 0.1);
+.loadingSpinner {
+  width: 58px;
+  height: 58px;
+
+  border-radius: 50%;
+
+  border:
+    3px solid rgba(73, 86, 49, 0.12);
+
+  border-top-color:
+    var(--primary-dark);
+
+  animation:
+    spin 0.9s linear infinite;
 }
 
-.checkpointInfo h4 {
-  margin: 0 0 6px 0;
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loadingText {
+  margin-top: 18px;
+
+  color: var(--text-main);
+
   font-size: 1rem;
-  color: #3A3F29;
 }
 
-.checkpointInfo p {
-  margin: 0;
-  font-size: 0.85rem;
-  color: #717959;
+.errorCard {
+  max-width: 480px;
+
+  padding: 38px;
+
+  border-radius: var(--radius-xl);
+
+  text-align: center;
+
+  background: var(--card-bg);
+
+  backdrop-filter: blur(16px);
+
+  border:
+    1px solid var(--border-color);
+
+  box-shadow: var(--shadow-sm);
 }
 
-.checkpointStatus {
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 500;
+.errorCard h2 {
+  margin: 0 0 14px;
+
+  color: var(--danger-color);
 }
 
-.checkpointStatus.completed {
-  background: rgba(46, 125, 50, 0.1);
-  color: #2e7d32;
+.errorCard p {
+  margin: 0 0 28px;
+
+  color: var(--text-muted);
+
+  line-height: 1.7;
 }
 
-.checkpointStatus.pending {
-  background: rgba(245, 124, 0, 0.1);
-  color: #ef6c00;
+.backButton {
+  padding: 14px 22px;
+
+  border: none;
+  border-radius: 999px;
+
+  background: var(--primary-dark);
+
+  color: var(--primary-accent);
+
+  cursor: pointer;
+
+  font-weight: 600;
+
+  transition: var(--transition);
 }
 
-.checkpointStatus.overdue {
-  background: rgba(244, 67, 54, 0.1);
-  color: #f44336;
+.backButton:hover {
+  transform: translateY(-2px);
+
+  background: var(--primary-accent);
+
+  color: var(--primary-dark);
+}
+
+/* MOBILE */
+
+@media (max-width: 900px) {
+  .goalHeroTop {
+    flex-direction: column;
+  }
+
+  .heroActions {
+    width: 100%;
+
+    flex-wrap: wrap;
+  }
+
+  .heroButton {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .goalDetailPage {
+    padding: 28px 18px 60px;
+  }
+
+  .goalHero {
+    padding: 26px;
+  }
+
+  .progressCard {
+    padding: 22px;
+  }
+
+  .progressHeader {
+    flex-direction: column;
+  }
+
+  .modalActions {
+    flex-direction: column;
+  }
+
+  .modalButton {
+    width: 100%;
+  }
+
+  .heroActions {
+    flex-direction: column;
+  }
+
+  .heroButton {
+    width: 100%;
+  }
+  
+  .infoGridGoalDetail{
+    flex-wrap: wrap;
+  }
 }

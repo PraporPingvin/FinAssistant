@@ -1,66 +1,90 @@
-/* src/components/UserMenu/UserMenu.css */
-.user-menu {
+:root {
+  --primary-dark: #495631;
+  --primary-accent: #EAED74;
+  --primary-light: #EFF2DD;
+
+  --card-bg: #FFFFFF;
+  --border-color: rgba(73, 86, 49, 0.08);
+  --border-solid: #DDE0C5;
+
+  --text-main: #495631;
+  --text-muted: #7B8465;
+
+  --danger-color: #E35D5D;
+
+  --shadow-sm: 0 4px 12px rgba(73, 86, 49, 0.08);
+  --shadow-md: 0 8px 24px rgba(73, 86, 49, 0.12);
+
+  --radius-sm: 12px;
+  --radius-md: 18px;
+  --radius-full: 999px;
+
+  --transition: all 0.28s ease;
+}
+
+.userMenu {
   position: relative;
   display: inline-block;
 }
 
-.user-menu-button {
+.userMenuButton {
   display: flex;
   align-items: center;
   gap: 10px;
   background: rgba(234, 237, 116, 0.15);
   border: 1px solid rgba(234, 237, 116, 0.3);
-  border-radius: 30px;
-  padding: 5px 15px 5px 5px;
+  border-radius: var(--radius-full);
+  padding: 6px 16px 6px 6px;
   cursor: pointer;
-  color: white;
-  transition: all 0.3s ease;
+  transition: var(--transition);
 }
 
-.user-menu-button:hover {
+.userMenuButton:hover {
   background: rgba(234, 237, 116, 0.25);
   border-color: rgba(234, 237, 116, 0.5);
 }
 
-.user-avatar {
-  width: 35px;
-  height: 35px;
+.userAvatar {
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  background: var(--primary-accent, #EAED74);
-  color: var(--primary-dark, #495631);
+  background: var(--primary-accent);
+  color: var(--primary-dark);
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 600;
-  font-size: 16px;
+  font-size: 0.9rem;
 }
 
-.user-name {
-  font-size: 14px;
+.userName {
+  font-size: 0.85rem;
   font-weight: 500;
   max-width: 120px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: var(--primary-accent);
 }
 
-.user-menu-arrow {
-  font-size: 10px;
-  transition: transform 0.3s ease;
+.userMenuArrow {
+  color: var(--primary-accent);
+  transition: transform var(--transition);
 }
 
-.user-menu-arrow.open {
+.userMenuArrow.open {
   transform: rotate(180deg);
 }
 
-.user-dropdown {
+.userDropdown {
   position: absolute;
   top: calc(100% + 10px);
-  width: 250px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(73, 86, 49, 0.15);
-  border: 1px solid var(--border-color, #DDE0C5);
+  right: 0;
+  width: 260px;
+  background: var(--card-bg);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-color);
   overflow: hidden;
   z-index: 1000;
   animation: dropdownFade 0.2s ease;
@@ -69,7 +93,7 @@
 @keyframes dropdownFade {
   from {
     opacity: 0;
-    transform: translateY(-10px);
+    transform: translateY(-8px);
   }
   to {
     opacity: 1;
@@ -77,66 +101,68 @@
   }
 }
 
-.user-info {
+.userInfo {
   padding: 16px;
-  background: var(--primary-light, #EFF2DD);
+  background: var(--primary-light);
 }
 
-.user-info-name {
+.userInfoName {
   font-weight: 600;
-  color: var(--primary-dark, #495631);
+  color: var(--text-main);
   margin-bottom: 4px;
+  font-size: 0.9rem;
 }
 
-.user-info-email {
-  font-size: 12px;
-  color: var(--text-muted, #717959);
+.userInfoEmail {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  word-break: break-all;
 }
 
-.dropdown-divider {
+.dropdownDivider {
   height: 1px;
-  background: var(--border-color, #DDE0C5);
-  margin: 4px 0;
+  background: var(--border-color);
+  margin: 6px 0;
 }
 
-.dropdown-item {
+.dropdownItem {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   width: 100%;
   padding: 12px 16px;
   border: none;
   background: none;
   text-align: left;
-  font-size: 14px;
-  color: var(--primary-dark, #495631);
+  font-size: 0.85rem;
+  color: var(--text-main);
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: var(--transition);
 }
 
-.dropdown-item:hover {
-  background: var(--primary-light, #EFF2DD);
+.dropdownItem:hover {
+  background: var(--primary-light);
 }
 
-.dropdown-item.logout {
-  color: #d32f2f;
+.dropdownItem.logout {
+  color: var(--danger-color);
 }
 
-.dropdown-item.logout:hover {
-  background: #ffebee;
+.dropdownItem.logout:hover {
+  background: rgba(227, 93, 93, 0.1);
 }
 
 @media (max-width: 768px) {
-  .user-name {
+  .userName {
     display: none;
   }
-  
-  .user-menu-button {
-    padding: 5px;
+
+  .userMenuButton {
+    padding: 6px;
   }
-  
-  .user-dropdown {
+
+  .userDropdown {
     width: 220px;
-    right: -10px;
+    right: -5px;
   }
 }

@@ -15,16 +15,13 @@ router.post('/register', validateRegistration, async (req, res) => {
         const { email, password, first_name, last_name } = req.body;
         console.log('📝 Попытка регистрации:', { email, first_name, last_name });
 
-        // Проверка уникальности email
         const userExists = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
         if (userExists.rows.length > 0) {
             return res.status(400).json({ error: 'Пользователь с таким email уже существует' });
         }
 
-        // Хеширование пароля
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Создание пользователя
         const result = await pool.query(
             `INSERT INTO users (email, password_hash, first_name, last_name, created_at, updated_at)
              VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
@@ -101,6 +98,44 @@ router.post('/login', async (req, res) => {
     }
 });
 
+// ✅ ПРОСТОЙ СБРОС ПАРОЛЯ (без email-подтверждения) - ДЛЯ РАЗРАБОТКИ
+router.post('/simple-reset-password', async (req, res) => {
+    try {
+        const { email, newPassword } = req.body;
+        
+        if (!email || !newPassword) {
+            return res.status(400).json({ error: 'Email и новый пароль обязательны' });
+        }
+        
+        if (newPassword.length < 6) {
+            return res.status(400).json({ error: 'Пароль должен быть не менее 6 символов' });
+        }
+        
+        const userResult = await pool.query('SELECT user_id FROM users WHERE email = $1', [email]);
+        
+        if (userResult.rows.length === 0) {
+            return res.status(404).json({ error: 'Пользователь с таким email не найден' });
+        }
+        
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        
+        await pool.query(
+            'UPDATE users SET password_hash = $1, updated_at = CURRENT_TIMESTAMP WHERE email = $2',
+            [hashedPassword, email]
+        );
+        
+        console.log(`✅ Пароль изменен для: ${email}`);
+        res.json({ 
+            success: true, 
+            message: 'Пароль успешно изменен!' 
+        });
+        
+    } catch (error) {
+        console.error('❌ Ошибка сброса пароля:', error);
+        res.status(500).json({ error: 'Ошибка сервера' });
+    }
+});
+
 // Проверка токена
 router.get('/verify', authenticateToken, async (req, res) => {
     try {
@@ -127,88 +162,5 @@ router.get('/verify', authenticateToken, async (req, res) => {
         res.status(401).json({ error: 'Недействительный токен' });
     }
 });
-
-// Запрос сброса пароля (заготовка)
-router.post('/forgot-password', async (req, res) => {
-    try {
-        const { email } = req.body;
-        if (!email) {
-            return res.status(400).json({ error: 'Email обязателен' });
-        }
-
-        const userResult = await pool.query('SELECT user_id FROM users WHERE email = $1', [email]);
-
-        if (userResult.rows.length === 0) {
-            return res.json({
-                message: 'Если пользователь с таким email существует, инструкция по сбросу пароля будет отправлена'
-            });
-        }
-
-        console.log(`📧 Запрос сброса пароля для: ${email}`);
-        res.json({
-            message: 'Если пользователь с таким email существует, инструкция по сбросу пароля будет отправлена'
-        });
-    } catch (error) {
-        console.error('❌ Ошибка:', error);
-        res.status(500).json({ error: 'Ошибка сервера' });
-    }
-});
-
-// Сброс пароля по токену (заготовка)
-router.post('/reset-password', async (req, res) => {
-    try {
-        const { token, newPassword } = req.body;
-
-        if (!token || !newPassword) {
-            return res.status(400).json({ error: 'Токен и новый пароль обязательны' });
-        }
-
-        if (newPassword.length < 6) {
-            return res.status(400).json({ error: 'Пароль должен быть не менее 6 символов' });
-        }
-
-        console.log('🔐 Запрос сброса пароля по токену (требуется реализация)');
-        res.status(501).json({
-            error: 'Функция сброса пароля требует реализации.'
-        });
-    } catch (error) {
-        console.error('❌ Ошибка:', error);
-        res.status(500).json({ error: 'Ошибка сервера' });
-    }
-});
-
-// Демо-сброс пароля (только для разработки)
-if (process.env.NODE_ENV !== 'production') {
-    router.post('/demo-reset-password', async (req, res) => {
-        console.warn('⚠️ Используется демо-эндпоинт сброса пароля!');
-        
-        try {
-            const { email, newPassword } = req.body;
-
-            if (!email || !newPassword) {
-                return res.status(400).json({ error: 'Email и новый пароль обязательны' });
-            }
-
-            if (newPassword.length < 6) {
-                return res.status(400).json({ error: 'Пароль должен быть не менее 6 символов' });
-            }
-
-            const userResult = await pool.query('SELECT user_id FROM users WHERE email = $1', [email]);
-
-            if (userResult.rows.length === 0) {
-                return res.status(404).json({ error: 'Пользователь с таким email не найден' });
-            }
-
-            const hashedPassword = await bcrypt.hash(newPassword, 10);
-            await pool.query('UPDATE users SET password_hash = $1, updated_at = CURRENT_TIMESTAMP WHERE email = $2', [hashedPassword, email]);
-
-            console.log('✅ [DEMO] Пароль изменен для:', email);
-            res.json({ success: true, message: 'Пароль успешно изменен! (ДЕМО-РЕЖИМ)' });
-        } catch (error) {
-            console.error('❌ Ошибка:', error);
-            res.status(500).json({ error: 'Ошибка сервера' });
-        }
-    });
-}
 
 module.exports = router;

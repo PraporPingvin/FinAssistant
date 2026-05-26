@@ -1,150 +1,253 @@
-/* src/pages/Settings/Settings.css */
-.settings-container {
-  max-width: 600px;
+:root {
+  --primary-dark: #495631;
+  --primary-accent: #EAED74;
+  --primary-light: #EFF2DD;
+
+  --card-bg: rgba(255, 255, 255, 0.72);
+  --border-color: rgba(73, 86, 49, 0.08);
+
+  --text-main: #495631;
+  --text-muted: #7B8465;
+
+  --success-color: #2E7D32;
+  --danger-color: #E35D5D;
+
+  --shadow-sm: 0 8px 24px rgba(73, 86, 49, 0.06);
+  --shadow-md: 0 10px 30px rgba(73, 86, 49, 0.08);
+
+  --radius-sm: 12px;
+  --radius-md: 18px;
+  --radius-lg: 24px;
+  --radius-full: 999px;
+
+  --transition: all 0.28s ease;
+}
+
+.settingsPage {
+  max-width: 900px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 42px 24px 80px;
 }
 
-.settings-container h1 {
-  color: var(--primary-dark, #495631);
-  margin-bottom: 30px;
+.pageHeaderSetting {
+  text-align: center;
+  margin-bottom: 42px;
+}
+
+.pageHeaderSetting h1 {
+  margin: 0 0 8px;
+  color: var(--text-main);
+  font-size: clamp(2rem, 4vw, 2.5rem);
   font-weight: 300;
-  font-size: 28px;
+  letter-spacing: -1px;
 }
 
-.settings-card {
-  background: white;
-  border-radius: 20px;
-  padding: 30px;
-  box-shadow: 0 4px 20px rgba(73, 86, 49, 0.1);
-  margin-bottom: 30px;
+.pageHeaderSetting p {
+  margin: 0;
+  color: var(--text-muted);
 }
 
-.settings-card h2 {
-  color: #495631;
-  margin-bottom: 20px;
-  font-size: 20px;
+.settingsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+}
+
+.settingsCard {
+  padding: 28px;
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.cardHeader svg {
+  color: var(--primary-dark);
+}
+
+.cardHeader h2 {
+  margin: 0;
+  color: var(--text-main);
+  font-size: 1.2rem;
   font-weight: 500;
 }
 
-.settings-form .form-group {
+.message {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  margin-bottom: 24px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+}
+
+.message.success {
+  background: rgba(46, 125, 50, 0.1);
+  color: var(--success-color);
+  border-left: 3px solid var(--success-color);
+}
+
+.message.error {
+  background: rgba(227, 93, 93, 0.1);
+  color: var(--danger-color);
+  border-left: 3px solid var(--danger-color);
+}
+
+.settingsForm {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.formGroup {
   margin-bottom: 20px;
 }
 
-.settings-form .form-group label {
-  display: block;
+.formLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   margin-bottom: 8px;
-  color: #495631;
+  color: var(--text-muted);
+  font-size: 0.85rem;
   font-weight: 500;
 }
 
-.settings-form .form-group input {
-  width: 100%;
-  padding: 12px;
-  border: 2px solid #DDE0C5;
-  border-radius: 12px;
-  font-size: 16px;
-  transition: all 0.3s ease;
-}
-
-.settings-form .form-group input:focus {
-  outline: none;
-  border-color: #EAED74;
-}
-
-.password-input-wrapper {
+.passwordWrapper {
   position: relative;
 }
 
-.show-password-checkbox {
-  margin: 15px 0;
+.formInput {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.75);
+  color: var(--text-main);
+  font-size: 0.95rem;
+  transition: var(--transition);
+  box-sizing: border-box;
 }
 
-.show-password-checkbox label {
+.formInput:focus {
+  outline: none;
+  border-color: var(--primary-accent);
+  box-shadow: 0 0 0 4px rgba(234, 237, 116, 0.18);
+}
+
+.showPasswordCheckbox {
+  margin: 16px 0 24px;
+}
+
+.showPasswordCheckbox label {
   display: flex;
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  color: #717959;
-  font-size: 14px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
 }
 
-.change-password-button {
-  width: 100%;
-  padding: 12px;
-  background: linear-gradient(135deg, #495631, #6b8c4a);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  font-size: 16px;
+.showPasswordCheckbox input {
   cursor: pointer;
-  transition: all 0.3s ease;
-  margin-top: 10px;
 }
 
-.change-password-button:hover:not(:disabled) {
+.submitButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: var(--primary-dark);
+  color: var(--primary-accent);
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.submitButton:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(73, 86, 49, 0.3);
+  background: var(--primary-accent);
+  color: var(--primary-dark);
+  box-shadow: var(--shadow-md);
 }
 
-.change-password-button:disabled {
-  opacity: 0.6;
+.submitButton:disabled {
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
-.account-info {
-  margin-top: 10px;
-}
-
-.account-info .info-row {
+.accountInfo {
   display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.infoRow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
   padding: 12px 0;
-  border-bottom: 1px solid #DDE0C5;
+  border-bottom: 1px solid var(--border-color);
 }
 
-.account-info .info-row label {
-  width: 100px;
-  font-weight: 600;
-  color: #495631;
+.infoRow:last-child {
+  border-bottom: none;
 }
 
-.account-info .info-row span {
-  flex: 1;
-  color: #717959;
+.infoLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 100px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
 }
 
-.settings-message {
-  padding: 12px;
-  border-radius: 12px;
-  margin-bottom: 20px;
-  text-align: center;
+.infoValue {
+  color: var(--text-main);
+  font-size: 0.95rem;
+  font-weight: 500;
+  word-break: break-all;
 }
 
-.settings-message.success {
-  background: #e8f5e9;
-  color: #2e7d32;
-}
-
-.settings-message.error {
-  background: #fee;
-  color: #d32f2f;
-}
-
-@media (max-width: 480px) {
-  .settings-container {
-    padding: 15px;
+@media (max-width: 900px) {
+  .settingsGrid {
+    grid-template-columns: 1fr;
+    gap: 24px;
   }
-  
-  .settings-card {
+}
+
+@media (max-width: 768px) {
+  .settingsPage {
+    padding: 28px 18px 60px;
+  }
+
+  .settingsCard {
     padding: 20px;
   }
-  
-  .account-info .info-row {
+
+  .infoRow {
     flex-direction: column;
-    gap: 5px;
+    align-items: flex-start;
+    gap: 6px;
   }
-  
-  .account-info .info-row label {
-    width: auto;
+
+  .infoLabel {
+    min-width: auto;
   }
 }

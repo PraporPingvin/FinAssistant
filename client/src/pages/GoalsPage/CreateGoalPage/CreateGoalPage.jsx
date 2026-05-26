@@ -1,5 +1,15 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  Plus,
+  X,
+  Calendar,
+  Target,
+  Wallet,
+  CreditCard,
+  Clock,
+  FileText,
+} from "lucide-react";
 import Layout from "../../../components/Layout";
 import { createGoal } from "../../../api/api";
 import "./CreateGoalPage.css";
@@ -23,7 +33,6 @@ function CreateGoalPage() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     
-    // Форматирование числовых полей
     if (["target_amount", "monthly_contribution", "initial_amount"].includes(name)) {
       const numericValue = value.replace(/[^\d]/g, '');
       setFormData(prev => ({
@@ -37,7 +46,6 @@ function CreateGoalPage() {
       }));
     }
     
-    // Очищаем ошибку при изменении
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -127,34 +135,35 @@ function CreateGoalPage() {
     <Layout>
       {loading && (
         <div className="loadingOverlay">
-          <div className="loadingSpinner"></div>
+          <div className="loadingSpinner" />
           <div className="loadingText">Создание цели...</div>
         </div>
       )}
       
-      <div className="createGoalContainer">
-        <div className="createGoalHeader">
-          <h1 className="createGoalTitle">Создание новой цели</h1>
-          <p className="createGoalSubtitle">
+      <div className="createGoalPage">
+        <div className="pageIntro">
+          <h1 className="pageTitle">Новая финансовая цель</h1>
+          <p className="pageSubtitle">
             Заполните информацию о вашей финансовой цели
           </p>
         </div>
         
         {success && (
           <div className="successMessage">
-            ✅ Цель успешно создана! Перенаправляем на страницу целей...
+            <Plus size={18} />
+            Цель успешно создана! Перенаправляем на страницу целей...
           </div>
         )}
         
         {errors.submit && (
           <div className="errorMessage">
-            ❌ {errors.submit}
+            <X size={18} />
+            {errors.submit}
           </div>
         )}
         
         <div className="createGoalForm">
           <form onSubmit={handleSubmit}>
-            {/* Название цели */}
             <div className="formGroup">
               <label htmlFor="title" className="formLabel">
                 Название цели <span className="required">*</span>
@@ -172,17 +181,17 @@ function CreateGoalPage() {
               {errors.title && <div className="validationError">{errors.title}</div>}
             </div>
             
-            {/* Целевая сумма и ежемесячный взнос */}
             <div className="formRow">
               <div className="formColumn">
                 <label htmlFor="target_amount" className="formLabel">
+                  <Target size={14} />
                   Целевая сумма (₽) <span className="required">*</span>
                 </label>
                 <input
                   id="target_amount"
                   name="target_amount"
                   type="text"
-                  placeholder="1000000"
+                  placeholder="1 000 000"
                   value={formData.target_amount}
                   onChange={handleChange}
                   className={`formInput ${errors.target_amount ? 'formInputError' : ''}`}
@@ -198,13 +207,14 @@ function CreateGoalPage() {
               
               <div className="formColumn">
                 <label htmlFor="monthly_contribution" className="formLabel">
+                  <CreditCard size={14} />
                   Ежемесячный взнос (₽) <span className="required">*</span>
                 </label>
                 <input
                   id="monthly_contribution"
                   name="monthly_contribution"
                   type="text"
-                  placeholder="15000"
+                  placeholder="15 000"
                   value={formData.monthly_contribution}
                   onChange={handleChange}
                   className={`formInput ${errors.monthly_contribution ? 'formInputError' : ''}`}
@@ -219,17 +229,17 @@ function CreateGoalPage() {
               </div>
             </div>
             
-            {/* Начальная сумма и дата начала */}
             <div className="formRow">
               <div className="formColumn">
                 <label htmlFor="initial_amount" className="formLabel">
+                  <Wallet size={14} />
                   Начальная сумма (₽)
                 </label>
                 <input
                   id="initial_amount"
                   name="initial_amount"
                   type="text"
-                  placeholder="50000"
+                  placeholder="50 000"
                   value={formData.initial_amount}
                   onChange={handleChange}
                   className="formInput"
@@ -244,6 +254,7 @@ function CreateGoalPage() {
               
               <div className="formColumn">
                 <label htmlFor="start_date" className="formLabel">
+                  <Calendar size={14} />
                   Дата начала <span className="required">*</span>
                 </label>
                 <input
@@ -259,9 +270,9 @@ function CreateGoalPage() {
               </div>
             </div>
             
-            {/* Дата завершения */}
             <div className="formGroup">
               <label htmlFor="deadline_date" className="formLabel">
+                <Clock size={14} />
                 Желаемая дата завершения (опционально)
               </label>
               <input
@@ -277,9 +288,9 @@ function CreateGoalPage() {
               {errors.deadline_date && <div className="validationError">{errors.deadline_date}</div>}
             </div>
             
-            {/* Описание */}
             <div className="formGroup">
               <label htmlFor="description" className="formLabel">
+                <FileText size={14} />
                 Описание цели (опционально)
               </label>
               <textarea
@@ -290,10 +301,10 @@ function CreateGoalPage() {
                 onChange={handleChange}
                 className="formTextarea"
                 disabled={loading}
+                rows="4"
               />
             </div>
             
-            {/* Кнопки */}
             <div className="formButtons">
               <button
                 type="button"
@@ -313,7 +324,6 @@ function CreateGoalPage() {
             </div>
           </form>
         </div>
-        
       </div>
     </Layout>
   );

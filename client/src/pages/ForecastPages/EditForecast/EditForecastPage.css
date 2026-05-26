@@ -1,0 +1,247 @@
+:root {
+  --primary-dark: #495631;
+  --primary-accent: #EAED74;
+  --primary-light: #EFF2DD;
+
+  --card-bg: rgba(255, 255, 255, 0.72);
+  --border-color: rgba(73, 86, 49, 0.08);
+
+  --text-main: #495631;
+  --text-muted: #7B8465;
+
+  --danger-color: #E35D5D;
+
+  --shadow-sm: 0 8px 24px rgba(73, 86, 49, 0.06);
+  --shadow-lg: 0 18px 40px rgba(73, 86, 49, 0.12);
+
+  --radius-xl: 32px;
+  --radius-lg: 24px;
+  --radius-md: 18px;
+  --radius-sm: 12px;
+
+  --transition: all 0.28s ease;
+}
+
+.editForecastPage {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 42px 24px 80px;
+}
+
+.backButtonNav {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  margin-bottom: 24px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: var(--transition);
+  border-radius: 999px;
+}
+
+.backButtonNav:hover {
+  background: rgba(73, 86, 49, 0.06);
+  color: var(--text-main);
+}
+
+.pageHeaderEditForecast {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.pageHeaderEditForecast h1 {
+  margin: 0 0 8px;
+  color: var(--text-main);
+  font-size: clamp(2rem, 4vw, 2.5rem);
+  font-weight: 300;
+  letter-spacing: -1px;
+}
+
+.pageHeaderEditForecast p {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.goalInfo {
+  padding: 24px;
+  margin-bottom: 32px;
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  text-align: center;
+}
+
+.goalInfo h2 {
+  margin: 0 0 12px;
+  color: var(--text-main);
+  font-size: 1.3rem;
+  font-weight: 500;
+}
+
+.goalProgress {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.goalProgress strong {
+  color: var(--primary-dark);
+  font-size: 1.1rem;
+}
+
+.separator {
+  color: var(--border-color);
+}
+
+.errorMessage {
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  border-radius: var(--radius-md);
+  background: rgba(227, 93, 93, 0.1);
+  color: var(--danger-color);
+  text-align: center;
+}
+
+.forecastForm {
+  padding: 36px;
+  border-radius: var(--radius-xl);
+  background: var(--card-bg);
+  backdrop-filter: blur(18px);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.formGroup {
+  margin-bottom: 28px;
+}
+
+.formGroup label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.formInput {
+  width: 100%;
+  padding: 14px 18px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.75);
+  color: var(--text-main);
+  font-size: 1rem;
+  transition: var(--transition);
+  box-sizing: border-box;
+}
+
+.formInput:focus {
+  outline: none;
+  border-color: var(--primary-accent);
+  box-shadow: 0 0 0 4px rgba(234, 237, 116, 0.18);
+}
+
+.formButtons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 14px;
+  margin-top: 32px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color);
+}
+
+.cancelButton,
+.submitButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.cancelButton {
+  background: rgba(73, 86, 49, 0.06);
+  color: var(--text-main);
+}
+
+.cancelButton:hover:not(:disabled) {
+  background: rgba(73, 86, 49, 0.12);
+}
+
+.submitButton {
+  background: var(--primary-dark);
+  color: var(--primary-accent);
+}
+
+.submitButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  background: var(--primary-accent);
+  color: var(--primary-dark);
+  box-shadow: var(--shadow-lg);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.loadingContainer {
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.loadingSpinner {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 3px solid rgba(73, 86, 49, 0.12);
+  border-top-color: var(--primary-dark);
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 768px) {
+  .editForecastPage {
+    padding: 28px 18px 60px;
+  }
+
+  .forecastForm {
+    padding: 24px 20px;
+  }
+
+  .formButtons {
+    flex-direction: column;
+  }
+
+  .cancelButton,
+  .submitButton {
+    width: 100%;
+  }
+}

@@ -1,4 +1,3 @@
-// src/components/Auth/AuthContainer.jsx
 import React, { useState } from "react";
 import Login from "./Login";
 import Register from "./Register";
@@ -6,11 +5,11 @@ import ForgotPassword from "./ForgotPassword";
 import "./Auth.css";
 
 function AuthContainer() {
-  const [mode, setMode] = useState("login"); // login, register, forgot
+  const [mode, setMode] = useState("login");
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
+    <div className="authContainer">
+      <div className="authCard">
         {mode === "login" && (
           <Login 
             onToggleMode={() => setMode("register")}

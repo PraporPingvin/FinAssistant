@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { Calendar, Target, CreditCard, ChevronLeft, Save, X } from "lucide-react";
 import Layout from "../../components/Layout";
 import { getGoal, updateGoal } from "../../api/api";
 import "./EditForecastPage.css";
@@ -30,7 +31,6 @@ function EditForecastPage() {
       const goalData = await getGoal(goalId);
       setGoal(goalData);
       
-      // Заполняем форму текущими данными
       setForecastData({
         predicted_finish_date: goalData.deadline_date 
           ? new Date(goalData.deadline_date).toISOString().split('T')[0]
@@ -68,22 +68,26 @@ function EditForecastPage() {
       };
       
       await updateGoal(goalId, updates);
-      alert("Прогноз успешно обновлен!");
       navigate(`/forecast/${goalId}`);
       
     } catch (error) {
       console.error("Ошибка обновления прогноза:", error);
-      alert(`Ошибка: ${error.message}`);
+      setError(`Ошибка: ${error.message}`);
     } finally {
       setSaving(false);
     }
+  };
+
+  const formatCurrency = (amount) => {
+    const num = parseFloat(amount) || 0;
+    return new Intl.NumberFormat('ru-RU').format(num);
   };
 
   if (loading) {
     return (
       <Layout>
         <div className="loadingContainer">
-          <div className="loadingSpinner"></div>
+          <div className="loadingSpinner" />
           <p>Загружаем данные...</p>
         </div>
       </Layout>
@@ -92,22 +96,41 @@ function EditForecastPage() {
 
   return (
     <Layout>
-      <div className="editForecastContainer">
-        <div className="pageHeader">
+      <div className="editForecastPage">
+        <button onClick={() => navigate(-1)} className="backButtonNav">
+          <ChevronLeft size={18} />
+          Назад
+        </button>
+
+        <div className="pageHeaderEditForecast">
           <h1>Редактирование прогноза</h1>
           <p>Настройте параметры прогноза достижения цели</p>
         </div>
-        
+
         {goal && (
           <div className="goalInfo">
-            <h3>Цель: {goal.title}</h3>
-            <p>Текущий прогресс: {Math.round((goal.current_amount / goal.target_amount) * 100)}%</p>
+            <h2>{goal.title}</h2>
+            <div className="goalProgress">
+              <span>Прогресс:</span>
+              <strong>{Math.round((goal.current_amount / goal.target_amount) * 100)}%</strong>
+              <span className="separator">•</span>
+              <span>{formatCurrency(goal.current_amount)} / {formatCurrency(goal.target_amount)} ₽</span>
+            </div>
           </div>
         )}
-        
+
+        {error && (
+          <div className="errorMessage">
+            {error}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="forecastForm">
           <div className="formGroup">
-            <label>Желаемая дата завершения</label>
+            <label>
+              <Calendar size={16} />
+              Желаемая дата завершения
+            </label>
             <input
               type="date"
               name="predicted_finish_date"
@@ -117,9 +140,12 @@ function EditForecastPage() {
               className="formInput"
             />
           </div>
-          
+
           <div className="formGroup">
-            <label>Целевая сумма (₽)</label>
+            <label>
+              <Target size={16} />
+              Целевая сумма (₽)
+            </label>
             <input
               type="number"
               name="target_amount"
@@ -128,11 +154,15 @@ function EditForecastPage() {
               min="0"
               step="1000"
               className="formInput"
+              required
             />
           </div>
-          
+
           <div className="formGroup">
-            <label>Ежемесячный взнос (₽)</label>
+            <label>
+              <CreditCard size={16} />
+              Ежемесячный взнос (₽)
+            </label>
             <input
               type="number"
               name="monthly_contribution"
@@ -141,9 +171,10 @@ function EditForecastPage() {
               min="0"
               step="1000"
               className="formInput"
+              required
             />
           </div>
-          
+
           <div className="formButtons">
             <button
               type="button"
@@ -151,6 +182,7 @@ function EditForecastPage() {
               className="cancelButton"
               disabled={saving}
             >
+              <X size={16} />
               Отмена
             </button>
             <button
@@ -158,6 +190,7 @@ function EditForecastPage() {
               className="submitButton"
               disabled={saving}
             >
+              <Save size={16} />
               {saving ? "Сохранение..." : "Сохранить прогноз"}
             </button>
           </div>

@@ -1,5 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
+import {
+  Target,
+  DollarSign,
+  TrendingUp,
+  Activity,
+  AlertCircle,
+  ArrowLeft,
+  Plus,
+  X,
+  Calendar,
+  Shield,
+  Zap,
+} from "lucide-react";
 import Layout from "../../../components/Layout";
 import { createScenario, getGoal, getScenarios } from "../../../api/api";
 import "./CreateScenarioPage.css";
@@ -32,7 +45,6 @@ function CreateScenarioPage() {
       const goalData = await getGoal(goalId);
       setGoal(goalData);
       
-      // Загружаем существующие сценарии
       try {
         const scenarios = await getScenarios(goalId);
         setExistingScenarios(scenarios || []);
@@ -46,33 +58,20 @@ function CreateScenarioPage() {
 
   const checkDuplicateName = (name) => {
     if (!name.trim()) return null;
-    
     const normalizedInput = name.trim().toLowerCase();
-    const existing = existingScenarios.find(
-      s => s.name?.toLowerCase() === normalizedInput
-    );
-    
-    return existing;
+    return existingScenarios.find(s => s.name?.toLowerCase() === normalizedInput);
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     
-    // Форматирование числовых полей
     if (["monthly_contribution", "expected_return", "inflation_rate"].includes(name)) {
       const numericValue = value.replace(/[^\d.]/g, '');
-      setFormData(prev => ({
-        ...prev,
-        [name]: numericValue
-      }));
+      setFormData(prev => ({ ...prev, [name]: numericValue }));
     } else {
-      setFormData(prev => ({
-        ...prev,
-        [name]: value
-      }));
+      setFormData(prev => ({ ...prev, [name]: value }));
     }
     
-    // Проверка дубликата имени
     if (name === "name" && value.trim()) {
       const duplicate = checkDuplicateName(value);
       if (duplicate) {
@@ -82,12 +81,8 @@ function CreateScenarioPage() {
       }
     }
     
-    // Очищаем ошибку при изменении
     if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ""
-      }));
+      setErrors(prev => ({ ...prev, [name]: "" }));
     }
   };
 
@@ -132,16 +127,15 @@ function CreateScenarioPage() {
     const monthly = parseFloat(formData.monthly_contribution) || 0;
     
     if (monthly <= 0) return 0;
-    
     const remaining = target - current;
     return Math.ceil(remaining / monthly);
   };
 
   const calculateRiskLevel = (expectedReturn) => {
     const returnValue = parseFloat(expectedReturn) || 0;
-    if (returnValue < 5) return { level: "Низкий", color: "#4caf50" };
-    if (returnValue < 10) return { level: "Средний", color: "#ff9800" };
-    return { level: "Высокий", color: "#f44336" };
+    if (returnValue < 5) return { level: "Низкий", color: "#2E7D32", icon: <Shield size={14} /> };
+    if (returnValue < 10) return { level: "Средний", color: "#F5A623", icon: <Activity size={14} /> };
+    return { level: "Высокий", color: "#E35D5D", icon: <Zap size={14} /> };
   };
 
   const handleSubmit = async (e) => {
@@ -166,7 +160,6 @@ function CreateScenarioPage() {
       };
       
       await createScenario(scenarioData);
-      alert(`Сценарий "${formData.name}" успешно создан!`);
       navigate(`/scenarios/${goalId}`);
       
     } catch (error) {
@@ -193,31 +186,48 @@ function CreateScenarioPage() {
   const monthsToGoal = calculateMonthsToGoal();
   const risk = calculateRiskLevel(formData.expected_return);
   const duplicate = checkDuplicateName(formData.name);
+  const effectiveReturn = (parseFloat(formData.expected_return) - parseFloat(formData.inflation_rate)).toFixed(1);
 
   return (
     <Layout>
-      <div className="createScenarioContainer">
-        <div className="createScenarioHeader">
+      <div className="createScenarioPage">
+        <button onClick={handleCancel} className="backButtonNav">
+          <ArrowLeft size={16} />
+          Назад
+        </button>
+
+        <div className="pageHeaderCreateScenario">
           <h1>Создание нового сценария</h1>
-          <p className="subtitle">
-            Настройте параметры для моделирования стратегии достижения цели
-          </p>
+          <p>Настройте параметры для моделирования стратегии достижения цели</p>
         </div>
         
         {goal && (
-          <div className="goalInfoCreate">
-            <h3>Цель: {goal.title}</h3>
-            <div className="goalStatsCreate">
-              <div className="goalStat">
-                <span className="goalStatLabel">Целевая сумма:</span>
-                <span className="goalStatValue">{formatCurrency(goal.target_amount)} ₽</span>
+          <div className="goalInfoCard">
+            <div className="goalInfoHeader">
+              <Target size={20} />
+              <h3>{goal.title}</h3>
+            </div>
+            <div className="goalInfoStatsScenario">
+              <div className="stat">
+                <span className="statLabel">Целевая сумма</span>
+                <span className="statValue">{formatCurrency(goal.target_amount)} ₽</span>
               </div>
-              <div className="goalStat">
-                <span className="goalStatLabel">Текущий прогресс:</span>
-                <span className="goalStatValue">
+              <div className="stat">
+                <span className="statLabel">Текущая сумма</span>
+                <span className="statValue">{formatCurrency(goal.current_amount)} ₽</span>
+              </div>
+              <div className="stat">
+                <span className="statLabel">Прогресс</span>
+                <span className="statValue">
                   {Math.round((parseFloat(goal.current_amount) / parseFloat(goal.target_amount)) * 100)}%
                 </span>
               </div>
+            </div>
+            <div className="progressBar">
+              <div 
+                className="progressFill" 
+                style={{ width: `${Math.round((parseFloat(goal.current_amount) / parseFloat(goal.target_amount)) * 100)}%` }}
+              />
             </div>
           </div>
         )}
@@ -225,15 +235,15 @@ function CreateScenarioPage() {
         <div className="scenarioFormContainer">
           {errors.submit && (
             <div className="errorMessage">
+              <AlertCircle size={16} />
               {errors.submit}
             </div>
           )}
           
           <form onSubmit={handleSubmit} className="scenarioForm">
-            {/* Название сценария */}
             <div className="formGroup">
               <label className="formLabel">
-                Название сценария *
+                Название сценария <span className="required">*</span>
               </label>
               <input
                 type="text"
@@ -247,23 +257,24 @@ function CreateScenarioPage() {
               {errors.name && <div className="validationError">{errors.name}</div>}
               {duplicate && !errors.name && (
                 <div className="warningMessage">
-                  ⚠️ Сценарий с названием "{duplicate.name}" уже существует
+                  <AlertCircle size={12} />
+                  Сценарий с названием "{duplicate.name}" уже существует
                 </div>
               )}
             </div>
             
-            {/* Параметры */}
             <div className="formRow">
               <div className="formColumn">
                 <label className="formLabel">
-                  Ежемесячный взнос (₽) *
+                  <DollarSign size={14} />
+                  Ежемесячный взнос (₽) <span className="required">*</span>
                 </label>
                 <input
                   type="text"
                   name="monthly_contribution"
                   value={formData.monthly_contribution}
                   onChange={handleChange}
-                  placeholder="15000"
+                  placeholder="15 000"
                   className={`formInput ${errors.monthly_contribution ? 'error' : ''}`}
                   disabled={loading}
                 />
@@ -281,7 +292,8 @@ function CreateScenarioPage() {
             <div className="formRow">
               <div className="formColumn">
                 <label className="formLabel">
-                  Ожидаемая доходность (%) *
+                  <TrendingUp size={14} />
+                  Ожидаемая доходность (%) <span className="required">*</span>
                 </label>
                 <input
                   type="text"
@@ -299,7 +311,8 @@ function CreateScenarioPage() {
               
               <div className="formColumn">
                 <label className="formLabel">
-                  Ожидаемая инфляция (%) *
+                  <Activity size={14} />
+                  Ожидаемая инфляция (%) <span className="required">*</span>
                 </label>
                 <input
                   type="text"
@@ -316,50 +329,47 @@ function CreateScenarioPage() {
               </div>
             </div>
             
-            {/* Превью результатов */}
             {formData.monthly_contribution && formData.expected_return && (
               <div className="previewSection">
-                <h4 className="previewTitle">Предварительный расчет</h4>
-                
-                <div className="previewRow">
-                  <span>Ожидаемый срок достижения:</span>
-                  <strong className="previewValue">
-                    {monthsToGoal} месяцев ({Math.round(monthsToGoal / 12)} лет)
-                  </strong>
-                </div>
-                
-                <div className="previewRow">
-                  <span>Уровень риска:</span>
-                  <strong className="previewValue" style={{ color: risk.color }}>
-                    {risk.level}
-                  </strong>
-                </div>
-                
-                <div className="previewRow">
-                  <span>Эффективная доходность:</span>
-                  <strong className="previewValue">
-                    {(parseFloat(formData.expected_return) - parseFloat(formData.inflation_rate)).toFixed(1)}%
-                  </strong>
+                <h4>Предварительный расчет</h4>
+                <div className="previewGrid">
+                  <div className="previewItem">
+                    <span className="previewLabel">Срок достижения</span>
+                    <strong className="previewValue">
+                      {monthsToGoal > 0 ? `${monthsToGoal} мес.` : "—"}
+                    </strong>
+                    {monthsToGoal > 0 && (
+                      <small>({Math.floor(monthsToGoal / 12)} г. {monthsToGoal % 12} мес.)</small>
+                    )}
+                  </div>
+                  <div className="previewItem">
+                    <span className="previewLabel">Уровень риска</span>
+                    <strong className="previewValue" style={{ color: risk.color }}>
+                      {risk.icon} {risk.level}
+                    </strong>
+                  </div>
+                  <div className="previewItem">
+                    <span className="previewLabel">Эффективная доходность</span>
+                    <strong className="previewValue">{effectiveReturn}%</strong>
+                    <small>(с учетом инфляции)</small>
+                  </div>
                 </div>
               </div>
             )}
             
-            {/* Описание */}
             <div className="formGroup">
-              <label className="formLabel">
-                Описание сценария (опционально)
-              </label>
+              <label className="formLabel">Описание сценария (опционально)</label>
               <textarea
                 name="description"
                 value={formData.description}
                 onChange={handleChange}
                 placeholder="Опишите особенности этого сценария..."
                 className="formTextarea"
+                rows="3"
                 disabled={loading}
               />
             </div>
             
-            {/* Кнопки */}
             <div className="formButtons">
               <button
                 type="button"
@@ -367,6 +377,7 @@ function CreateScenarioPage() {
                 className="formButton cancelButton"
                 disabled={loading}
               >
+                <X size={14} />
                 Отмена
               </button>
               <button
@@ -374,6 +385,7 @@ function CreateScenarioPage() {
                 className="formButton submitButton"
                 disabled={loading || duplicate}
               >
+                <Plus size={14} />
                 {loading ? "Создание..." : "Создать сценарий"}
               </button>
             </div>

@@ -1,7 +1,7 @@
-// src/components/Auth/ResetPassword.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { resetPassword } from "../../api/auth";
+import { Lock, Eye, EyeOff, ArrowLeft, CheckCircle } from "lucide-react";
 import "./Auth.css";
 
 function ResetPassword() {
@@ -75,18 +75,18 @@ function ResetPassword() {
 
   if (!token) {
     return (
-      <div className="auth-container">
-        <div className="auth-card">
-          <div className="auth-form">
-            <h2>Ошибка</h2>
-            <div className="auth-error">
+      <div className="authContainer">
+        <div className="authCard">
+          <div className="authForm">
+            <div className="authHeader">
+              <div className="authLogo">⚠️</div>
+              <h2>Ошибка</h2>
+            </div>
+            <div className="authError">
               Недействительная или устаревшая ссылка для восстановления пароля.
             </div>
-            <button 
-              onClick={() => navigate("/login")}
-              className="auth-button"
-              style={{ marginTop: '20px' }}
-            >
+            <button onClick={() => navigate("/login")} className="authButton" style={{ marginTop: '20px' }}>
+              <ArrowLeft size={18} />
               Вернуться ко входу
             </button>
           </div>
@@ -95,100 +95,104 @@ function ResetPassword() {
     );
   }
 
-  return (
-    <div className="auth-container">
-      <div className="auth-card">
-        {success ? (
-          <div className="auth-form">
-            <div className="success-message">
-              <div className="success-icon">✅</div>
+  if (success) {
+    return (
+      <div className="authContainer">
+        <div className="authCard">
+          <div className="authForm">
+            <div className="successMessage">
+              <div className="successIcon">✅</div>
               <h3>Пароль успешно изменен!</h3>
-              <p>
-                Теперь вы можете войти в аккаунт с новым паролем.
-              </p>
-              <p className="note">
-                Через несколько секунд вы будете перенаправлены на страницу входа...
-              </p>
+              <p>Теперь вы можете войти в аккаунт с новым паролем.</p>
+              <p className="note">Через несколько секунд вы будете перенаправлены...</p>
             </div>
           </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="auth-form">
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="authContainer">
+      <div className="authCard">
+        <form onSubmit={handleSubmit} className="authForm">
+          <div className="authHeader">
+            <div className="authLogo">🔑</div>
             <h2>Установка нового пароля</h2>
-            
-            {error && <div className="auth-error">{error}</div>}
-            
-            <div className="form-group">
-              <label htmlFor="password">Новый пароль *</label>
-              <div className="password-input-wrapper">
-                <input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  disabled={loading}
-                  autoComplete="new-password"
-                  required
-                />
-                <button
-                  type="button"
-                  className="password-toggle"
-                  onClick={() => setShowPassword(!showPassword)}
-                  tabIndex="-1"
-                >
-                  {showPassword ? "👁️" : "👁️‍🗨️"}
-                </button>
-              </div>
-            </div>
-            
-            <div className="form-group">
-              <label htmlFor="confirmPassword">Подтвердите пароль *</label>
-              <div className="password-input-wrapper">
-                <input
-                  id="confirmPassword"
-                  type={showConfirmPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  disabled={loading}
-                  autoComplete="new-password"
-                  required
-                />
-                <button
-                  type="button"
-                  className="password-toggle"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  tabIndex="-1"
-                >
-                  {showConfirmPassword ? "👁️" : "👁️‍🗨️"}
-                </button>
-              </div>
-            </div>
-            
-            <p className="form-hint">
-              Пароль должен содержать не менее 6 символов
-            </p>
-            
-            <button 
-              type="submit" 
-              disabled={loading}
-              className="auth-button"
-            >
-              {loading ? "Сохранение..." : "Сохранить новый пароль"}
-            </button>
-            
-            <div className="auth-switch">
-              <button 
-                type="button" 
-                onClick={() => navigate("/login")}
-                className="switch-button"
+            <p>Придумайте надежный пароль</p>
+          </div>
+          
+          {error && <div className="authError">{error}</div>}
+          
+          <div className="formGroup">
+            <label htmlFor="password" className="formLabel">
+              <Lock size={16} />
+              Новый пароль <span className="required">*</span>
+            </label>
+            <div className="passwordWrapper">
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 disabled={loading}
+                autoComplete="new-password"
+                className="formInput"
+                required
+              />
+              <button
+                type="button"
+                className="passwordToggle"
+                onClick={() => setShowPassword(!showPassword)}
+                tabIndex="-1"
               >
-                ← Вернуться ко входу
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
-          </form>
-        )}
+          </div>
+          
+          <div className="formGroup">
+            <label htmlFor="confirmPassword" className="formLabel">
+              <Lock size={16} />
+              Подтвердите пароль <span className="required">*</span>
+            </label>
+            <div className="passwordWrapper">
+              <input
+                id="confirmPassword"
+                type={showConfirmPassword ? "text" : "password"}
+                placeholder="••••••••"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                disabled={loading}
+                autoComplete="new-password"
+                className="formInput"
+                required
+              />
+              <button
+                type="button"
+                className="passwordToggle"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                tabIndex="-1"
+              >
+                {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+          </div>
+          
+          <p className="formHint">Пароль должен содержать не менее 6 символов</p>
+          
+          <button type="submit" disabled={loading} className="authButton">
+            {loading ? "Сохранение..." : "Сохранить новый пароль"}
+          </button>
+          
+          <div className="authSwitch">
+            <button type="button" onClick={() => navigate("/login")} className="backLink" disabled={loading}>
+              <ArrowLeft size={14} />
+              Вернуться ко входу
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

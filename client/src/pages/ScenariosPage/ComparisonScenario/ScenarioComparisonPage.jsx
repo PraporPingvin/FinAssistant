@@ -1,5 +1,35 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
+import {
+  ArrowLeft,
+  Home,
+  Target,
+  BarChart3,
+  Plus,
+  X,
+  RefreshCw,
+  Download,
+  Printer,
+  CheckCircle,
+  AlertCircle,
+  TrendingUp,
+  DollarSign,
+  Calendar,
+  Clock,
+  Shield,
+  Zap,
+  Activity,
+  Star,
+  Trophy,
+  AlertTriangle,
+  ChevronDown,
+  ChevronUp,
+  FileText,
+  Save,
+  Eye,
+  Trash2,
+  Edit2,
+} from "lucide-react";
 import Layout from "../../../components/Layout";
 import { getGoals, getScenarios, createForecast } from "../../../api/api";
 import { useAuth } from "../../../context/AuthContext";
@@ -19,24 +49,23 @@ function ScenarioComparisonPage() {
 
   const { user } = useAuth();
 
-  // Выбранные сценарии для сравнения
   const [selectedScenarios, setSelectedScenarios] = useState([
     { id: "", goalId: "" },
     { id: "", goalId: "" }
   ]);
 
-  // Данные для сравнения
   const [comparisonData, setComparisonData] = useState([]);
   const [analysis, setAnalysis] = useState(null);
   const [isComparing, setIsComparing] = useState(false);
   const [savingToDb, setSavingToDb] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [exportFormat, setExportFormat] = useState("json");
 
   useEffect(() => {
     loadData();
   }, []);
 
-  // Фильтруем сценарии при изменении выбранной цели
   useEffect(() => {
     if (selectedGoal) {
       const filtered = scenarios.filter(s => 
@@ -44,7 +73,6 @@ function ScenarioComparisonPage() {
       );
       setFilteredScenarios(filtered);
       
-      // Если есть сценарии для этой цели, сбрасываем выбор
       if (filtered.length > 0) {
         if (filtered.length >= 2) {
           setSelectedScenarios([
@@ -56,23 +84,15 @@ function ScenarioComparisonPage() {
             { id: filtered[0].scenario_id.toString(), goalId: selectedGoal },
             { id: "", goalId: selectedGoal }
           ]);
-        } else {
-          setSelectedScenarios([
-            { id: "", goalId: selectedGoal },
-            { id: "", goalId: selectedGoal }
-          ]);
         }
       }
     } else {
-      // Если цель не выбрана, показываем все сценарии
       setFilteredScenarios(scenarios);
     }
   }, [selectedGoal, scenarios]);
 
-  // Начинаем сравнение при выборе достаточного количества сценариев
   useEffect(() => {
     const selectedCount = selectedScenarios.filter(s => s.id && s.id !== "").length;
-    
     if (selectedCount >= 2 && filteredScenarios.length > 0) {
       loadComparisonData();
     } else {
@@ -87,77 +107,52 @@ function ScenarioComparisonPage() {
       setLoading(true);
       setError("");
 
-      console.log("🔄 Начинаем загрузку данных для сравнения...");
-
-      // Загружаем все цели
       const goalsData = await getGoals();
-      console.log("✅ Загружено целей:", goalsData.length);
       setGoals(goalsData);
 
-      // Находим цель по goalId из URL
-      let currentGoal = null;
-      if (goalId) {
-        currentGoal = goalsData.find(g => g.goal_id && g.goal_id.toString() === goalId.toString());
-        console.log(`🎯 Найдена цель из URL:`, currentGoal);
-      }
-
-      // Загружаем сценарии для всех целей
       const scenariosPromises = goalsData.map(goal =>
-        getScenarios(goal.goal_id).catch((error) => {
-          console.warn(`⚠️ Не удалось загрузить сценарии для цели ${goal.goal_id}:`, error);
-          return [];
-        })
+        getScenarios(goal.goal_id).catch(() => [])
       );
 
       const scenariosResults = await Promise.all(scenariosPromises);
 
-      // Объединяем все сценарии с информацией о цели
       const allScenarios = [];
-      let scenarioCount = 0;
-
       goalsData.forEach((goal, index) => {
         const goalScenarios = scenariosResults[index] || [];
-        console.log(`📊 Цель "${goal.title}" (ID: ${goal.goal_id}): ${goalScenarios.length} сценариев`);
-
         goalScenarios.forEach(scenario => {
-          scenarioCount++;
           allScenarios.push({
             ...scenario,
             goal_id: goal.goal_id,
             goal_title: goal.title,
             goal_target: goal.target_amount,
             goal_current: goal.current_amount,
-            goal_progress: goal.target_amount > 0 ? Math.round((parseFloat(goal.current_amount) / parseFloat(goal.target_amount)) * 100) : 0
+            goal_progress: goal.target_amount > 0 
+              ? Math.round((parseFloat(goal.current_amount) / parseFloat(goal.target_amount)) * 100) 
+              : 0
           });
         });
       });
 
-      console.log(`✅ Всего загружено сценариев: ${scenarioCount}`);
       setScenarios(allScenarios);
 
-      // Если есть цель из URL, фильтруем сценарии для нее
-      if (currentGoal) {
-        const goalScenarios = allScenarios.filter(s => 
-          s.goal_id && s.goal_id.toString() === currentGoal.goal_id.toString()
-        );
-        console.log(`🎯 Сценарии для цели ${currentGoal.title}:`, goalScenarios);
-
-        if (goalScenarios.length >= 2) {
-          setSelectedScenarios([
-            { id: goalScenarios[0].scenario_id.toString(), goalId: goalScenarios[0].goal_id.toString() },
-            { id: goalScenarios[1].scenario_id.toString(), goalId: goalScenarios[1].goal_id.toString() }
-          ]);
-          console.log(`✅ Автоматически выбраны сценарии: ${goalScenarios[0].scenario_id}, ${goalScenarios[1].scenario_id}`);
-        } else if (goalScenarios.length === 1) {
-          setSelectedScenarios([
-            { id: goalScenarios[0].scenario_id.toString(), goalId: goalScenarios[0].goal_id.toString() },
-            { id: "", goalId: currentGoal.goal_id.toString() }
-          ]);
+      if (goalId) {
+        const currentGoal = goalsData.find(g => g.goal_id && g.goal_id.toString() === goalId.toString());
+        if (currentGoal) {
+          setSelectedGoal(goalId);
+          const goalScenarios = allScenarios.filter(s => 
+            s.goal_id && s.goal_id.toString() === currentGoal.goal_id.toString()
+          );
+          if (goalScenarios.length >= 2) {
+            setSelectedScenarios([
+              { id: goalScenarios[0].scenario_id.toString(), goalId: currentGoal.goal_id.toString() },
+              { id: goalScenarios[1].scenario_id.toString(), goalId: currentGoal.goal_id.toString() }
+            ]);
+          }
         }
       }
 
     } catch (error) {
-      console.error("❌ Ошибка загрузки данных:", error);
+      console.error("Ошибка загрузки данных:", error);
       setError(`Не удалось загрузить данные: ${error.message}`);
     } finally {
       setLoading(false);
@@ -172,11 +167,7 @@ function ScenarioComparisonPage() {
         .filter(s => s.id && s.id !== "")
         .map(s => s.id.toString().trim());
 
-      console.log("🔄 Начинаем сравнение сценариев:");
-      console.log("Выбранные ID:", selectedIds);
-
       if (selectedIds.length < 2) {
-        console.log("⚠️ Недостаточно сценариев для сравнения");
         setComparisonData([]);
         setAnalysis(null);
         return;
@@ -187,24 +178,15 @@ function ScenarioComparisonPage() {
           const scenarioIdStr = s.scenario_id ? s.scenario_id.toString() : "";
           return scenarioIdStr === scenarioId;
         });
-
-        if (!scenario) {
-          console.warn(`⚠️ Сценарий с ID ${scenarioId} не найден`);
-          return null;
-        }
-
-        console.log(`✅ Найден сценарий: ${scenario.name} (ID: ${scenario.scenario_id})`);
         return scenario;
       }).filter(Boolean);
 
       if (selectedScenariosData.length < 2) {
-        console.log("⚠️ Не удалось найти достаточно сценариев для сравнения");
         setComparisonData([]);
         setAnalysis(null);
         return;
       }
 
-      // Рассчитываем данные для каждого сценария
       const comparisonResults = selectedScenariosData.map(scenario => {
         const targetAmount = parseFloat(scenario.goal_target) || 0;
         const currentAmount = parseFloat(scenario.goal_current) || 0;
@@ -270,12 +252,10 @@ function ScenarioComparisonPage() {
 
       if (comparisonResults.length >= 2) {
         performAnalysis(comparisonResults);
-      } else {
-        setAnalysis(null);
       }
 
     } catch (error) {
-      console.error("❌ Ошибка загрузки данных для сравнения:", error);
+      console.error("Ошибка загрузки данных для сравнения:", error);
       setComparisonData([]);
       setAnalysis(null);
     } finally {
@@ -283,13 +263,11 @@ function ScenarioComparisonPage() {
     }
   }, [selectedScenarios, scenarios]);
 
-  // Функция расчета уровня риска с учетом названия сценария
   const calculateRiskLevel = (expectedReturn, scenarioName = "") => {
     const returnValue = parseFloat(expectedReturn) || 0;
     let riskLevel = "Низкий";
     let riskScore = 1;
 
-    // Если в названии есть указание на риск, используем его
     const lowerName = (scenarioName || "").toLowerCase();
     if (lowerName.includes('высок') && lowerName.includes('риск')) {
       riskLevel = "Высокий";
@@ -301,16 +279,12 @@ function ScenarioComparisonPage() {
       riskLevel = "Низкий";
       riskScore = 1;
     } else {
-      // Автоматический расчет на основе доходности
       if (returnValue > 15) {
         riskLevel = "Высокий";
         riskScore = 3;
       } else if (returnValue > 8) {
         riskLevel = "Средний";
         riskScore = 2;
-      } else {
-        riskLevel = "Низкий";
-        riskScore = 1;
       }
     }
 
@@ -323,53 +297,36 @@ function ScenarioComparisonPage() {
 
   const getRiskDescription = (riskLevel) => {
     switch (riskLevel) {
-      case "Низкий":
-        return "Минимальный риск, стабильный доход";
-      case "Средний":
-        return "Умеренный риск, баланс доходности и безопасности";
-      case "Высокий":
-        return "Высокий риск, потенциально высокая доходность";
-      default:
-        return "";
+      case "Низкий": return "Минимальный риск, стабильный доход";
+      case "Средний": return "Умеренный риск, баланс доходности и безопасности";
+      case "Высокий": return "Высокий риск, потенциально высокая доходность";
+      default: return "";
     }
   };
 
   const calculateRating = (factors, scenarioName = "") => {
-    // Взвешенная система оценки (макс 100 баллов)
     let score = 0;
 
-    // Анализируем название для коррекции рейтинга
     const lowerName = (scenarioName || "").toLowerCase();
     const hasHighRiskInName = lowerName.includes('высок') && lowerName.includes('риск');
     const hasLowRiskInName = lowerName.includes('низк') && lowerName.includes('риск');
 
-    // Меньше месяцев - лучше (до 30 баллов)
     if (factors.monthsToGoal < 12) score += 30;
     else if (factors.monthsToGoal < 24) score += 25;
     else if (factors.monthsToGoal < 36) score += 20;
     else if (factors.monthsToGoal < 60) score += 15;
     else if (isFinite(factors.monthsToGoal)) score += 10;
-    else score += 5; // Если срок недостижим
+    else score += 5;
 
-    // Выше вероятность - лучше (до 25 баллов)
     score += (factors.probability * 0.25);
 
-    // Ниже риск - лучше (до 20 баллов)
-    // Для высокорисковых сценариев меньше штраф, для низкорисковых - больше бонус
     let riskModifier = 20;
-    if (hasHighRiskInName) {
-      riskModifier = 15; // Меньше важность риска
-    } else if (hasLowRiskInName) {
-      riskModifier = 25; // Больше важность риска
-    }
+    if (hasHighRiskInName) riskModifier = 15;
+    else if (hasLowRiskInName) riskModifier = 25;
 
-    // Максимальные баллы за низкий риск, меньше за средний, еще меньше за высокий
     score += (4 - factors.riskScore) * (riskModifier / 3);
-
-    // Выше эффективная доходность - лучше (до 15 баллов)
     score += Math.min(Math.max(factors.effectiveReturn, 0) * 2, 15);
 
-    // Ниже нагрузка - лучше (до 10 баллов)
     if (factors.monthlyLoad < 20) score += 10;
     else if (factors.monthlyLoad < 30) score += 8;
     else if (factors.monthlyLoad < 40) score += 5;
@@ -379,14 +336,10 @@ function ScenarioComparisonPage() {
   };
 
   const performAnalysis = (scenariosData) => {
-    console.log("🔍 Выполняем анализ для:", scenariosData);
-
-    // Находим лучший и худший сценарии
     const sortedByRating = [...scenariosData].sort((a, b) => b.rating - a.rating);
     const bestScenario = sortedByRating[0];
     const worstScenario = sortedByRating[sortedByRating.length - 1];
 
-    // Сравниваем параметры
     const comparisons = {
       months: compareValues(scenariosData.map(s => s.monthsToGoal), "месяцев до цели", "меньше - лучше"),
       risk: compareValues(scenariosData.map(s => s.riskScore), "уровень риска", "меньше - лучше"),
@@ -395,15 +348,7 @@ function ScenarioComparisonPage() {
       monthlyLoad: compareValues(scenariosData.map(s => s.monthlyLoad), "ежемесячная нагрузка", "меньше - лучше")
     };
 
-    // Генерируем рекомендации
     const recommendations = generateRecommendations(bestScenario, worstScenario, comparisons);
-
-    console.log("📊 Результаты анализа:", {
-      bestScenario,
-      worstScenario,
-      comparisons,
-      recommendations
-    });
 
     setAnalysis({
       bestScenario,
@@ -439,18 +384,16 @@ function ScenarioComparisonPage() {
   const generateRecommendations = (best, worst, comparisons) => {
     const recommendations = [];
 
-    // Рекомендация по сроку
     if (comparisons.months.difference > 12 && isFinite(best.monthsToGoal) && isFinite(worst.monthsToGoal)) {
       recommendations.push({
-        title: "⏱️ Срок достижения",
+        title: "Срок достижения",
+        icon: <Clock size={16} />,
         content: `Сценарий "${best.name}" позволяет достичь цели на ${comparisons.months.difference} месяцев быстрее, чем "${worst.name}".`
       });
     }
 
-    // Рекомендация по риску
     if (comparisons.risk.difference >= 1) {
       let riskContent = "";
-
       if (best.riskScore < worst.riskScore) {
         riskContent = `"${best.name}" имеет более безопасную стратегию (${best.riskLevel} риск) по сравнению с "${worst.name}" (${worst.riskLevel} риск).`;
       } else if (best.riskScore > worst.riskScore) {
@@ -458,65 +401,45 @@ function ScenarioComparisonPage() {
       } else {
         riskContent = `Оба сценария имеют ${best.riskLevel} уровень риска.`;
       }
-
       recommendations.push({
-        title: "🎯 Уровень риска",
+        title: "Уровень риска",
+        icon: <Shield size={16} />,
         content: riskContent
       });
     }
 
-    // Рекомендация по нагрузке
     if (comparisons.monthlyLoad.difference > 15) {
       let loadContent = "";
-
       if (best.monthlyLoad < worst.monthlyLoad) {
         loadContent = `"${best.name}" имеет меньшую финансовую нагрузку (${best.monthlyLoad}% от дохода) по сравнению с "${worst.name}" (${worst.monthlyLoad}% от дохода).`;
       } else {
         loadContent = `"${worst.name}" требует меньших ежемесячных взносов (${worst.monthlyLoad}% от дохода), что легче для бюджета, чем "${best.name}" (${best.monthlyLoad}% от дохода).`;
       }
-
       recommendations.push({
-        title: "💰 Финансовая нагрузка",
+        title: "Финансовая нагрузка",
+        icon: <DollarSign size={16} />,
         content: loadContent
       });
     }
 
-    // Рекомендация по доходности
     if (comparisons.effectiveReturn.difference > 3) {
       let returnContent = "";
-
       if (best.effectiveReturn > worst.effectiveReturn) {
         returnContent = `"${best.name}" предлагает более высокую эффективную доходность (${best.effectiveReturn.toFixed(1)}%) после вычета инфляции по сравнению с "${worst.name}" (${worst.effectiveReturn.toFixed(1)}%).`;
       } else {
         returnContent = `"${worst.name}" обеспечивает более стабильный, хотя и меньший доход (${worst.effectiveReturn.toFixed(1)}% против ${best.effectiveReturn.toFixed(1)}% у "${best.name}").`;
       }
-
       recommendations.push({
-        title: "📈 Эффективность",
+        title: "Эффективность",
+        icon: <TrendingUp size={16} />,
         content: returnContent
       });
     }
 
-    // Рекомендация по вероятности
-    if (comparisons.probability.difference > 20) {
-      let probabilityContent = "";
-
-      if (best.probability > worst.probability) {
-        probabilityContent = `"${best.name}" имеет более высокую вероятность успеха (${best.probability}%) по сравнению с "${worst.name}" (${worst.probability}%).`;
-      } else {
-        probabilityContent = `Несмотря на более низкий рейтинг, "${worst.name}" имеет более предсказуемый результат (${worst.probability}% вероятность).`;
-      }
-
-      recommendations.push({
-        title: "🎯 Вероятность успеха",
-        content: probabilityContent
-      });
-    }
-
-    // Общая рекомендация
     const generalAdvice = getGeneralAdvice(best, worst);
     recommendations.push({
-      title: "🏆 Оптимальный выбор",
+      title: "Оптимальный выбор",
+      icon: <Trophy size={16} />,
       content: generalAdvice
     });
 
@@ -537,12 +460,9 @@ function ScenarioComparisonPage() {
       return `"${best.name}" - агрессивная стратегия с высоким риском (${best.rating}/100). Подходит для инвесторов, готовых к риску ради большей доходности.`;
     } else if (best.rating - worst.rating > 20) {
       return `Настоятельно рекомендуется "${best.name}" (${best.rating}/100) - значительно превосходит "${worst.name}" (${worst.rating}/100) по большинству параметров.`;
-    } else {
-      return `На основе комплексного анализа рекомендуется "${best.name}" с общим рейтингом ${best.rating}/100 баллов.`;
     }
+    return `На основе комплексного анализа рекомендуется "${best.name}" с общим рейтингом ${best.rating}/100 баллов.`;
   };
-
-  // ============ ФУНКЦИИ ДЛЯ СОХРАНЕНИЯ В БАЗУ ДАННЫХ ============
 
   const handleSaveToDatabase = async () => {
     if (!comparisonData.length || !analysis) {
@@ -554,27 +474,19 @@ function ScenarioComparisonPage() {
       setSavingToDb(true);
       setSaveSuccess(false);
 
-      console.log("💾 Сохраняем сравнение в базу данных...");
-
-      // Сохраняем каждый сценарий как отдельный прогноз
       const savePromises = comparisonData.map(async (scenario) => {
-        // Определяем дату прогноза (сегодня)
         const forecastDate = new Date().toISOString().split('T')[0];
-        
-        // Определяем прогнозируемую дату достижения цели
         let predictedFinishDate = null;
         if (isFinite(scenario.monthsToGoal) && scenario.monthsToGoal > 0) {
           const date = new Date();
           date.setMonth(date.getMonth() + scenario.monthsToGoal);
           predictedFinishDate = date.toISOString().split('T')[0];
         } else {
-          // Если срок не определен, ставим через 10 лет
           const date = new Date();
           date.setFullYear(date.getFullYear() + 10);
           predictedFinishDate = date.toISOString().split('T')[0];
         }
 
-        // Создаем объект прогноза
         const forecastData = {
           goal_id: parseInt(scenario.goal_id),
           scenario_id: parseInt(scenario.scenario_id),
@@ -586,108 +498,58 @@ function ScenarioComparisonPage() {
           final_amount: parseFloat(scenario.goal_target) || 0
         };
 
-        console.log(`📊 Сохраняем прогноз для сценария "${scenario.name}":`, forecastData);
-
-        // Отправляем на сервер
         return await createForecast(forecastData);
       });
 
-      // Ждем сохранения всех прогнозов
-      const results = await Promise.all(savePromises);
-      
-      console.log("✅ Все прогнозы успешно сохранены:", results);
+      await Promise.all(savePromises);
       setSaveSuccess(true);
-      
-      // Показываем сообщение об успехе
-      alert(`✅ Сравнение успешно сохранено в базу данных!\nСохранено ${results.length} прогнозов.`);
-
-      // Сбрасываем флаг успеха через 3 секунды
+      alert(`Сравнение успешно сохранено в базу данных!\nСохранено ${savePromises.length} прогнозов.`);
       setTimeout(() => setSaveSuccess(false), 3000);
 
     } catch (error) {
-      console.error("❌ Ошибка при сохранении в базу данных:", error);
-      alert(`❌ Ошибка при сохранении: ${error.message}`);
+      console.error("Ошибка при сохранении в базу данных:", error);
+      alert(`Ошибка при сохранении: ${error.message}`);
     } finally {
       setSavingToDb(false);
     }
   };
 
-  const handleSaveToLocalStorage = () => {
-    try {
-      // Создаем объект с данными для сохранения
-      const savedComparison = {
-        id: `comparison_${Date.now()}`,
-        timestamp: new Date().toISOString(),
-        date: new Date().toLocaleDateString('ru-RU'),
-        time: new Date().toLocaleTimeString('ru-RU'),
-        goalId: selectedGoal,
-        goalTitle: currentGoal?.title || 'Все цели',
-        scenarios: comparisonData.map(s => ({
-          id: s.scenario_id,
-          name: s.name,
-          goalTitle: s.goal_title,
-          rating: s.rating,
-          monthlyContribution: s.monthly_contribution,
-          expectedReturn: s.expected_return,
-          inflationRate: s.inflation_rate,
-          monthsToGoal: s.monthsToGoal,
-          riskLevel: s.riskLevel,
-          probability: s.probability
-        })),
-        analysis: analysis ? {
-          bestScenario: analysis.bestScenario?.name,
-          worstScenario: analysis.worstScenario?.name,
-          averageRating: analysis.averageRating,
-          recommendations: analysis.recommendations
-        } : null
-      };
+  const handleExportComparison = () => {
+    const exportData = {
+      timestamp: new Date().toISOString(),
+      comparedScenarios: comparisonData.map(s => ({
+        name: s.name,
+        goal: s.goal_title,
+        rating: s.rating,
+        monthsToGoal: s.monthsToGoal,
+        expectedReturn: s.expected_return,
+        monthlyContribution: s.monthly_contribution,
+        riskLevel: s.riskLevel,
+        probability: s.probability
+      })),
+      analysis: analysis ? {
+        bestScenario: analysis.bestScenario?.name,
+        worstScenario: analysis.worstScenario?.name,
+        averageRating: analysis.averageRating,
+        recommendations: analysis.recommendations
+      } : null
+    };
 
-      // Получаем существующие сохраненные сравнения из localStorage
-      const savedComparisons = JSON.parse(localStorage.getItem('savedComparisons') || '[]');
-      
-      // Добавляем новое сравнение
-      savedComparisons.push(savedComparison);
-      
-      // Сохраняем обратно в localStorage
-      localStorage.setItem('savedComparisons', JSON.stringify(savedComparisons));
-      
-      alert('✅ Сравнение успешно сохранено в локальное хранилище!');
-      
-      console.log('💾 Сохраненное сравнение:', savedComparison);
-    } catch (error) {
-      console.error('❌ Ошибка при сохранении в localStorage:', error);
-      alert('Не удалось сохранить сравнение в локальное хранилище.');
-    }
+    const dataStr = JSON.stringify(exportData, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+    const exportFileDefaultName = `сравнение-сценариев-${new Date().toISOString().slice(0, 10)}.json`;
+
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+    setShowExportModal(false);
   };
 
-  const handleViewSavedComparisons = () => {
-    const savedComparisons = JSON.parse(localStorage.getItem('savedComparisons') || '[]');
-    
-    if (savedComparisons.length === 0) {
-      alert('У вас пока нет сохраненных сравнений в локальном хранилище.');
-      return;
-    }
-    
-    // Формируем сообщение со списком сохраненных сравнений
-    let message = '📋 Сохраненные сравнения (localStorage):\n\n';
-    savedComparisons.forEach((comp, index) => {
-      message += `${index + 1}. ${comp.goalTitle} - ${comp.date} ${comp.time}\n`;
-      message += `   Сценариев: ${comp.scenarios.length}, Лучший: ${comp.analysis?.bestScenario || '—'}\n\n`;
-    });
-    
-    alert(message);
-  };
-
-  // ============ КОНЕЦ ФУНКЦИЙ ДЛЯ СОХРАНЕНИЯ ============
-
-  // Обработчики
   const handleGoalChange = (goalId) => {
-    console.log(`🎯 Изменена цель: ${goalId}`);
     setSelectedGoal(goalId);
     setComparisonData([]);
     setAnalysis(null);
-    
-    // Обновляем URL без перезагрузки страницы
     if (goalId) {
       navigate(`/scenarios/compare/${goalId}`, { replace: true });
     } else {
@@ -697,22 +559,15 @@ function ScenarioComparisonPage() {
 
   const handleScenarioChange = (index, scenarioId) => {
     const newSelected = [...selectedScenarios];
-
     if (scenarioId) {
-      const scenario = scenarios.find(s => {
-        const scenarioIdStr = s.scenario_id ? s.scenario_id.toString() : "";
-        return scenarioIdStr === scenarioId;
-      });
-
+      const scenario = scenarios.find(s => s.scenario_id?.toString() === scenarioId);
       newSelected[index] = {
         id: scenarioId,
-        goalId: scenario?.goal_id ? scenario.goal_id.toString() : selectedGoal
+        goalId: scenario?.goal_id?.toString() || selectedGoal
       };
-      console.log(`✅ Выбран сценарий ${index + 1}: ID=${scenarioId}, цель=${newSelected[index].goalId}`);
     } else {
       newSelected[index] = { id: "", goalId: selectedGoal || "" };
     }
-
     setSelectedScenarios(newSelected);
   };
 
@@ -733,84 +588,25 @@ function ScenarioComparisonPage() {
     setAnalysis(null);
   };
 
-  const handleCompareNow = () => {
-    const selectedCount = selectedScenarios.filter(s => s.id && s.id !== "").length;
-    if (selectedCount >= 2) {
-      loadComparisonData();
-    } else {
-      alert("Выберите как минимум 2 сценария для сравнения");
-    }
-  };
-
-  const handleExportComparison = () => {
-    const exportData = {
-      timestamp: new Date().toISOString(),
-      comparedScenarios: comparisonData.map(s => ({
-        name: s.name,
-        goal: s.goal_title,
-        rating: s.rating
-      })),
-      analysis: analysis
-    };
-
-    const dataStr = JSON.stringify(exportData, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
-
-    const exportFileDefaultName = `сравнение-сценариев-${new Date().toISOString().slice(0, 10)}.json`;
-
-    const linkElement = document.createElement('a');
-    linkElement.setAttribute('href', dataUri);
-    linkElement.setAttribute('download', exportFileDefaultName);
-    linkElement.click();
-  };
-
-  // Вспомогательные функции
   const formatCurrency = (amount) => {
     const num = parseFloat(amount) || 0;
     return new Intl.NumberFormat('ru-RU').format(num);
   };
 
-  const getScenarioOptions = () => {
-    // Если выбрана конкретная цель, показываем только ее сценарии
-    const scenariosToShow = selectedGoal 
-      ? scenarios.filter(s => s.goal_id && s.goal_id.toString() === selectedGoal.toString())
-      : scenarios;
-    
-    return scenariosToShow.map(scenario => {
-      const scenarioId = scenario.scenario_id ? scenario.scenario_id.toString() : "";
-      return {
-        value: scenarioId,
-        label: `${scenario.name || 'Без названия'} (${scenario.goal_title || 'Без цели'})`,
-        goalId: scenario.goal_id ? scenario.goal_id.toString() : ""
-      };
-    });
+  const getRiskIcon = (riskLevel) => {
+    if (riskLevel === "Низкий") return <Shield size={14} />;
+    if (riskLevel === "Средний") return <Activity size={14} />;
+    return <Zap size={14} />;
   };
 
-  const getBestWorstClass = (value, comparisonKey) => {
-    if (!analysis || comparisonData.length < 2) return "";
-
-    const comparison = analysis.comparisons[comparisonKey];
-    if (!comparison || comparison.values.length < 2) return "";
-
-    const minValue = Math.min(...comparison.values);
-    const maxValue = Math.max(...comparison.values);
-
-    // Для некоторых параметров "лучше" значит меньше (срок, риск, нагрузка)
-    // Для других "лучше" значит больше (вероятность, доходность)
-    const betterIsLess = ["months", "risk", "monthlyLoad"].includes(comparisonKey);
-
-    if (betterIsLess) {
-      return value === minValue ? "bestValue" : value === maxValue ? "worstValue" : "";
-    } else {
-      return value === maxValue ? "bestValue" : value === minValue ? "worstValue" : "";
-    }
+  const getRiskClass = (riskLevel) => {
+    if (riskLevel === "Низкий") return "riskLow";
+    if (riskLevel === "Средний") return "riskMedium";
+    return "riskHigh";
   };
 
-  const getSelectedCount = () => {
-    return selectedScenarios.filter(s => s.id && s.id !== "").length;
-  };
+  const getSelectedCount = () => selectedScenarios.filter(s => s.id && s.id !== "").length;
 
-  // Получаем текущую цель для отображения
   const currentGoal = selectedGoal 
     ? goals.find(g => g.goal_id && g.goal_id.toString() === selectedGoal.toString())
     : null;
@@ -819,7 +615,7 @@ function ScenarioComparisonPage() {
     return (
       <Layout>
         <div className="loadingContainer">
-          <div className="loadingAnimation"></div>
+          <div className="loadingSpinner" />
           <p>Загружаем данные для сравнения...</p>
         </div>
       </Layout>
@@ -832,26 +628,24 @@ function ScenarioComparisonPage() {
   return (
     <Layout>
       <div className="scenarioComparisonContainer">
-        {/* Хлебные крошки */}
         <div className="breadcrumb">
-          <Link to="/">Главная</Link>
-          {" > "}
-          <Link to="/scenarios">Сценарии</Link>
-          {" > "}
-          <span>Сравнение сценариев</span>
+          <Link to="/"><Home size={14} /> Главная</Link>
+          <span>/</span>
+          <Link to="/scenarios"><BarChart3 size={14} /> Сценарии</Link>
+          <span>/</span>
+          <span className="current">Сравнение сценариев</span>
           {currentGoal && (
             <>
-              {" > "}
+              <span>/</span>
               <span>{currentGoal.title}</span>
             </>
           )}
         </div>
 
-        {/* Заголовок */}
-        <div className="pageHeader">
-          <div className="headerContent">
+        <div className="pageHeaderForecast">
+          <div className="headerContentForecast">
             <h1>Сравнение сценариев</h1>
-            <p className="headerSubtitle">
+            <p className="headerDescription">
               {currentGoal 
                 ? `Сравнение сценариев для цели: "${currentGoal.title}"`
                 : "Сравните различные стратегии достижения финансовых целей"
@@ -860,25 +654,22 @@ function ScenarioComparisonPage() {
           </div>
         </div>
 
-        {/* Выбор цели */}
         <div className="goalSelectionSection">
           <div className="goalSelectionHeader">
             <h3>
-              <span>🎯</span>
+              <Target size={18} />
               Выберите цель для сравнения
             </h3>
-            <div className="goalStats">
-              {currentGoal && (
-                <>
-                  <span className="goalStat">
-                    📊 Целевая сумма: {formatCurrency(currentGoal.target_amount)} ₽
-                  </span>
-                  <span className="goalStat">
-                    📈 Прогресс: {Math.round((parseFloat(currentGoal.current_amount) / parseFloat(currentGoal.target_amount)) * 100)}%
-                  </span>
-                </>
-              )}
-            </div>
+            {currentGoal && (
+              <div className="goalStatsScenario">
+                <span className="goalStat">
+                  Целевая сумма: {formatCurrency(currentGoal.target_amount)} ₽
+                </span>
+                <span className="goalStat">
+                  Прогресс: {Math.round((parseFloat(currentGoal.current_amount) / parseFloat(currentGoal.target_amount)) * 100)}%
+                </span>
+              </div>
+            )}
           </div>
           
           <div className="goalSelector">
@@ -923,60 +714,48 @@ function ScenarioComparisonPage() {
           </div>
         </div>
 
-        {/* Сообщение об ошибке */}
         {error && (
           <div className="errorMessage">
-            <strong>Внимание:</strong> {error}
+            <AlertCircle size={18} />
+            <span>{error}</span>
           </div>
         )}
 
-        {/* Выбор сценариев */}
         <div className="selectionSection">
           <div className="selectionHeader">
             <h3>
-              <span>📊</span>
+              <BarChart3 size={18} />
               Выберите сценарии для сравнения
               {selectedCount > 0 && (
-                <span className="selectionCount">
-                  {selectedCount} выбрано
-                </span>
+                <span className="selectionCount">{selectedCount} выбрано</span>
               )}
             </h3>
             {currentGoal && filteredScenarios.length >= 2 && (
               <p className="selectionHint">
-                ⚠️ Выбрана цель "{currentGoal.title}". Доступно сценариев: {filteredScenarios.length}
+                Выбрана цель "{currentGoal.title}". Доступно сценариев: {filteredScenarios.length}
               </p>
             )}
           </div>
 
           <div className="selectedScenariosGrid">
             {selectedScenarios.map((selected, index) => {
-              // Ищем сценарий среди отфильтрованных (только для выбранной цели)
-              const scenario = filteredScenarios.find(s => {
-                const scenarioId = s.scenario_id ? s.scenario_id.toString() : "";
-                return scenarioId === selected.id;
-              });
+              const scenario = filteredScenarios.find(s => s.scenario_id?.toString() === selected.id);
               
               return (
                 <div key={index} className="scenarioSelectorCard">
                   <div className="scenarioSelectorHeader">
                     <div>
-                      <h4 className="scenarioSelectorTitle">
-                        Сценарий {index + 1}
-                      </h4>
+                      <h4 className="scenarioSelectorTitle">Сценарий {index + 1}</h4>
                       {scenario && (
                         <div className="scenarioGoal">
-                          <span>🎯</span>
+                          <Target size={12} />
                           {scenario.goal_title}
                         </div>
                       )}
                     </div>
                     {index >= 2 && (
-                      <button
-                        onClick={() => handleRemoveScenario(index)}
-                        className="removeButton"
-                      >
-                        ×
+                      <button onClick={() => handleRemoveScenario(index)} className="removeButton" title="Удалить">
+                        <X size={14} />
                       </button>
                     )}
                   </div>
@@ -989,9 +768,9 @@ function ScenarioComparisonPage() {
                   >
                     <option value="">Выберите сценарий...</option>
                     {selectedGoal && filteredScenarios.length > 0 ? (
-                      getScenarioOptions().map(option => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
+                      filteredScenarios.map(option => (
+                        <option key={option.scenario_id} value={option.scenario_id.toString()}>
+                          {option.name} (взнос: {formatCurrency(option.monthly_contribution)} ₽)
                         </option>
                       ))
                     ) : (
@@ -1013,172 +792,65 @@ function ScenarioComparisonPage() {
             
             {!selectedGoal ? (
               <div className="emptySelection">
-                <div className="emptySelectionIcon">🎯</div>
+                <Target size={36} />
                 <h4>Сначала выберите цель</h4>
                 <p>Пожалуйста, выберите цель из списка выше, чтобы увидеть доступные сценарии</p>
               </div>
             ) : filteredScenarios.length < 2 ? (
               <div className="emptySelection">
-                <div className="emptySelectionIcon">📊</div>
+                <BarChart3 size={36} />
                 <h4>Недостаточно сценариев</h4>
                 <p>Для цели "{currentGoal?.title}" доступно только {filteredScenarios.length} сценариев</p>
                 <p>Для сравнения нужно как минимум 2 сценария</p>
-                <Link 
-                  to={`/scenarios/new/${selectedGoal}`} 
-                  className="emptyStateButton"
-                  style={{ marginTop: '15px' }}
-                >
-                  <span>➕</span>
+                <Link to={`/scenarios/new/${selectedGoal}`} className="emptyStateButton">
+                  <Plus size={14} />
                   Создать новый сценарий
                 </Link>
               </div>
             ) : null}
           </div>
 
-          {/* Кнопки управления */}
           <div className="selectionControls">
-            <button
-              onClick={handleAddScenario}
-              className="addButton"
-              disabled={selectedScenarios.length >= 5}
-            >
-              <span>+</span>
+            <button onClick={handleAddScenario} className="addButton" disabled={selectedScenarios.length >= 5}>
+              <Plus size={14} />
               Добавить сценарий
             </button>
             {selectedCount >= 2 && (
-              <button
-                onClick={handleCompareNow}
-                className="addButton"
-                disabled={isComparing}
-                style={{ backgroundColor: isComparing ? '#cccccc' : '' }}
-              >
-                {isComparing ? '⏳ Сравниваем...' : '🔍 Сравнить'}
+              <button onClick={loadComparisonData} className="addButton" disabled={isComparing}>
+                {isComparing ? "Сравниваем..." : "Сравнить"}
               </button>
             )}
-            <button
-              onClick={handleClearAll}
-              className="clearButton"
-            >
+            <button onClick={handleClearAll} className="clearButton">
               Очистить все
             </button>
           </div>
         </div>
 
-        {/* Состояние загрузки сравнения */}
         {isComparing && (
           <div className="comparingMessage">
-            <div className="loadingAnimation" style={{ margin: '0 auto 15px' }}></div>
+            <div className="loadingSpinnerSmall" />
             <p>Выполняем сравнение сценариев...</p>
-            <p style={{ fontSize: '0.9rem', marginTop: '10px' }}>
-              Анализируем {selectedCount} сценариев для цели "{currentGoal?.title}"
-            </p>
           </div>
         )}
 
-        {/* Сообщение о недостатке сценариев в системе */}
-        {!isComparing && !selectedGoal && (
-          <div className="emptyState">
-            <div className="emptyStateIcon">🎯</div>
-            <h3>Выберите цель для сравнения</h3>
-            <p>
-              Пожалуйста, выберите цель из списка выше, чтобы увидеть доступные сценарии для сравнения.
-            </p>
-          </div>
-        )}
-
-        {/* Сообщение о недостатке сценариев для выбранной цели */}
-        {!isComparing && selectedGoal && filteredScenarios.length < 2 && (
-          <div className="emptyState">
-            <div className="emptyStateIcon">📊</div>
-            <h3>Недостаточно сценариев для сравнения</h3>
-            <p>
-              Для цели "{currentGoal?.title}" доступно только {filteredScenarios.length} сценарий.
-              Для сравнения нужно как минимум 2 сценария.
-            </p>
-            <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginTop: '20px' }}>
-              <Link to={`/scenarios/new/${selectedGoal}`} className="emptyStateButton">
-                <span>➕</span>
-                Создать сценарий
-              </Link>
-              <button 
-                onClick={() => handleGoalChange("")}
-                className="emptyStateButton" 
-                style={{ backgroundColor: '#f5f5f5', color: '#495631' }}
-              >
-                <span>🔍</span>
-                Посмотреть все сценарии
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Таблица сравнения */}
         {!isComparing && comparisonData.length >= 2 && (
           <>
             <div className="comparisonTableWrapper">
               <div className="comparisonTableHeader">
                 <h3>
-                  <span>📈</span>
+                  <BarChart3 size={18} />
                   Сравнительный анализ
-                  <span className="selectionCount">
-                    {comparisonData.length} сценария
-                  </span>
+                  <span className="selectionCount">{comparisonData.length} сценария</span>
                 </h3>
                 <div className="tableControls">
-                  {/* КНОПКА СОХРАНЕНИЯ В БАЗУ ДАННЫХ */}
-                  <button
-                    onClick={handleSaveToDatabase}
-                    className="saveToDbButton"
-                    disabled={savingToDb || !comparisonData.length}
-                    title="Сохранить прогнозы в базу данных"
-                  >
-                    {savingToDb ? (
-                      <>⏳ Сохранение...</>
-                    ) : saveSuccess ? (
-                      <>✅ Сохранено!</>
-                    ) : (
-                      <>
-                        <span>💾</span>
-                        Сохранить
-                      </>
-                    )}
+                  <button onClick={handleSaveToDatabase} className="saveToDbButton" disabled={savingToDb}>
+                    {savingToDb ? "Сохранение..." : saveSuccess ? "Сохранено!" : <><Save size={14} /> Сохранить</>}
                   </button>
-
-                  {/* КНОПКА СОХРАНЕНИЯ В LOCALSTORAGE */}
-                  {/* <button
-                    onClick={handleSaveToLocalStorage}
-                    className="saveToLocalButton"
-                    disabled={!comparisonData.length}
-                    title="Сохранить в локальное хранилище"
-                  >
-                    <span>📋</span>
-                    Сохранить локально
-                  </button> */}
-
-                  {/* КНОПКА ПРОСМОТРА СОХРАНЕННЫХ */}
-                  {/* <button
-                    onClick={handleViewSavedComparisons}
-                    className="viewSavedButton"
-                    title="Просмотреть сохраненные в localStorage"
-                  >
-                    <span>📂</span>
-                    Сохраненные
-                  </button> */}
-
-                  <button
-                    onClick={handleExportComparison}
-                    className="exportButton"
-                    title="Экспортировать в JSON"
-                  >
-                    <span>📥</span>
-                    Экспорт
+                  <button onClick={() => setShowExportModal(true)} className="exportButton" title="Экспортировать">
+                    <Download size={14} /> Экспорт
                   </button>
-                  <button
-                    onClick={() => window.print()}
-                    className="optionButton"
-                    title="Распечатать"
-                  >
-                    🖨️ Печать
+                  <button onClick={() => window.print()} className="optionButton" title="Печать">
+                    <Printer size={14} /> Печать
                   </button>
                 </div>
               </div>
@@ -1191,166 +863,87 @@ function ScenarioComparisonPage() {
                       {comparisonData.map((scenario, index) => (
                         <th key={index} className="scenarioColumn scenarioColumnHeader">
                           <div className="scenarioTitle">{scenario.name || `Сценарий ${index + 1}`}</div>
-                          <div className="scenarioGoal">{scenario.goal_title}</div>
-                          <div style={{
-                            fontSize: '0.8rem',
-                            marginTop: '5px',
-                            color: 'rgba(73, 86, 49, 0.8)'
-                          }}>
-                            Рейтинг: {scenario.rating}/100
-                          </div>
+                          <div className="scenarioGoalTitle">{scenario.goal_title}</div>
+                          <div className="scenarioRating">Рейтинг: {scenario.rating}/100</div>
                         </th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
-                    {/* Основные параметры */}
                     <tr>
-                      <td>Целевая сумма</td>
+                      <td className="paramLabel">Целевая сумма</td>
                       {comparisonData.map((scenario, index) => (
                         <td key={index} className="valueCell">
-                          <div className="highlight">{formatCurrency(scenario.goal_target)} ₽</div>
+                          <strong>{formatCurrency(scenario.goal_target)} ₽</strong>
                         </td>
                       ))}
                     </tr>
                     <tr>
-                      <td>Текущий прогресс</td>
+                      <td className="paramLabel">Текущий прогресс</td>
                       {comparisonData.map((scenario, index) => (
                         <td key={index} className="valueCell">
-                          <div className="highlight">{scenario.goal_progress}%</div>
+                          <strong>{scenario.goal_progress}%</strong>
                           <div className="subtext">{formatCurrency(scenario.goal_current)} ₽</div>
                         </td>
                       ))}
                     </tr>
                     <tr>
-                      <td>Ежемесячный взнос</td>
+                      <td className="paramLabel">Ежемесячный взнос</td>
                       {comparisonData.map((scenario, index) => (
                         <td key={index} className="valueCell">
-                          <div className="highlight">{formatCurrency(scenario.monthly_contribution)} ₽</div>
-                          <div className="subtext">Годовой: {formatCurrency(scenario.yearlyContribution)} ₽</div>
+                          <strong>{formatCurrency(scenario.monthly_contribution)} ₽</strong>
                         </td>
                       ))}
                     </tr>
                     <tr>
-                      <td>Ожидаемая доходность</td>
+                      <td className="paramLabel">Ожидаемая доходность</td>
                       {comparisonData.map((scenario, index) => (
-                        <td key={index} className="valueCell">
-                          <div className="highlight">{scenario.expected_return}%</div>
-                        </td>
+                        <td key={index} className="valueCell">{scenario.expected_return}%</td>
                       ))}
                     </tr>
                     <tr>
-                      <td>Инфляция</td>
+                      <td className="paramLabel">Срок достижения</td>
                       {comparisonData.map((scenario, index) => (
-                        <td key={index} className="valueCell">
-                          {scenario.inflation_rate}%
-                        </td>
-                      ))}
-                    </tr>
-
-                    {/* Расчетные параметры */}
-                    <tr className="calculatedRow">
-                      <td><strong>Срок достижения</strong></td>
-                      {comparisonData.map((scenario, index) => (
-                        <td key={index} className={`valueCell ${getBestWorstClass(scenario.monthsToGoal, 'months')}`}>
+                        <td key={index} className={`valueCell ${getBestWorstClass(scenario.monthsToGoal, 'months', comparisonData, analysis)}`}>
                           {isFinite(scenario.monthsToGoal) ? (
-                            <>
-                              <div className="highlight">
-                                {scenario.monthsToGoal} месяцев
-                              </div>
-                              <div className="subtext">
-                                {Math.floor(scenario.monthsToGoal / 12)} лет {scenario.monthsToGoal % 12} месяцев
-                              </div>
-                            </>
-                          ) : (
-                            <div className="highlight" style={{ color: '#e63946' }}>
-                              Недостижимо
-                            </div>
-                          )}
+                            <strong>{scenario.monthsToGoal} мес.</strong>
+                          ) : <span className="warningText">Недостижимо</span>}
                         </td>
                       ))}
                     </tr>
                     <tr>
-                      <td>Эффективная доходность</td>
+                      <td className="paramLabel">Уровень риска</td>
                       {comparisonData.map((scenario, index) => (
-                        <td key={index} className={`valueCell ${getBestWorstClass(scenario.effectiveReturn, 'effectiveReturn')}`}>
-                          <div className={`highlight ${scenario.effectiveReturn > 0 ? 'positive' : 'negative'}`}>
-                            {scenario.effectiveReturn.toFixed(1)}%
-                          </div>
-                          <div className="subtext">После инфляции</div>
-                        </td>
+                        <td key={index} className={`valueCell ${getBestWorstClass(scenario.riskScore, 'risk', comparisonData, analysis)}`}>
+                          <span className={`riskBadge ${getRiskClass(scenario.riskLevel)}`}>
+                            {getRiskIcon(scenario.riskLevel)} {scenario.riskLevel}
+                          </span>
+                         </td>
                       ))}
                     </tr>
                     <tr>
-                      <td>Уровень риска</td>
+                      <td className="paramLabel">Вероятность успеха</td>
                       {comparisonData.map((scenario, index) => (
-                        <td key={index} className={`valueCell ${getBestWorstClass(scenario.riskScore, 'risk')}`}>
-                          <div className={`riskBadge risk${scenario.riskScore}`}>
-                            {scenario.riskLevel}
-                          </div>
-                          <div className="subtext">{scenario.riskDescription}</div>
-                        </td>
-                      ))}
-                    </tr>
-                    <tr>
-                      <td>Вероятность успеха</td>
-                      {comparisonData.map((scenario, index) => (
-                        <td key={index} className={`valueCell ${getBestWorstClass(scenario.probability, 'probability')}`}>
+                        <td key={index} className={`valueCell ${getBestWorstClass(scenario.probability, 'probability', comparisonData, analysis)}`}>
                           <div className="probabilityBar">
-                            <div
-                              className="probabilityFill"
-                              style={{ width: `${scenario.probability}%` }}
-                            ></div>
-                            <span className="probabilityText">{scenario.probability}%</span>
+                            <div className="probabilityFill" style={{ width: `${scenario.probability}%` }} />
+                            <span>{scenario.probability}%</span>
                           </div>
-                        </td>
+                         </td>
                       ))}
                     </tr>
                     <tr>
-                      <td>Ежемесячная нагрузка</td>
-                      {comparisonData.map((scenario, index) => (
-                        <td key={index} className={`valueCell ${getBestWorstClass(scenario.monthlyLoad, 'monthlyLoad')}`}>
-                          <div className="loadIndicator">
-                            {scenario.monthlyLoad < 20 ? (
-                              <span style={{ color: '#2e7d32' }}>Низкая</span>
-                            ) : scenario.monthlyLoad < 35 ? (
-                              <span style={{ color: '#f9a825' }}>Средняя</span>
-                            ) : (
-                              <span style={{ color: '#e63946' }}>Высокая</span>
-                            )}
-                            <div className="loadBar">
-                              <div
-                                className={`loadFill load${Math.floor(scenario.monthlyLoad / 20) + 1}`}
-                                style={{ width: `${Math.min(scenario.monthlyLoad, 100)}%` }}
-                              ></div>
-                            </div>
-                            <div className="subtext">{scenario.monthlyLoad}% от дохода</div>
-                          </div>
-                        </td>
-                      ))}
-                    </tr>
-                    <tr>
-                      <td>Реалистичность</td>
-                      {comparisonData.map((scenario, index) => (
-                        <td key={index} className="valueCell">
-                          <div className={`feasibilityBadge feasibility${scenario.feasibilityScore}`}>
-                            {scenario.feasibility}
-                          </div>
-                        </td>
-                      ))}
-                    </tr>
-                    <tr>
-                      <td>Общий рейтинг</td>
+                      <td className="paramLabel">Общий рейтинг</td>
                       {comparisonData.map((scenario, index) => (
                         <td key={index} className="valueCell">
                           <div className="ratingDisplay">
-                            <div className="ratingScore">{scenario.rating}/100</div>
+                            <span className="ratingScore">{scenario.rating}/100</span>
                             <div className="ratingStars">
                               {"★".repeat(Math.floor(scenario.rating / 20))}
                               {"☆".repeat(5 - Math.floor(scenario.rating / 20))}
                             </div>
                           </div>
-                        </td>
+                         </td>
                       ))}
                     </tr>
                   </tbody>
@@ -1358,83 +951,43 @@ function ScenarioComparisonPage() {
               </div>
             </div>
 
-            {/* Анализ и рекомендации */}
             {analysis && (
               <div className="analysisSection">
-                <div className="analysisHeader">
-                  <h3>
-                    <span>🔍</span>
-                    Анализ и рекомендации <br/>
-                    {analysis.averageRating && (
-                      <span className="averageRating">
-                        Средний рейтинг: {analysis.averageRating}/100
-                      </span>
-                    )}
-                  </h3>
-                </div>
-
                 <div className="bestWorstComparison">
                   <div className="bestScenarioCard">
                     <div className="bestWorstHeader best">
-                      <span>🏆</span>
+                      <Trophy size={20} />
                       <h4>Лучший сценарий</h4>
                     </div>
                     <div className="bestWorstContent">
                       <h5>{analysis.bestScenario.name}</h5>
                       <p>Цель: {analysis.bestScenario.goal_title}</p>
-                      <div className="ratingBadge bestRating">
-                        Рейтинг: {analysis.bestScenario.rating}/100
-                      </div>
+                      <div className="ratingBadge bestRating">Рейтинг: {analysis.bestScenario.rating}/100</div>
                       <div className="bestWorstDetails">
-                        <div>
-                          <span>Срок:</span>
-                          <strong>{analysis.bestScenario.monthsToGoal} месяцев</strong>
-                        </div>
-                        <div>
-                          <span>Риск:</span>
-                          <strong className={`riskText risk${analysis.bestScenario.riskScore}`}>
-                            {analysis.bestScenario.riskLevel}
-                          </strong>
-                        </div>
-                        <div>
-                          <span>Нагрузка:</span>
-                          <strong>{analysis.bestScenario.monthlyLoad}%</strong>
-                        </div>
+                        <div><span>Срок:</span> <strong>{analysis.bestScenario.monthsToGoal} мес.</strong></div>
+                        <div><span>Риск:</span> <strong>{analysis.bestScenario.riskLevel}</strong></div>
+                        <div><span>Нагрузка:</span> <strong>{analysis.bestScenario.monthlyLoad}%</strong></div>
                       </div>
                     </div>
                   </div>
 
                   <div className="vsSeparator">
                     <div className="vsCircle">VS</div>
-                    <div className="vsLine"></div>
                   </div>
 
                   <div className="worstScenarioCard">
                     <div className="bestWorstHeader worst">
-                      <span>⚠️</span>
+                      <AlertTriangle size={20} />
                       <h4>Худший сценарий</h4>
                     </div>
                     <div className="bestWorstContent">
                       <h5>{analysis.worstScenario.name}</h5>
                       <p>Цель: {analysis.worstScenario.goal_title}</p>
-                      <div className="ratingBadge worstRating">
-                        Рейтинг: {analysis.worstScenario.rating}/100
-                      </div>
+                      <div className="ratingBadge worstRating">Рейтинг: {analysis.worstScenario.rating}/100</div>
                       <div className="bestWorstDetails">
-                        <div>
-                          <span>Срок:</span>
-                          <strong>{analysis.worstScenario.monthsToGoal} месяцев</strong>
-                        </div>
-                        <div>
-                          <span>Риск:</span>
-                          <strong className={`riskText risk${analysis.worstScenario.riskScore}`}>
-                            {analysis.worstScenario.riskLevel}
-                          </strong>
-                        </div>
-                        <div>
-                          <span>Нагрузка:</span>
-                          <strong>{analysis.worstScenario.monthlyLoad}%</strong>
-                        </div>
+                        <div><span>Срок:</span> <strong>{analysis.worstScenario.monthsToGoal} мес.</strong></div>
+                        <div><span>Риск:</span> <strong>{analysis.worstScenario.riskLevel}</strong></div>
+                        <div><span>Нагрузка:</span> <strong>{analysis.worstScenario.monthlyLoad}%</strong></div>
                       </div>
                     </div>
                   </div>
@@ -1445,14 +998,7 @@ function ScenarioComparisonPage() {
                   <div className="recommendationsGrid">
                     {analysis.recommendations.map((rec, index) => (
                       <div key={index} className="recommendationCard">
-                        <div className="recommendationIcon">
-                          {rec.title.includes('Срок') && '⏱️'}
-                          {rec.title.includes('риск') && '🎯'}
-                          {rec.title.includes('Финансовая') && '💰'}
-                          {rec.title.includes('Эффективность') && '📈'}
-                          {rec.title.includes('Вероятность') && '🎯'}
-                          {rec.title.includes('Оптимальный') && '🏆'}
-                        </div>
+                        <div className="recommendationIcon">{rec.icon || <FileText size={18} />}</div>
                         <div className="recommendationContent">
                           <h5>{rec.title}</h5>
                           <p>{rec.content}</p>
@@ -1465,18 +1011,63 @@ function ScenarioComparisonPage() {
             )}
           </>
         )}
-
-        {/* Сообщение о необходимости выбора */}
-        {!isComparing && !comparisonData.length && scenarios.length >= 2 && selectedCount < 2 && (
-          <div className="selectionPrompt">
-            <div className="selectionPromptIcon">📊</div>
-            <h3>Выберите сценарии для сравнения</h3>
-            <p>Для начала сравнения выберите как минимум 2 сценария из доступных {scenarios.length} вариантов</p>
-          </div>
-        )}
       </div>
+
+      {showExportModal && (
+        <div className="modalOverlay" onClick={() => setShowExportModal(false)}>
+          <div className="modalContent" onClick={(e) => e.stopPropagation()}>
+            <div className="modalHeader">
+              <h3>Экспорт сравнения</h3>
+              <button onClick={() => setShowExportModal(false)} className="closeButton">
+                <X size={18} />
+              </button>
+            </div>
+            <div className="modalBody">
+              <div className="exportOptions">
+                <label className="exportOption">
+                  <input
+                    type="radio"
+                    value="json"
+                    checked={exportFormat === "json"}
+                    onChange={(e) => setExportFormat(e.target.value)}
+                  />
+                  <span>JSON</span>
+                </label>
+              </div>
+            </div>
+            <div className="modalFooter">
+              <button onClick={() => setShowExportModal(false)} className="cancelButtonModal">
+                Отмена
+              </button>
+              <button onClick={handleExportComparison} className="submitButtonModal">
+                <Download size={14} /> Экспортировать
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </Layout>
   );
+}
+
+function getBestWorstClass(value, key, comparisonData, analysis) {
+  if (!analysis || !analysis.comparisons || !comparisonData.length) return "";
+  
+  const comparison = analysis.comparisons[key];
+  if (!comparison || comparison.values.length < 2) return "";
+  
+  const betterIsLess = ["months", "risk", "monthlyLoad"].includes(key);
+  const isMin = value === comparison.min;
+  const isMax = value === comparison.max;
+  
+  if (betterIsLess) {
+    if (isMin && comparison.min !== comparison.max) return "bestValue";
+    if (isMax && comparison.min !== comparison.max) return "worstValue";
+  } else {
+    if (isMax && comparison.min !== comparison.max) return "bestValue";
+    if (isMin && comparison.min !== comparison.max) return "worstValue";
+  }
+  return "";
 }
 
 export default ScenarioComparisonPage;

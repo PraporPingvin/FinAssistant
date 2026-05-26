@@ -1,7 +1,7 @@
-// src/components/UserMenu/UserMenu.jsx
 import React, { useState, useRef, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { User, Settings, LogOut, ChevronDown, UserCircle } from "lucide-react";
 import "./UserMenu.css";
 
 function UserMenu() {
@@ -19,7 +19,6 @@ function UserMenu() {
     setIsOpen(!isOpen);
   };
 
-  // Закрываем меню при клике вне его
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -35,7 +34,6 @@ function UserMenu() {
 
   if (!user) return null;
 
-  // Получаем инициалы пользователя
   const getInitials = () => {
     if (user.first_name && user.last_name) {
       return `${user.first_name[0]}${user.last_name[0]}`.toUpperCase();
@@ -46,34 +44,39 @@ function UserMenu() {
     return user.email[0].toUpperCase();
   };
 
+  const displayName = user.first_name || user.email.split('@')[0];
+
   return (
-    <div className="user-menu" ref={menuRef}>
-      <button className="user-menu-button" onClick={toggleMenu}>
-        <div className="user-avatar">
+    <div className="userMenu" ref={menuRef}>
+      <button className="userMenuButton" onClick={toggleMenu}>
+        <div className="userAvatar">
           {getInitials()}
         </div>
-        <span className="user-name">
-          {user.first_name || user.email.split('@')[0]}
-        </span>
-        <span className={`user-menu-arrow ${isOpen ? 'open' : ''}`}>▼</span>
+        <span className="userName">{displayName}</span>
+        <ChevronDown size={14} className={`userMenuArrow ${isOpen ? "open" : ""}`} />
       </button>
 
       {isOpen && (
-        <div className="user-dropdown">
-          <div className="user-info">
-            <div className="user-info-name">{user.first_name} {user.last_name}</div>
-            <div className="user-info-email">{user.email}</div>
+        <div className="userDropdown">
+          <div className="userInfo">
+            <div className="userInfoName">
+              {user.first_name} {user.last_name}
+            </div>
+            <div className="userInfoEmail">{user.email}</div>
           </div>
-          <div className="dropdown-divider"></div>
-          <button className="dropdown-item" onClick={() => navigate('/profile')}>
-            👤 Профиль
+          <div className="dropdownDivider" />
+          <button className="dropdownItem" onClick={() => navigate('/profile')}>
+            <User size={16} />
+            Профиль
           </button>
-          <button className="dropdown-item" onClick={() => navigate('/settings')}>
-            ⚙️ Настройки
+          <button className="dropdownItem" onClick={() => navigate('/settings')}>
+            <Settings size={16} />
+            Настройки
           </button>
-          <div className="dropdown-divider"></div>
-          <button className="dropdown-item logout" onClick={handleLogout}>
-            🚪 Выйти
+          <div className="dropdownDivider" />
+          <button className="dropdownItem logout" onClick={handleLogout}>
+            <LogOut size={16} />
+            Выйти
           </button>
         </div>
       )}

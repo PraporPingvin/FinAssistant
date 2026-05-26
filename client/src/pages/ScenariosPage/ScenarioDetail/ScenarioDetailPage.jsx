@@ -1,5 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
+import {
+  ArrowLeft,
+  Target,
+  DollarSign,
+  TrendingUp,
+  Activity,
+  Calendar,
+  Clock,
+  Edit2,
+  Trash2,
+  AlertCircle,
+  Shield,
+  Zap,
+  Save,
+  X,
+  Eye,
+  BarChart3,
+} from "lucide-react";
 import Layout from "../../../components/Layout";
 import { getScenario, updateScenario, deleteScenario, getGoal, getForecast } from "../../../api/api";
 import "./ScenarioDetailPage.css";
@@ -29,16 +47,13 @@ function ScenarioDetailPage() {
       setLoading(true);
       setError("");
 
-      // Загружаем сценарий
       const scenarioData = await getScenario(scenarioId);
       setScenario(scenarioData);
       setEditData(scenarioData);
 
-      // Загружаем цель
       const goalData = await getGoal(scenarioData.goal_id);
       setGoal(goalData);
 
-      // Пытаемся загрузить прогноз
       try {
         const forecastData = await getForecast(scenarioData.goal_id);
         setForecast(forecastData);
@@ -57,7 +72,6 @@ function ScenarioDetailPage() {
   const handleEditChange = (e) => {
     const { name, value } = e.target;
 
-    // Форматирование числовых полей
     if (["monthly_contribution", "expected_return", "inflation_rate", "target_amount"].includes(name)) {
       const numericValue = value.replace(/[^\d.]/g, '');
       setEditData(prev => ({
@@ -84,20 +98,17 @@ function ScenarioDetailPage() {
         target_amount: parseFloat(editData.target_amount)
       };
 
-      // Удаляем undefined поля
       Object.keys(updates).forEach(key =>
         updates[key] === undefined && delete updates[key]
       );
 
-      const updatedScenario = await updateScenario(scenarioId, updates);
-      setScenario(updatedScenario);
+      await updateScenario(scenarioId, updates);
+      setScenario(editData);
       setEditMode(false);
-
-      alert("Сценарий успешно обновлен!");
 
     } catch (error) {
       console.error("Ошибка сохранения:", error);
-      alert(`Ошибка сохранения: ${error.message}`);
+      setError(`Ошибка сохранения: ${error.message}`);
     } finally {
       setSaving(false);
     }
@@ -111,12 +122,10 @@ function ScenarioDetailPage() {
     try {
       setDeleting(true);
       await deleteScenario(scenarioId);
-      alert("Сценарий успешно удален!");
       navigate(`/scenarios/${scenario?.goal_id}`);
-
     } catch (error) {
       console.error("Ошибка удаления:", error);
-      alert(`Ошибка удаления: ${error.message}`);
+      setError(`Ошибка удаления: ${error.message}`);
     } finally {
       setDeleting(false);
     }
@@ -157,9 +166,9 @@ function ScenarioDetailPage() {
 
   const calculateRiskLevel = (expectedReturn) => {
     const returnValue = parseFloat(expectedReturn) || 0;
-    if (returnValue < 5) return { level: "Низкий", color: "#4caf50", icon: "🟢" };
-    if (returnValue < 10) return { level: "Средний", color: "#ff9800", icon: "🟡" };
-    return { level: "Высокий", color: "#f44336", icon: "🔴" };
+    if (returnValue < 5) return { level: "Низкий", color: "#2E7D32", icon: <Shield size={14} /> };
+    if (returnValue < 10) return { level: "Средний", color: "#F5A623", icon: <Activity size={14} /> };
+    return { level: "Высокий", color: "#E35D5D", icon: <Zap size={14} /> };
   };
 
   const handleCancelEdit = () => {
@@ -171,7 +180,7 @@ function ScenarioDetailPage() {
     return (
       <Layout>
         <div className="loadingContainer">
-          <div className="loadingSpinner"></div>
+          <div className="loadingSpinner" />
           <p>Загружаем данные сценария...</p>
         </div>
       </Layout>
@@ -181,13 +190,15 @@ function ScenarioDetailPage() {
   if (error || !scenario) {
     return (
       <Layout>
-        <div className="scenarioDetailContainer">
-          <div className="errorMessage">
-            <strong>Внимание:</strong> {error || "Сценарий не найден"}
+        <div className="scenarioDetailPage">
+          <div className="errorCard">
+            <AlertCircle size={48} />
+            <h2>Ошибка</h2>
+            <p>{error || "Сценарий не найден"}</p>
+            <button onClick={() => navigate("/scenarios")} className="backButton">
+              ← Вернуться к сценариям
+            </button>
           </div>
-          <Link to="/scenarios" className="backButton">
-            ← Вернуться к сценариям
-          </Link>
         </div>
       </Layout>
     );
@@ -199,102 +210,75 @@ function ScenarioDetailPage() {
 
   return (
     <Layout>
-      <div className="scenarioDetailContainer">
-        {/* Хлебные крошки */}
-        <div className="breadcrumb">
-          <Link to="/">Главная</Link>
-          {" > "}
-          <Link to="/goals">Цели</Link>
-          {" > "}
-          {goal && (
-            <>
-              <Link to={`/goals/${goal.goal_id}`}>{goal.title}</Link>
-              {" > "}
-            </>
-          )}
-          <Link to={`/scenarios/${scenario.goal_id}`}>Сценарии</Link>
-          {" > "}
-          <span>{scenario.name}</span>
-        </div>
+      <div className="scenarioDetailPage">
+        <button onClick={() => navigate(-1)} className="backButtonNav">
+          <ArrowLeft size={16} />
+          Назад
+        </button>
 
-        {/* Заголовок и действия */}
         <div className="pageHeader">
-          <div className="headerContentDetail">
-            <div className="headerTop">
-              <h1>
-                {editMode ? (
-                  <input
-                    type="text"
-                    name="name"
-                    value={editData.name || ""}
-                    onChange={handleEditChange}
-                    className="editTitleInput"
-                    placeholder="Название сценария"
-                  />
-                ) : (
-                  scenario.name
-                )}
-              </h1>
-              <div className="scenarioMeta">
-                <span className="scenarioDate">Создан: {formatDate(scenario.created_at)}</span>
-              </div>
+          <div className="headerContentScenario">
+            {editMode ? (
+              <input
+                type="text"
+                name="name"
+                value={editData.name || ""}
+                onChange={handleEditChange}
+                className="titleInput"
+                placeholder="Название сценария"
+              />
+            ) : (
+              <h1>{scenario.name}</h1>
+            )}
+            <div className="scenarioMeta">
+              <span className="metaItem">
+                <Calendar size={14} />
+                Создан: {formatDate(scenario.created_at)}
+              </span>
             </div>
-            <p className="headerSubtitle">
-              Детальная информация о сценарии достижения финансовой цели
-            </p>
+            <p className="headerSubtitle">Детальная информация о сценарии достижения финансовой цели</p>
           </div>
 
-          <div className="actionsContainerDetail">
+          <div className="actionsContainer">
             {!editMode ? (
               <>
-                <button
-                  onClick={() => setEditMode(true)}
-                  className="actionButtonDetail editButtonDetal"
-                >
-                  ✏ Редактировать
+                <button onClick={() => setEditMode(true)} className="actionButton editButtonScenario" disabled={deleting}>
+                  <Edit2 size={16} />
+                  Редактировать
                 </button>
-                <button
-                  onClick={() => navigate(`/forecast/${scenario.goal_id}?scenario=${scenarioId}`)}
-                  className="actionButtonDetail forecastButtonDetail"
-                >
-                  🔮 Прогноз
+                <button onClick={() => navigate(`/forecast/${scenario.goal_id}?scenario=${scenarioId}`)} className="actionButton forecastButton">
+                  <BarChart3 size={16} />
+                  Прогноз
                 </button>
-                <button
-                  onClick={handleDelete}
-                  className="actionButtonDetail deleteButtonDetail"
-                  disabled={deleting}
-                >
-                  {deleting ? "🗑 Удаление..." : "🗑 Удалить"}
+                <button onClick={handleDelete} className="actionButton deleteButton" disabled={deleting}>
+                  <Trash2 size={16} />
+                  {deleting ? "Удаление..." : "Удалить"}
                 </button>
               </>
             ) : (
               <>
-                <button
-                  onClick={handleCancelEdit}
-                  className="actionButtonDetail cancelButtonDetail"
-                  disabled={saving}
-                >
-                  ✖ Отмена
+                <button onClick={handleCancelEdit} className="actionButton cancelButton" disabled={saving}>
+                  <X size={16} />
+                  Отмена
                 </button>
-                <button
-                  onClick={handleSave}
-                  className="actionButtonDetail saveButtonDetail"
-                  disabled={saving}
-                >
-                  {saving ? "💾 Сохранение..." : "💾 Сохранить"}
+                <button onClick={handleSave} className="actionButton saveButton" disabled={saving}>
+                  <Save size={16} />
+                  {saving ? "Сохранение..." : "Сохранить"}
                 </button>
               </>
             )}
           </div>
         </div>
 
-        {/* Основная информация */}
         <div className="scenarioMainInfo">
           <div className="infoCard">
             <h3>Основные параметры</h3>
-            <div className="infoGrid">
+            <div className="infoGridScenarioDetail">
               <div className="infoItem">
-                <span className="infoLabel">Ежемесячный взнос:</span>
+                <span className="infoLabel">
+                  <DollarSign size={14} />
+                  Ежемесячный взнос
+                </span>
                 {editMode ? (
                   <input
                     type="text"
@@ -312,7 +296,10 @@ function ScenarioDetailPage() {
               </div>
 
               <div className="infoItem">
-                <span className="infoLabel">Ожидаемая доходность:</span>
+                <span className="infoLabel">
+                  <TrendingUp size={14} />
+                  Ожидаемая доходность
+                </span>
                 {editMode ? (
                   <input
                     type="text"
@@ -328,7 +315,10 @@ function ScenarioDetailPage() {
               </div>
 
               <div className="infoItem">
-                <span className="infoLabel">Ожидаемая инфляция:</span>
+                <span className="infoLabel">
+                  <Activity size={14} />
+                  Ожидаемая инфляция
+                </span>
                 {editMode ? (
                   <input
                     type="text"
@@ -344,7 +334,10 @@ function ScenarioDetailPage() {
               </div>
 
               <div className="infoItem">
-                <span className="infoLabel">Целевая сумма:</span>
+                <span className="infoLabel">
+                  <Target size={14} />
+                  Целевая сумма
+                </span>
                 {editMode ? (
                   <input
                     type="text"
@@ -355,9 +348,7 @@ function ScenarioDetailPage() {
                     placeholder="1000000"
                   />
                 ) : (
-                  <span className="infoValue">
-                    {formatCurrency(scenario.target_amount)} ₽
-                  </span>
+                  <span className="infoValue">{formatCurrency(scenario.target_amount)} ₽</span>
                 )}
               </div>
             </div>
@@ -365,9 +356,12 @@ function ScenarioDetailPage() {
 
           <div className="infoCard">
             <h3>Расчетные показатели</h3>
-            <div className="infoGrid">
+            <div className="infoGridScenarioDetail">
               <div className="infoItem">
-                <span className="infoLabel">Срок достижения:</span>
+                <span className="infoLabel">
+                  <Clock size={14} />
+                  Срок достижения
+                </span>
                 <span className="infoValue">
                   {isFinite(monthsToGoal) ? (
                     <>
@@ -383,19 +377,22 @@ function ScenarioDetailPage() {
               </div>
 
               <div className="infoItem">
-                <span className="infoLabel">Уровень риска:</span>
+                <span className="infoLabel">
+                  <Shield size={14} />
+                  Уровень риска
+                </span>
                 <span className="infoValue">
-                  <span
-                    className="riskBadge"
-                    style={{ backgroundColor: risk.color }}
-                  >
+                  <span className="riskBadge" style={{ backgroundColor: risk.color }}>
                     {risk.icon} {risk.level}
                   </span>
                 </span>
               </div>
 
               <div className="infoItem">
-                <span className="infoLabel">Эффективная доходность:</span>
+                <span className="infoLabel">
+                  <TrendingUp size={14} />
+                  Эффективная доходность
+                </span>
                 <span className="infoValue highlight">
                   {effectiveReturn}%
                   <span className="subText">(с учетом инфляции)</span>
@@ -403,7 +400,10 @@ function ScenarioDetailPage() {
               </div>
 
               <div className="infoItem">
-                <span className="infoLabel">Ежемесячный темп накопления:</span>
+                <span className="infoLabel">
+                  <DollarSign size={14} />
+                  Ежемесячный темп
+                </span>
                 <span className="infoValue">
                   {formatCurrency(scenario.monthly_contribution)} ₽
                   <span className="subText">
@@ -415,19 +415,53 @@ function ScenarioDetailPage() {
           </div>
         </div>
 
-        {/* Навигация */}
+        {goal && (
+          <div className="goalCard">
+            <h3>
+              <Target size={18} />
+              Связанная цель
+            </h3>
+            <div className="goalInfo">
+              <div className="goalRow">
+                <span className="goalLabel">Название</span>
+                <span className="goalValue">{goal.title}</span>
+              </div>
+              <div className="goalRow">
+                <span className="goalLabel">Целевая сумма</span>
+                <span className="goalValue">{formatCurrency(goal.target_amount)} ₽</span>
+              </div>
+              <div className="goalRow">
+                <span className="goalLabel">Текущая сумма</span>
+                <span className="goalValue">{formatCurrency(goal.current_amount)} ₽</span>
+              </div>
+              <div className="goalRow">
+                <span className="goalLabel">Прогресс</span>
+                <span className="goalValue">
+                  {Math.round((parseFloat(goal.current_amount) / parseFloat(goal.target_amount)) * 100)}%
+                </span>
+              </div>
+            </div>
+            <div className="progressBar">
+              <div 
+                className="progressFill" 
+                style={{ width: `${Math.round((parseFloat(goal.current_amount) / parseFloat(goal.target_amount)) * 100)}%` }}
+              />
+            </div>
+            <div className="goalActions">
+              <button onClick={() => navigate(`/goals/${goal.goal_id}`)} className="goalActionButton">
+                Перейти к цели →
+              </button>
+            </div>
+          </div>
+        )}
+
         <div className="navigationSection">
-          <button
-            onClick={() => navigate(`/scenarios/${scenario.goal_id}`)}
-            className="navigationButton backButtonDetail"
-          >
+          <button onClick={() => navigate(`/scenarios/${scenario.goal_id}`)} className="navButton backButtonDetail">
             ← Назад к списку сценариев
           </button>
-          <button
-            onClick={() => navigate(`/goals/${scenario.goal_id}`)}
-            className="navigationButton forwardButtonDetail"
-          >
-            Перейти к цели →
+          <button onClick={() => navigate(`/scenarios/compare/${scenario.goal_id}`)} className="navButton compareButton">
+            <BarChart3 size={16} />
+            Сравнить сценарии
           </button>
         </div>
       </div>

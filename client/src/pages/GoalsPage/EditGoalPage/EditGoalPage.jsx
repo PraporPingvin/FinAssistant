@@ -1,5 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import {
+  Save,
+  X,
+  Calendar,
+  Target,
+  Wallet,
+  CreditCard,
+  Clock,
+  FileText,
+  AlertCircle,
+} from "lucide-react";
 import Layout from "../../../components/Layout";
 import { getGoal, updateGoal } from "../../../api/api";
 import "./EditGoalPage.css";
@@ -64,7 +75,6 @@ function EditGoalPage() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     
-    // Форматирование числовых полей
     if (["target_amount", "monthly_contribution", "initial_amount"].includes(name)) {
       const numericValue = value.replace(/[^\d]/g, '');
       setFormData(prev => ({
@@ -78,7 +88,6 @@ function EditGoalPage() {
       }));
     }
     
-    // Очищаем ошибку при изменении
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -139,11 +148,11 @@ function EditGoalPage() {
         initial_amount: parseFloat(formData.initial_amount) || 0,
         start_date: formData.start_date,
         deadline_date: formData.deadline_date || null,
-        status: formData.status
+        status: formData.status,
+        description: formData.description
       };
       
       await updateGoal(goalId, goalData);
-      alert("Цель успешно обновлена!");
       navigate(`/goals/${goalId}`);
       
     } catch (err) {
@@ -164,7 +173,7 @@ function EditGoalPage() {
     return (
       <Layout>
         <div className="loadingContainer">
-          <div className="loadingSpinner"></div>
+          <div className="loadingSpinner" />
           <p>Загрузка данных цели...</p>
         </div>
       </Layout>
@@ -175,10 +184,14 @@ function EditGoalPage() {
     return (
       <Layout>
         <div className="errorContainer">
-          <div className="errorMessage">{error}</div>
-          <button onClick={() => navigate("/goals")} className="backButton">
-            Вернуться к списку целей
-          </button>
+          <div className="errorCard">
+            <AlertCircle size={42} />
+            <h2>Ошибка</h2>
+            <p>{error}</p>
+            <button onClick={() => navigate("/goals")} className="backButton">
+              Вернуться к списку целей
+            </button>
+          </div>
         </div>
       </Layout>
     );
@@ -186,23 +199,23 @@ function EditGoalPage() {
 
   return (
     <Layout>
-      <div className="editGoalContainer">
-        <div className="editGoalHeader">
-          <h1>Редактирование цели</h1>
-          <p className="editGoalSubtitle">
+      <div className="editGoalPage">
+        <div className="pageIntro">
+          <h1 className="pageTitle">Редактирование цели</h1>
+          <p className="pageSubtitle">
             Измените информацию о вашей финансовой цели
           </p>
         </div>
         
         {errors.submit && (
           <div className="errorMessage">
-            ❌ {errors.submit}
+            <X size={18} />
+            {errors.submit}
           </div>
         )}
         
         <div className="editGoalForm">
           <form onSubmit={handleSubmit}>
-            {/* Название цели */}
             <div className="formGroup">
               <label htmlFor="title" className="formLabel">
                 Название цели <span className="required">*</span>
@@ -220,17 +233,17 @@ function EditGoalPage() {
               {errors.title && <div className="validationError">{errors.title}</div>}
             </div>
             
-            {/* Целевая сумма и ежемесячный взнос */}
             <div className="formRow">
               <div className="formColumn">
                 <label htmlFor="target_amount" className="formLabel">
+                  <Target size={14} />
                   Целевая сумма (₽) <span className="required">*</span>
                 </label>
                 <input
                   id="target_amount"
                   name="target_amount"
                   type="text"
-                  placeholder="1000000"
+                  placeholder="1 000 000"
                   value={formData.target_amount}
                   onChange={handleChange}
                   className={`formInput ${errors.target_amount ? 'formInputError' : ''}`}
@@ -246,13 +259,14 @@ function EditGoalPage() {
               
               <div className="formColumn">
                 <label htmlFor="monthly_contribution" className="formLabel">
+                  <CreditCard size={14} />
                   Ежемесячный взнос (₽) <span className="required">*</span>
                 </label>
                 <input
                   id="monthly_contribution"
                   name="monthly_contribution"
                   type="text"
-                  placeholder="15000"
+                  placeholder="15 000"
                   value={formData.monthly_contribution}
                   onChange={handleChange}
                   className={`formInput ${errors.monthly_contribution ? 'formInputError' : ''}`}
@@ -267,17 +281,17 @@ function EditGoalPage() {
               </div>
             </div>
             
-            {/* Начальная сумма и дата начала */}
             <div className="formRow">
               <div className="formColumn">
                 <label htmlFor="initial_amount" className="formLabel">
+                  <Wallet size={14} />
                   Начальная сумма (₽)
                 </label>
                 <input
                   id="initial_amount"
                   name="initial_amount"
                   type="text"
-                  placeholder="50000"
+                  placeholder="50 000"
                   value={formData.initial_amount}
                   onChange={handleChange}
                   className="formInput"
@@ -292,6 +306,7 @@ function EditGoalPage() {
               
               <div className="formColumn">
                 <label htmlFor="start_date" className="formLabel">
+                  <Calendar size={14} />
                   Дата начала <span className="required">*</span>
                 </label>
                 <input
@@ -307,10 +322,10 @@ function EditGoalPage() {
               </div>
             </div>
             
-            {/* Дата завершения и статус */}
             <div className="formRow">
               <div className="formColumn">
                 <label htmlFor="deadline_date" className="formLabel">
+                  <Clock size={14} />
                   Желаемая дата завершения
                 </label>
                 <input
@@ -345,9 +360,9 @@ function EditGoalPage() {
               </div>
             </div>
             
-            {/* Описание */}
             <div className="formGroup">
               <label htmlFor="description" className="formLabel">
+                <FileText size={14} />
                 Описание цели
               </label>
               <textarea
@@ -362,7 +377,6 @@ function EditGoalPage() {
               />
             </div>
             
-            {/* Кнопки */}
             <div className="formButtons">
               <button
                 type="button"
@@ -377,6 +391,7 @@ function EditGoalPage() {
                 disabled={saving}
                 className="formButton submitButton"
               >
+                <Save size={16} />
                 {saving ? "Сохранение..." : "Сохранить изменения"}
               </button>
             </div>

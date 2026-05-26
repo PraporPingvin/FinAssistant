@@ -1,15 +1,12 @@
-/* PaymentEditForm.css */
+:root {
+  --primary-dark: #495631;
+  --primary-accent: #EAED74;
+  --border-color: rgba(73, 86, 49, 0.08);
+  --text-muted: #7B8465;
+}
+
 .paymentEditForm {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-}
-
-.editFormTitle {
-  font-size: 1.2rem;
-  font-weight: 400;
-  color: var(--primary-dark);
-  margin: 0 0 10px 0;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--border-color);
+  gap: 24px;
 }

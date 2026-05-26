@@ -1,288 +1,463 @@
-/* ScenarioComparisonPage.css */
-
-/* Основные цвета новой палитры */
 :root {
   --primary-dark: #495631;
   --primary-accent: #EAED74;
   --primary-light: #EFF2DD;
-  --card-bg: #FFFFFF;
-  --border-color: #DDE0C5;
-  --text-muted: #717959;
-  --text-dark: #3A3F29;
-  --shadow: 0 4px 12px rgba(73, 86, 49, 0.08);
-  --shadow-hover: 0 8px 24px rgba(73, 86, 49, 0.12);
-  --success-color: #4caf50;
-  --warning-color: #ff9800;
-  --danger-color: #f44336;
+
+  --card-bg: rgba(255, 255, 255, 0.72);
+  --border-color: rgba(73, 86, 49, 0.08);
+
+  --text-main: #495631;
+  --text-muted: #7B8465;
+
+  --success-color: #2E7D32;
+  --warning-color: #F5A623;
+  --danger-color: #E35D5D;
+
+  --shadow-sm: 0 8px 24px rgba(73, 86, 49, 0.06);
+  --shadow-md: 0 10px 30px rgba(73, 86, 49, 0.08);
+  --shadow-lg: 0 18px 40px rgba(73, 86, 49, 0.12);
+
+  --radius-sm: 12px;
+  --radius-md: 18px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --radius-full: 999px;
+
+  --transition: all 0.28s ease;
 }
 
 /* Контейнер */
 .scenarioComparisonContainer {
-  padding: 30px 20px;
   max-width: 1400px;
   margin: 0 auto;
-  min-height: calc(100vh - 80px);
+  padding: 42px 24px 80px;
 }
 
 /* Хлебные крошки */
 .breadcrumb {
-  margin-bottom: 25px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 36px;
   color: var(--text-muted);
-  font-size: 0.9rem;
-  font-weight: 300;
+  font-size: 0.92rem;
 }
 
 .breadcrumb a {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   color: var(--text-muted);
   text-decoration: none;
-  transition: color 0.3s ease;
+  transition: var(--transition);
 }
 
 .breadcrumb a:hover {
   color: var(--primary-dark);
 }
 
-.breadcrumb span {
-  color: var(--primary-dark);
-  font-weight: 400;
+.breadcrumb .current {
+  color: var(--text-main);
+  font-weight: 600;
 }
 
 /* Заголовок */
-.pageHeader {
+.pageHeaderForecast {
+  text-align: center;
+  margin-bottom: 42px;
+}
+
+.headerContentForecast h1 {
+  margin: 0 0 8px;
+  color: var(--text-main);
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  font-weight: 300;
+  letter-spacing: -1px;
+}
+
+.headerDescription {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+/* Выбор цели */
+.goalSelectionSection {
+  padding: 28px;
+  margin-bottom: 32px;
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.goalSelectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.goalSelectionHeader h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  color: var(--text-main);
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+.goalStatsScenario {
+  display: flex;
+  gap: 20px;
+}
+
+.goalStat {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.goalSelector select {
+  width: 100%;
+  padding: 14px 18px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.75);
+  color: var(--text-main);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.goalSelector select:focus {
+  outline: none;
+  border-color: var(--primary-accent);
+  box-shadow: 0 0 0 4px rgba(234, 237, 116, 0.18);
+}
+
+.goalInfoCard {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: var(--radius-md);
+  background: rgba(234, 237, 116, 0.08);
+  border: 1px solid rgba(234, 237, 116, 0.2);
+}
+
+.goalInfoHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.goalInfoHeader h4 {
+  margin: 0;
+  color: var(--text-main);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.goalProgress {
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  background: var(--primary-accent);
+  color: var(--primary-dark);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.goalInfoDetails {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.goalInfoDetails div {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 35px;
+  gap: 4px;
 }
 
-.headerContent h1 {
-  margin: 0 0 10px 0;
-  font-size: 2rem;
-  font-weight: 300;
-  color: var(--primary-dark);
-  line-height: 1.3;
-}
-
-.headerSubtitle {
+.goalInfoDetails span {
+  font-size: 0.7rem;
   color: var(--text-muted);
-  font-size: 1rem;
-  font-weight: 300;
-  margin: 0;
+}
+
+.goalInfoDetails strong {
+  font-size: 0.9rem;
+  color: var(--text-main);
 }
 
 /* Сообщения об ошибках */
 .errorMessage {
-  background-color: rgba(234, 237, 116, 0.2);
-  color: var(--primary-dark);
-  padding: 18px;
-  border-radius: 8px;
-  margin-bottom: 25px;
-  border-left: 4px solid var(--primary-accent);
-  font-weight: 300;
-}
-
-.errorMessage strong {
-  font-weight: 400;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 24px;
+  margin-bottom: 28px;
+  border-radius: var(--radius-md);
+  background: rgba(227, 93, 93, 0.1);
+  color: var(--danger-color);
+  border-left: 4px solid var(--danger-color);
 }
 
 /* Выбор сценариев */
 .selectionSection {
-  background-color: var(--card-bg);
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: var(--shadow);
+  padding: 28px;
+  margin-bottom: 32px;
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
   border: 1px solid var(--border-color);
-  margin-bottom: 30px;
+  box-shadow: var(--shadow-sm);
 }
 
 .selectionHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
   flex-wrap: wrap;
-  gap: 15px;
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
 .selectionHeader h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   margin: 0;
-  font-size: 1.3rem;
-  font-weight: 300;
+  color: var(--text-main);
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+.selectionCount {
+  margin-left: 10px;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  background: rgba(234, 237, 116, 0.2);
   color: var(--primary-dark);
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
 }
 
-.selectionControls {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  align-items: center;
-  margin-top: 20px;
+.selectionHint {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.85rem;
 }
 
-.addButton {
-  padding: 10px 20px;
-  background-color: var(--primary-dark);
-  color: var(--primary-accent);
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 300;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.addButton:hover {
-  background-color: var(--primary-accent);
-  color: var(--primary-dark);
-  transform: translateY(-2px);
-}
-
-.clearButton {
-  padding: 10px 20px;
-  background-color: transparent;
-  color: var(--primary-dark);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 300;
-  transition: all 0.3s ease;
-}
-
-.clearButton:hover {
-  background-color: rgba(221, 224, 197, 0.2);
-}
-
-/* Сетка выбранных сценариев */
 .selectedScenariosGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 20px;
-  margin-top: 20px;
+  margin-bottom: 24px;
 }
 
 .scenarioSelectorCard {
-  background-color: rgba(73, 86, 49, 0.03);
   padding: 20px;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.55);
   border: 1px solid var(--border-color);
-  transition: all 0.3s ease;
+  transition: var(--transition);
 }
 
 .scenarioSelectorCard:hover {
-  background-color: rgba(73, 86, 49, 0.05);
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: var(--shadow-sm);
 }
 
 .scenarioSelectorHeader {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 15px;
+  margin-bottom: 16px;
 }
-
-.saveToDbButton{
-  padding: 10px 20px;
-  background-color: var(--primary-dark);
-  color: var(--primary-accent);
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 300;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.bestScenarioCard{
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.saveToDbButton:hover {
-  background-color: var(--primary-accent);
-  color: var(--primary-dark);
-}
-
 
 .scenarioSelectorTitle {
+  margin: 0 0 6px;
+  color: var(--text-main);
   font-size: 1rem;
-  font-weight: 400;
-  color: var(--primary-dark);
-  margin: 0 0 8px 0;
+  font-weight: 600;
 }
 
 .scenarioGoal {
-  font-size: 0.85rem;
-  color: var(--text-muted);
   display: flex;
   align-items: center;
   gap: 6px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
 }
 
 .removeButton {
-  padding: 6px 10px;
-  background-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: rgba(227, 93, 93, 0.1);
+  border: none;
+  border-radius: var(--radius-sm);
   color: var(--danger-color);
-  border: 1px solid var(--danger-color);
-  border-radius: 4px;
   cursor: pointer;
-  font-size: 0.8rem;
-  transition: all 0.3s ease;
+  transition: var(--transition);
 }
 
 .removeButton:hover {
-  background-color: var(--danger-color);
+  background: var(--danger-color);
   color: white;
+  transform: translateY(-2px);
 }
 
 .scenarioSelect {
   width: 100%;
-  padding: 10px;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  border-radius: var(--radius-sm);
   border: 1px solid var(--border-color);
-  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.75);
+  color: var(--text-main);
   font-size: 0.9rem;
-  color: var(--primary-dark);
-  background-color: white;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: var(--transition);
 }
 
 .scenarioSelect:focus {
   outline: none;
   border-color: var(--primary-accent);
-  box-shadow: 0 0 0 3px rgba(234, 237, 116, 0.2);
+  box-shadow: 0 0 0 4px rgba(234, 237, 116, 0.18);
+}
+
+.scenarioPreview {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--text-muted);
 }
 
 .emptySelection {
-  text-align: center;
-  padding: 40px 20px;
-  color: var(--text-muted);
-  font-size: 0.95rem;
   grid-column: 1 / -1;
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--text-muted);
+}
+
+.emptySelection h4 {
+  margin: 16px 0 8px;
+  color: var(--text-main);
+  font-size: 1.1rem;
+  font-weight: 500;
 }
 
 .emptySelection p {
-  margin: 10px 0;
+  margin: 0 0 16px;
 }
 
-/* Основная таблица сравнения */
-.comparisonTableWrapper {
-  background-color: var(--card-bg);
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: var(--shadow);
+.emptyStateButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: var(--primary-dark);
+  color: var(--primary-accent);
+  border: none;
+  border-radius: var(--radius-full);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.emptyStateButton:hover {
+  transform: translateY(-2px);
+  background: var(--primary-accent);
+  color: var(--primary-dark);
+  box-shadow: var(--shadow-md);
+}
+
+.selectionControls {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.addButton,
+.clearButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.addButton {
+  background: var(--primary-dark);
+  color: var(--primary-accent);
+  border: none;
+}
+
+.addButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  background: var(--primary-accent);
+  color: var(--primary-dark);
+  box-shadow: var(--shadow-md);
+}
+
+.clearButton {
+  background: rgba(73, 86, 49, 0.06);
+  color: var(--text-main);
   border: 1px solid var(--border-color);
-  margin-bottom: 30px;
+}
+
+.clearButton:hover {
+  background: rgba(73, 86, 49, 0.12);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Сообщение о загрузке сравнения */
+.comparingMessage {
+  text-align: center;
+  padding: 48px 24px;
+  margin: 20px 0;
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+}
+
+.loadingSpinnerSmall {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  margin-bottom: 16px;
+  border: 3px solid var(--border-color);
+  border-top-color: var(--primary-dark);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+/* Таблица сравнения */
+.comparisonTableWrapper {
+  padding: 28px;
+  margin-bottom: 32px;
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
   overflow-x: auto;
 }
 
@@ -290,665 +465,541 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 25px;
   flex-wrap: wrap;
-  gap: 15px;
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
 .comparisonTableHeader h3 {
-  margin: 0;
-  font-size: 1.3rem;
-  font-weight: 300;
-  color: var(--primary-dark);
   display: flex;
   align-items: center;
   gap: 10px;
+  margin: 0;
+  color: var(--text-main);
+  font-size: 1.2rem;
+  font-weight: 500;
 }
 
 .tableControls {
   display: flex;
-  gap: 10px;
+  gap: 12px;
+}
+
+.saveToDbButton,
+.exportButton,
+.optionButton {
+  display: inline-flex;
   align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: var(--transition);
+}
+
+.saveToDbButton {
+  background: var(--primary-dark);
+  color: var(--primary-accent);
+  border: none;
+}
+
+.saveToDbButton:hover:not(:disabled) {
+  background: var(--primary-accent);
+  color: var(--primary-dark);
 }
 
 .exportButton {
-  padding: 10px 20px;
-  background-color: var(--primary-dark);
+  background: var(--primary-dark);
   color: var(--primary-accent);
   border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 300;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
 
 .exportButton:hover {
-  background-color: var(--primary-accent);
+  background: var(--primary-accent);
   color: var(--primary-dark);
 }
 
 .optionButton {
-  padding: 10px 20px;
-  background-color: transparent;
-  color: var(--primary-dark);
+  background: rgba(73, 86, 49, 0.06);
+  color: var(--text-main);
   border: 1px solid var(--border-color);
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 300;
-  transition: all 0.3s ease;
 }
 
 .optionButton:hover {
-  background-color: rgba(221, 224, 197, 0.2);
+  background: rgba(73, 86, 49, 0.12);
 }
 
-/* Таблица сравнения */
+/* Таблица */
 .comparisonTable {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
 }
 
 .comparisonTable th {
-  background-color: rgba(73, 86, 49, 0.05);
-  padding: 16px 12px;
+  padding: 14px 12px;
+  background: rgba(73, 86, 49, 0.05);
+  color: var(--text-main);
+  font-weight: 600;
   text-align: left;
-  font-weight: 400;
-  color: var(--primary-dark);
   border-bottom: 2px solid var(--border-color);
-  position: sticky;
-  top: 0;
 }
 
 .comparisonTable td {
-  padding: 14px 12px;
-  border-bottom: 1px solid rgba(221, 224, 197, 0.5);
+  padding: 12px;
+  border-bottom: 1px solid var(--border-color);
   vertical-align: middle;
 }
 
 .comparisonTable tr:hover td {
-  background-color: rgba(234, 237, 116, 0.05);
+  background: rgba(234, 237, 116, 0.05);
 }
 
-/* Стили для столбцов сценариев */
 .scenarioColumn {
-  min-width: 200px;
-  max-width: 250px;
+  min-width: 180px;
 }
 
 .scenarioColumnHeader {
-  background-color: var(--primary-accent) !important;
-  color: var(--primary-dark) !important;
-  font-weight: 400 !important;
-  position: relative;
+  background: rgba(234, 237, 116, 0.15) !important;
 }
 
-.scenarioColumnHeader .scenarioTitle {
-  font-size: 1rem;
-  margin-bottom: 6px;
+.scenarioTitle {
+  font-weight: 600;
+  margin-bottom: 4px;
 }
 
-.scenarioColumnHeader .scenarioGoal {
-  font-size: 0.8rem;
-  opacity: 0.8;
+.scenarioGoalTitle {
+  font-size: 0.7rem;
+  color: var(--text-muted);
 }
 
-/* Стили для ячеек */
-.bestValue {
-  background-color: rgba(76, 175, 80, 0.1) !important;
-  font-weight: 500;
-  color: var(--success-color);
+.scenarioRating {
+  font-size: 0.7rem;
+  color: var(--primary-dark);
+  margin-top: 4px;
 }
 
-.worstValue {
-  background-color: rgba(244, 67, 54, 0.1) !important;
-  font-weight: 500;
-  color: var(--danger-color);
-}
-
-.equalValue {
-  background-color: rgba(255, 152, 0, 0.1) !important;
-  font-weight: 500;
-  color: var(--warning-color);
+.paramLabel {
+  font-weight: 600;
+  color: var(--text-main);
 }
 
 .valueCell {
   text-align: center;
-  font-weight: 400;
 }
 
-.valueCell .highlight {
-  font-size: 1.1rem;
-  font-weight: 500;
+.valueCell strong {
+  color: var(--text-main);
 }
 
-.valueCell .subtext {
-  font-size: 0.8rem;
+.subtext {
+  font-size: 0.7rem;
   color: var(--text-muted);
   margin-top: 4px;
 }
 
-/* Рейтинг и рекомендации */
-.ratingSection {
-  background-color: var(--card-bg);
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: var(--shadow);
-  border: 1px solid var(--border-color);
-  margin-bottom: 30px;
-}
-
-.ratingHeader {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.ratingHeader h3 {
-  margin: 0;
-  font-size: 1.3rem;
-  font-weight: 300;
-  color: var(--primary-dark);
-}
-
-.ratingGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
-  margin-top: 20px;
-}
-
-.ratingCard {
-  background-color: rgba(73, 86, 49, 0.03);
-  padding: 20px;
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
-  transition: all 0.3s ease;
-}
-
-.ratingCard:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-hover);
-}
-
-.ratingCard.best {
-  border-color: var(--success-color);
-  background-color: rgba(76, 175, 80, 0.05);
-}
-
-.ratingCard.worst {
-  border-color: var(--danger-color);
-  background-color: rgba(244, 67, 54, 0.05);
-}
-
-.ratingCardTitle {
-  font-size: 1.1rem;
-  font-weight: 400;
-  margin: 0 0 15px 0;
-  color: var(--primary-dark);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.ratingCardTitle .badge {
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  font-weight: 500;
-}
-
-.best .ratingCardTitle .badge {
-  background-color: var(--success-color);
-  color: white;
-}
-
-.worst .ratingCardTitle .badge {
-  background-color: var(--danger-color);
-  color: white;
-}
-
-.ratingScore {
-  font-size: 1.8rem;
-  font-weight: 300;
-  color: var(--primary-dark);
-  text-align: center;
-  margin: 15px 0;
-}
-
-.ratingScore .maxScore {
-  font-size: 1rem;
-  color: var(--text-muted);
-  margin-left: 5px;
-}
-
-.ratingDetails {
-  margin-top: 15px;
-}
-
-.ratingDetail {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-  padding-bottom: 8px;
-  border-bottom: 1px dashed rgba(221, 224, 197, 0.5);
-}
-
-.ratingDetail:last-child {
-  margin-bottom: 0;
-  padding-bottom: 0;
-  border-bottom: none;
-}
-
-.ratingDetailLabel {
-  font-size: 0.9rem;
-  color: var(--text-muted);
-}
-
-.ratingDetailValue {
-  font-size: 0.9rem;
-  color: var(--primary-dark);
-  font-weight: 400;
-}
-
-.ratingDetailValue.positive {
-  color: var(--success-color);
-}
-
-.ratingDetailValue.negative {
+.warningText {
   color: var(--danger-color);
 }
 
-/* Рекомендации */
-.recommendationsSection {
-  background-color: var(--card-bg);
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: var(--shadow);
-  border: 1px solid var(--border-color);
+/* Лучшие/худшие значения */
+.bestValue {
+  background: rgba(46, 125, 50, 0.1) !important;
+  font-weight: 600;
 }
 
-.recommendationsHeader {
-  display: flex;
+.worstValue {
+  background: rgba(227, 93, 93, 0.1) !important;
+}
+
+/* Риск-бейджи */
+.riskBadge {
+  display: inline-flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.recommendationsHeader h3 {
-  margin: 0;
-  font-size: 1.3rem;
-  font-weight: 300;
-  color: var(--primary-dark);
-}
-
-.recommendationsGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
-}
-
-.recommendationCard {
-  padding: 20px;
-  border-radius: 8px;
-  background-color: rgba(73, 86, 49, 0.03);
-  border-left: 4px solid var(--primary-accent);
-}
-
-.recommendationCardTitle {
-  font-size: 1rem;
-  font-weight: 400;
-  margin: 0 0 10px 0;
-  color: var(--primary-dark);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.recommendationCardContent {
-  font-size: 0.9rem;
-  color: var(--text-muted);
-  line-height: 1.5;
-  margin: 0;
-}
-
-/* Индикаторы прогресса */
-.progressIndicator {
-  height: 8px;
-  background-color: rgba(221, 224, 197, 0.5);
-  border-radius: 4px;
-  overflow: hidden;
-  margin: 5px 0;
-}
-
-.progressFill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--primary-accent), var(--primary-dark));
-  border-radius: 4px;
-  transition: width 0.5s ease;
-}
-
-/* Загрузка */
-.loadingContainer {
-  text-align: center;
-  padding: 80px 20px;
-}
-
-.loadingContainer p {
-  color: var(--primary-dark);
-  font-size: 1.1rem;
-  font-weight: 300;
-}
-
-.loadingAnimation {
-  display: inline-block;
-  width: 50px;
-  height: 50px;
-  border: 3px solid var(--border-color);
-  border-radius: 50%;
-  border-top-color: var(--primary-dark);
-  animation: spin 1s ease-in-out infinite;
-  margin-bottom: 20px;
-}
-
-/* Добавьте в ScenarioComparisonPage.css */
-
-/* Индикатор выбранных сценариев */
-.selectionCount {
-  display: inline-block;
-  margin-left: 10px;
-  font-size: 0.9rem;
-  color: var(--primary-dark);
-  background-color: rgba(234, 237, 116, 0.3);
+  gap: 6px;
   padding: 4px 12px;
-  border-radius: 15px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 500;
 }
 
-/* Сообщение о загрузке сравнения */
-.comparingMessage {
-  text-align: center;
-  padding: 40px 20px;
-  color: var(--text-muted);
-  background-color: var(--card-bg);
-  border-radius: 8px;
-  margin: 20px 0;
-  border: 1px solid var(--border-color);
-}
-
-/* Предварительная информация о сценарии */
-.scenarioPreview {
-  margin-top: 10px;
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  display: flex;
-  justify-content: space-between;
-}
-
-/* Добавьте в ScenarioComparisonPage.css */
-
-/* Модальное окно экспорта */
-.exportModal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  padding: 20px;
-}
-
-.exportModalContent {
-  background-color: var(--card-bg);
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: var(--shadow-hover);
-  max-width: 500px;
-  width: 100%;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
-.exportModalHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 25px;
-}
-
-.exportModalHeader h3 {
-  margin: 0;
-  font-size: 1.3rem;
-  font-weight: 300;
-  color: var(--primary-dark);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.closeModalButton {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  color: var(--text-muted);
-  cursor: pointer;
-  padding: 5px;
-  line-height: 1;
-}
-
-.closeModalButton:hover {
-  color: var(--primary-dark);
-}
-
-.exportOptions {
-  margin-bottom: 25px;
-}
-
-.exportOption {
-  margin-bottom: 15px;
-}
-
-.exportOption label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 300;
-  color: var(--primary-dark);
-  font-size: 0.95rem;
-}
-
-.exportSelect {
-  width: 100%;
-  padding: 12px 16px;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 300;
-  color: var(--primary-dark);
-  background-color: var(--card-bg);
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.exportSelect:focus {
-  outline: none;
-  border-color: var(--primary-accent);
-  box-shadow: 0 0 0 3px rgba(234, 237, 116, 0.2);
-}
-
-.exportOptionGroup {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
-  margin-top: 20px;
-}
-
-.exportOptionGroup .exportOption {
-  margin-bottom: 0;
-}
-
-.exportCheckbox {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 12px;
-  cursor: pointer;
-}
-
-.exportCheckbox input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-  accent-color: var(--primary-dark);
-}
-
-.exportCheckbox label {
-  margin: 0;
-  cursor: pointer;
-  font-size: 0.9rem;
-  color: var(--text-muted);
-}
-
-.exportModalActions {
-  display: flex;
-  gap: 15px;
-  justify-content: flex-end;
-  margin-top: 25px;
-  padding-top: 20px;
-  border-top: 1px solid var(--border-color);
-}
-
-.exportActionButton {
-  padding: 12px 24px;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-  font-size: 0.95rem;
-  font-weight: 300;
-  transition: all 0.3s ease;
-  min-width: 120px;
-}
-
-.exportActionButton.cancel {
-  background-color: transparent;
-  color: var(--primary-dark);
-  border: 1px solid var(--border-color);
-}
-
-.exportActionButton.cancel:hover {
-  background-color: rgba(221, 224, 197, 0.2);
-}
-
-.exportActionButton.export {
-  background-color: var(--primary-dark);
-  color: var(--primary-accent);
-}
-
-.exportActionButton.export:hover {
-  background-color: var(--primary-accent);
-  color: var(--primary-dark);
-}
-
-.exportActionButton:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* Индикатор загрузки */
-.exportLoading {
-  text-align: center;
-  padding: 20px;
-}
-
-.exportLoadingSpinner {
-  display: inline-block;
-  width: 40px;
-  height: 40px;
-  border: 3px solid var(--border-color);
-  border-radius: 50%;
-  border-top-color: var(--primary-dark);
-  animation: spin 1s ease-in-out infinite;
-  margin-bottom: 15px;
-}
-
-.exportSuccess {
-  text-align: center;
-  padding: 20px;
+.riskLow {
+  background: rgba(46, 125, 50, 0.15);
   color: var(--success-color);
 }
 
-.exportSuccessIcon {
-  font-size: 3rem;
-  margin-bottom: 15px;
+.riskMedium {
+  background: rgba(245, 166, 35, 0.15);
+  color: var(--warning-color);
 }
 
-.exportSuccess p {
-  margin: 10px 0;
-  color: var(--text-muted);
+.riskHigh {
+  background: rgba(227, 93, 93, 0.15);
+  color: var(--danger-color);
 }
 
-/* Подсказки */
-.exportHint {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  margin-top: 5px;
-  font-style: italic;
+/* Probability bar */
+.probabilityBar {
+  position: relative;
+  width: 100px;
+  height: 20px;
+  margin: 0 auto;
+  background: rgba(73, 86, 49, 0.08);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.probabilityFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--success-color), #66bb6a);
+  border-radius: var(--radius-full);
+  transition: width 0.5s ease;
+}
+
+.probabilityBar span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+/* Rating display */
+.ratingDisplay {
+  text-align: center;
+}
+
+.ratingScore {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+
+.ratingStars {
+  font-size: 0.7rem;
+  color: var(--warning-color);
+}
+
+/* Анализ и рекомендации */
+.analysisSection {
+  margin-top: 32px;
 }
 
 .bestWorstComparison {
   display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 40px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.bestScenarioCard,
+.worstScenarioCard {
+  flex: 1;
+  min-width: 280px;
+  padding: 24px;
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+}
+
+.bestScenarioCard:hover,
+.worstScenarioCard:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.bestWorstHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid;
+}
+
+.bestWorstHeader.best {
+  border-bottom-color: var(--success-color);
+}
+
+.bestWorstHeader.worst {
+  border-bottom-color: var(--danger-color);
+}
+
+.bestWorstHeader h4 {
+  margin: 0;
+  color: var(--text-main);
+  font-size: 1.1rem;
+}
+
+.bestWorstContent h5 {
+  margin: 0 0 8px;
+  color: var(--text-main);
+  font-size: 1rem;
+}
+
+.bestWorstContent p {
+  margin: 0 0 16px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.ratingBadge {
+  display: inline-block;
+  padding: 6px 12px;
+  margin-bottom: 16px;
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.bestRating {
+  background: rgba(46, 125, 50, 0.15);
+  color: var(--success-color);
+}
+
+.worstRating {
+  background: rgba(227, 93, 93, 0.15);
+  color: var(--danger-color);
+}
+
+.bestWorstDetails {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.bestWorstDetails div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bestWorstDetails span {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.bestWorstDetails strong {
+  font-size: 0.9rem;
+  color: var(--text-main);
+}
+
+.vsSeparator {
+  display: flex;
+  align-items: center;
+}
+
+.vsCircle {
+  width: 50px;
+  height: 50px;
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 100px;
-  margin-bottom: 20px;
+  border-radius: 50%;
+  background: var(--primary-dark);
+  color: var(--primary-accent);
+  font-weight: 700;
+  font-size: 1.2rem;
 }
 
-.goalInfoDetails {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+.recommendationsSection {
+  padding: 28px;
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
 }
 
-.goalInfoHeader {
+.recommendationsSection h4 {
+  margin: 0 0 20px;
+  color: var(--text-main);
+  font-size: 1rem;
+}
+
+.recommendationsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.recommendationCard {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  gap: 16px;
+  padding: 20px;
+  border-radius: var(--radius-md);
+  background: rgba(73, 86, 49, 0.03);
+  border-left: 4px solid var(--primary-accent);
+}
+
+.recommendationIcon {
+  flex-shrink: 0;
+  color: var(--primary-dark);
+}
+
+.recommendationContent h5 {
+  margin: 0 0 8px;
+  color: var(--text-main);
+  font-size: 0.9rem;
+}
+
+.recommendationContent p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+/* Модальное окно */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
   align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(73, 86, 49, 0.18);
+  backdrop-filter: blur(10px);
+  z-index: 1000;
 }
 
-.goalSelector {
-  margin-bottom: 40px;
+.modalContent {
+  width: 100%;
+  max-width: 460px;
+  padding: 32px;
+  border-radius: var(--radius-xl);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: var(--shadow-lg);
+  animation: modalAppear 0.28s ease;
 }
 
-/* Адаптивность для модального окна */
-@media (max-width: 768px) {
-  .exportModalContent {
-    padding: 20px;
+@keyframes modalAppear {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
   }
-
-  .exportOptionGroup {
-    grid-template-columns: 1fr;
-  }
-
-  .exportModalActions {
-    flex-direction: column;
-  }
-
-  .exportActionButton {
-    width: 100%;
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
-/* Анимация */
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.modalHeader h3 {
+  margin: 0;
+  color: var(--text-main);
+  font-size: 1.3rem;
+  font-weight: 500;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+}
+
+.closeButton:hover {
+  background: rgba(73, 86, 49, 0.08);
+  color: var(--danger-color);
+}
+
+.modalBody {
+  margin-bottom: 24px;
+}
+
+.exportOptions {
+  display: flex;
+  gap: 20px;
+}
+
+.exportOption {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: var(--text-main);
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+}
+
+.cancelButtonModal,
+.submitButtonModal {
+  padding: 10px 24px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.cancelButtonModal {
+  background: rgba(73, 86, 49, 0.06);
+  color: var(--text-main);
+  border: none;
+}
+
+.cancelButtonModal:hover {
+  background: rgba(73, 86, 49, 0.12);
+}
+
+.submitButtonModal {
+  background: var(--primary-dark);
+  color: var(--primary-accent);
+  border: none;
+}
+
+.submitButtonModal:hover {
+  transform: translateY(-2px);
+  background: var(--primary-accent);
+  color: var(--primary-dark);
+  box-shadow: var(--shadow-md);
+}
+
+/* Загрузка */
+.loadingContainer {
+  min-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.loadingSpinner {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 3px solid rgba(73, 86, 49, 0.12);
+  border-top-color: var(--primary-dark);
+  animation: spin 0.9s linear infinite;
+}
+
 @keyframes spin {
   to {
     transform: rotate(360deg);
@@ -956,77 +1007,90 @@
 }
 
 /* Адаптивность */
-@media (max-width: 1200px) {
-  .comparisonTable {
-    font-size: 0.9rem;
+@media (max-width: 900px) {
+  .bestWorstComparison {
+    flex-direction: column;
+    gap: 20px;
   }
 
-  .scenarioColumn {
-    min-width: 180px;
+  .vsSeparator {
+    justify-content: center;
+  }
+
+  .recommendationsGrid {
+    grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 768px) {
   .scenarioComparisonContainer {
-    padding: 20px 15px;
+    padding: 28px 18px 60px;
   }
 
-  .pageHeader h1 {
-    font-size: 1.6rem;
+  .goalSelectionHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .goalStatsScenario {
+    flex-wrap: wrap;
   }
 
   .selectedScenariosGrid {
     grid-template-columns: 1fr;
   }
 
+  .selectionControls {
+    flex-direction: column;
+  }
+
+  .addButton,
+  .clearButton {
+    width: 100%;
+    justify-content: center;
+  }
+
   .comparisonTableWrapper {
-    padding: 15px;
+    padding: 16px;
   }
 
-  .comparisonTable {
-    font-size: 0.85rem;
-  }
-
-  .comparisonTable th,
-  .comparisonTable td {
-    padding: 10px 8px;
-  }
-
-  .scenarioColumnHeader .scenarioTitle {
-    font-size: 0.9rem;
-  }
-
-  .ratingGrid,
-  .recommendationsGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .selectionHeader {
+  .comparisonTableHeader {
     flex-direction: column;
     align-items: flex-start;
   }
 
-  .selectionControls {
+  .tableControls {
     width: 100%;
-    justify-content: flex-end;
-  }
-}
-
-@media (max-width: 480px) {
-  .comparisonTable {
-    font-size: 0.8rem;
+    flex-wrap: wrap;
   }
 
-  .comparisonTable th,
-  .comparisonTable td {
-    padding: 8px 6px;
+  .saveToDbButton,
+  .exportButton,
+  .optionButton {
+    flex: 1;
+    justify-content: center;
   }
 
-  .valueCell .highlight {
-    font-size: 1rem;
+  .bestWorstComparison {
+    gap: 16px;
   }
 
-  .ratingScore {
-    font-size: 1.5rem;
+  .bestScenarioCard,
+  .worstScenarioCard {
+    min-width: auto;
+  }
+
+  .modalContent {
+    padding: 24px;
+  }
+
+  .modalFooter {
+    flex-direction: column;
+  }
+
+  .cancelButtonModal,
+  .submitButtonModal {
+    width: 100%;
+    justify-content: center;
   }
 }

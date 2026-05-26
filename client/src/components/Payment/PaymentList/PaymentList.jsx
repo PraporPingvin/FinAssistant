@@ -1,4 +1,5 @@
 import React from "react";
+import { Edit2, Trash2, Calendar, DollarSign, FileText, Clock } from "lucide-react";
 import "./PaymentList.css";
 
 function PaymentList({ payments, onEdit, onDelete }) {
@@ -20,6 +21,21 @@ function PaymentList({ payments, onEdit, onDelete }) {
     }
   };
 
+  const formatDateTime = (dateString) => {
+    if (!dateString) return "—";
+    try {
+      return new Date(dateString).toLocaleDateString('ru-RU', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch {
+      return "—";
+    }
+  };
+
   const handleDelete = async (payment) => {
     if (window.confirm(`Вы уверены, что хотите удалить платеж на сумму ${formatCurrency(payment.amount)} ₽?\n\nЭто действие нельзя отменить.`)) {
       onDelete(payment.payment_id);
@@ -28,7 +44,7 @@ function PaymentList({ payments, onEdit, onDelete }) {
 
   if (!payments || payments.length === 0) {
     return (
-      <div className="emptyState">
+      <div className="emptyPaymentList">
         <p>Платежей пока нет</p>
       </div>
     );
@@ -45,35 +61,24 @@ function PaymentList({ payments, onEdit, onDelete }) {
   const lastPayment = payments.length > 0 ? payments[0] : null;
 
   return (
-    <div>
+    <div className="paymentList">
       <div className="paymentSummary">
         <div className="summaryItem">
           <span className="summaryLabel">Всего платежей</span>
           <span className="summaryValue">{payments.length}</span>
         </div>
-        
         <div className="summaryItem">
           <span className="summaryLabel">Общая сумма</span>
-          <span className="totalAmount">
-            {formatCurrency(totalAmount)}
-            <span className="currency"> ₽</span>
-          </span>
+          <span className="summaryValue totalAmount">{formatCurrency(totalAmount)} ₽</span>
         </div>
-        
         <div className="summaryItem">
           <span className="summaryLabel">Средний платеж</span>
-          <span className="summaryValue">
-            {formatCurrency(averageAmount)}
-            <span className="currency"> ₽</span>
-          </span>
+          <span className="summaryValue">{formatCurrency(averageAmount)} ₽</span>
         </div>
-        
         {lastPayment && (
           <div className="summaryItem">
             <span className="summaryLabel">Последний платеж</span>
-            <span className="summaryValue">
-              {formatDate(lastPayment.payment_date)}
-            </span>
+            <span className="summaryValue">{formatDate(lastPayment.payment_date)}</span>
           </div>
         )}
       </div>
@@ -86,7 +91,7 @@ function PaymentList({ payments, onEdit, onDelete }) {
               <th className="tableHeader">Сумма</th>
               <th className="tableHeader">Описание</th>
               <th className="tableHeader">Добавлен</th>
-              <th className="tableHeader">Действия</th>
+              <th className="tableHeader actionsHeader">Действия</th>
             </tr>
           </thead>
           <tbody>
@@ -96,32 +101,28 @@ function PaymentList({ payments, onEdit, onDelete }) {
                   {formatDate(payment.payment_date)}
                 </td>
                 <td className="tableCell amountCell">
-                  {formatCurrency(payment.amount)}
-                  <span className="currency"> ₽</span>
+                  {formatCurrency(payment.amount)} ₽
                 </td>
-                <td 
-                  className="tableCell descriptionCell descriptionFull" 
-                  title={payment.description || "—"}
-                >
+                <td className="tableCell descriptionCell" title={payment.description || "—"}>
                   {payment.description || "—"}
                 </td>
                 <td className="tableCell dateCell">
-                  {formatDate(payment.created_at)}
+                  {formatDateTime(payment.created_at)}
                 </td>
                 <td className="tableCell actionsCell">
                   <button
                     onClick={() => onEdit(payment)}
-                    className="actionButton editButton"
+                    className="actionButton editButtonPayment"
                     title="Редактировать платеж"
                   >
-                    ✏️
+                    <Edit2 size={14} />
                   </button>
                   <button
                     onClick={() => handleDelete(payment)}
                     className="actionButton deleteButton"
                     title="Удалить платеж"
                   >
-                    🗑️
+                    <Trash2 size={14} />
                   </button>
                 </td>
               </tr>

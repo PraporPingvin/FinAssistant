@@ -1,5 +1,13 @@
-// src/components/CheckpointForm/CheckpointForm.jsx
 import React, { useState } from "react";
+import {
+  Plus,
+  X,
+  Calendar,
+  DollarSign,
+  Flag,
+  AlertCircle,
+  CheckCircle,
+} from "lucide-react";
 import "./CheckpointForm.css";
 
 function CheckpointForm({ goalId, goalTitle, goalTarget, currentAmount, onSubmit, onCancel }) {
@@ -74,27 +82,63 @@ function CheckpointForm({ goalId, goalTitle, goalTarget, currentAmount, onSubmit
     return new Intl.NumberFormat('ru-RU').format(parseFloat(value));
   };
 
-  return (
-    <form onSubmit={handleSubmit} className="checkpoint-form">
-      <h3>➕ Новая контрольная точка</h3>
-      <p className="form-goal-info">Цель: {goalTitle}</p>
+  const getPriorityIcon = (priority) => {
+    switch (priority) {
+      case "high": return <Flag size={14} className="priorityHigh" />;
+      case "medium": return <Flag size={14} className="priorityMedium" />;
+      case "low": return <Flag size={14} className="priorityLow" />;
+      default: return null;
+    }
+  };
 
-      <div className="form-group">
-        <label>Название *</label>
+  const getPriorityText = (priority) => {
+    switch (priority) {
+      case "high": return "Высокий";
+      case "medium": return "Средний";
+      case "low": return "Низкий";
+      default: return "Средний";
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="checkpointForm">
+      <div className="formHeader">
+        <h3>
+          <Plus size={18} />
+          Новая контрольная точка
+        </h3>
+        <button type="button" onClick={onCancel} className="closeButton">
+          <X size={18} />
+        </button>
+      </div>
+      
+      <p className="formGoalInfo">
+        <Flag size={14} />
+        Цель: {goalTitle}
+      </p>
+
+      <div className="formGroup">
+        <label className="formLabel">
+          Название <span className="required">*</span>
+        </label>
         <input
           type="text"
           name="title"
           value={formData.title}
           onChange={handleChange}
           placeholder="Например: Накопить 50% суммы"
+          className={`formInput ${errors.title ? "error" : ""}`}
           disabled={submitting}
         />
         {errors.title && <div className="error">{errors.title}</div>}
       </div>
 
-      <div className="form-row">
-        <div className="form-group">
-          <label>Сумма *</label>
+      <div className="formRow">
+        <div className="formGroup">
+          <label className="formLabel">
+            <DollarSign size={14} />
+            Сумма <span className="required">*</span>
+          </label>
           <input
             type="number"
             name="target_amount"
@@ -103,6 +147,7 @@ function CheckpointForm({ goalId, goalTitle, goalTarget, currentAmount, onSubmit
             placeholder={goalTarget}
             min="0"
             step="1000"
+            className={`formInput ${errors.target_amount ? "error" : ""}`}
             disabled={submitting}
           />
           {formData.target_amount && (
@@ -111,46 +156,61 @@ function CheckpointForm({ goalId, goalTitle, goalTarget, currentAmount, onSubmit
           {errors.target_amount && <div className="error">{errors.target_amount}</div>}
         </div>
 
-        <div className="form-group">
-          <label>Дата выполнения (опционально)</label>
+        <div className="formGroup">
+          <label className="formLabel">
+            <Calendar size={14} />
+            Дата выполнения
+          </label>
           <input
             type="date"
             name="target_date"
             value={formData.target_date}
             onChange={handleChange}
+            className="formInput"
             disabled={submitting}
           />
         </div>
       </div>
 
-      <div className="form-group">
-        <label>Приоритет</label>
-        <select name="priority" value={formData.priority} onChange={handleChange} disabled={submitting}>
+      <div className="formGroup">
+        <label className="formLabel">
+          <Flag size={14} />
+          Приоритет
+        </label>
+        <select name="priority" value={formData.priority} onChange={handleChange} className="formSelect" disabled={submitting}>
           <option value="high">🔴 Высокий</option>
           <option value="medium">🟡 Средний</option>
           <option value="low">🟢 Низкий</option>
         </select>
       </div>
 
-      <div className="form-group">
-        <label>Описание</label>
+      <div className="formGroup">
+        <label className="formLabel">Описание</label>
         <textarea
           name="description"
           value={formData.description}
           onChange={handleChange}
           placeholder="Дополнительная информация..."
           rows="3"
+          className="formTextarea"
           disabled={submitting}
         />
       </div>
 
-      {errors.submit && <div className="error submit-error">{errors.submit}</div>}
+      {errors.submit && (
+        <div className="submitError">
+          <AlertCircle size={14} />
+          {errors.submit}
+        </div>
+      )}
 
-      <div className="form-buttons">
-        <button type="button" onClick={onCancel} className="cancel-btn" disabled={submitting}>
+      <div className="formButtons">
+        <button type="button" onClick={onCancel} className="cancelBtn" disabled={submitting}>
+          <X size={14} />
           Отмена
         </button>
-        <button type="submit" className="submit-btn" disabled={submitting}>
+        <button type="submit" className="submitBtn" disabled={submitting}>
+          <CheckCircle size={14} />
           {submitting ? "Создание..." : "Создать контрольную точку"}
         </button>
       </div>

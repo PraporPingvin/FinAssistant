@@ -1,6 +1,14 @@
-// client/src/pages/CheckpointsPage/CheckpointsCalendar.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Calendar,
+  Target,
+  DollarSign,
+  Eye,
+  AlertCircle,
+} from "lucide-react";
 import { getCheckpoints, getGoals } from "../../../api/api";
 import "./CheckpointsCalendar.css";
 
@@ -23,7 +31,6 @@ function CheckpointsCalendar() {
         getGoals(),
         getCheckpoints().catch(() => [])
       ]);
-      
       setGoals(goalsData);
       setCheckpoints(checkpointsData || []);
     } catch (error) {
@@ -63,60 +70,62 @@ function CheckpointsCalendar() {
     return goal?.title || "Неизвестная цель";
   };
 
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case "completed": return "✅";
+      case "pending": return "⏳";
+      case "overdue": return "⚠️";
+      default: return "📌";
+    }
+  };
+
   const renderCalendar = () => {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
     const daysInMonth = getDaysInMonth(currentDate);
     const firstDay = getFirstDayOfMonth(currentDate);
     
-    const days = [];
     const weekDays = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
+    const adjustedFirstDay = firstDay === 0 ? 6 : firstDay - 1;
     
-    // Заголовки дней недели
-    days.push(
-      <div key="weekdays" className="calendar-weekdays">
-        {weekDays.map(day => (
-          <div key={day} className="weekday">{day}</div>
-        ))}
-      </div>
-    );
-
-    // Пустые ячейки до первого дня месяца
     const emptyCells = [];
-    for (let i = 1; i < firstDay; i++) {
-      emptyCells.push(<div key={`empty-${i}`} className="calendar-day empty"></div>);
+    for (let i = 0; i < adjustedFirstDay; i++) {
+      emptyCells.push(<div key={`empty-${i}`} className="calendarDay empty"></div>);
     }
     
-    // Ячейки с днями
     const dayCells = [];
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(year, month, day);
-      const dateStr = formatDate(date);
       const dayCheckpoints = getCheckpointsForDate(date);
       const isToday = date.toDateString() === new Date().toDateString();
-      const isSelected = selectedDate && dateStr === formatDate(selectedDate);
+      const isSelected = selectedDate && formatDate(date) === formatDate(selectedDate);
       
       dayCells.push(
         <div 
           key={`day-${day}`} 
-          className={`calendar-day ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''} ${dayCheckpoints.length > 0 ? 'has-checkpoints' : ''}`}
+          className={`calendarDay ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''} ${dayCheckpoints.length > 0 ? 'hasCheckpoints' : ''}`}
           onClick={() => setSelectedDate(date)}
         >
-          <span className="day-number">{day}</span>
+          <span className="dayNumber">{day}</span>
           {dayCheckpoints.length > 0 && (
-            <span className="checkpoints-indicator">
-              {dayCheckpoints.length}
-            </span>
+            <span className="checkpointsIndicator">{dayCheckpoints.length}</span>
           )}
         </div>
       );
     }
 
     return (
-      <div className="calendar-grid">
-        {emptyCells}
-        {dayCells}
-      </div>
+      <>
+        <div className="calendarWeekdays">
+          {weekDays.map(day => (
+            <div key={day} className="weekday">{day}</div>
+          ))}
+        </div>
+        <div className="calendarGrid">
+          {emptyCells}
+          {dayCells}
+        </div>
+      </>
     );
   };
 
@@ -134,8 +143,8 @@ function CheckpointsCalendar() {
 
   if (loading) {
     return (
-      <div className="calendar-loading">
-        <div className="loading-spinner"></div>
+      <div className="calendarLoading">
+        <div className="loadingSpinner" />
         <p>Загрузка календаря...</p>
       </div>
     );
@@ -144,48 +153,57 @@ function CheckpointsCalendar() {
   const selectedDateCheckpoints = selectedDate ? getCheckpointsForDate(selectedDate) : [];
 
   return (
-    <div className="calendar-page">
-      <div className="calendar-container">
-        <div className="calendar-header">
-          <button className="month-nav" onClick={() => changeMonth(-1)}>←</button>
-          <h2 className="current-month">
+    <div className="calendarPage">
+      <div className="calendarContainer">
+        <div className="calendarHeader">
+          <button className="monthNav" onClick={() => changeMonth(-1)}>
+            <ChevronLeft size={20} />
+          </button>
+          <h2 className="currentMonth">
             {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
           </h2>
-          <button className="month-nav" onClick={() => changeMonth(1)}>→</button>
+          <button className="monthNav" onClick={() => changeMonth(1)}>
+            <ChevronRight size={20} />
+          </button>
         </div>
 
         {renderCalendar()}
       </div>
 
       {selectedDate && (
-        <div className="selected-date-checkpoints">
+        <div className="selectedDateCheckpoints">
           <h3>
+            <Calendar size={18} />
             Контрольные точки на {selectedDate.toLocaleDateString('ru-RU')}
             {selectedDateCheckpoints.length === 0 && " — нет"}
           </h3>
           
           {selectedDateCheckpoints.length > 0 && (
-            <div className="checkpoints-mini-list">
+            <div className="checkpointsMiniList">
               {selectedDateCheckpoints.map(cp => (
-                <div key={cp.checkpoint_id} className="calendar-checkpoint-item">
-                  <div className="checkpoint-mini-header">
-                    <span className="checkpoint-mini-title">{cp.title}</span>
-                    <span className={`checkpoint-mini-status status-${cp.status}`}>
-                      {cp.status === "completed" ? "✅" : 
-                       cp.status === "pending" ? "⏳" : "⚠️"}
+                <div key={cp.checkpoint_id} className="calendarCheckpointItem">
+                  <div className="checkpointMiniHeader">
+                    <span className="checkpointMiniTitle">{cp.title}</span>
+                    <span className="checkpointMiniStatus">
+                      {getStatusIcon(cp.status)}
                     </span>
                   </div>
-                  <div className="checkpoint-mini-details">
-                    <span>🎯 {getGoalTitle(cp.goal_id)}</span>
-                    <span className="checkpoint-amount">
+                  <div className="checkpointMiniDetails">
+                    <span>
+                      <Target size={12} />
+                      {getGoalTitle(cp.goal_id)}
+                    </span>
+                    <span className="checkpointAmount">
+                      <DollarSign size={12} />
                       {new Intl.NumberFormat('ru-RU').format(cp.target_amount)} ₽
                     </span>
                   </div>
                   <button 
-                    className="view-button"
+                    className="viewButton"
                     onClick={() => navigate(`/goals/${cp.goal_id}`)}
                   >
-                    👁️ Просмотр
+                    <Eye size={14} />
+                    Просмотр
                   </button>
                 </div>
               ))}

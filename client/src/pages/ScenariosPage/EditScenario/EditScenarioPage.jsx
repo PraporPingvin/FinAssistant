@@ -1,5 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import {
+  ArrowLeft,
+  Save,
+  X,
+  Target,
+  DollarSign,
+  TrendingUp,
+  Activity,
+  Shield,
+  Zap,
+  AlertCircle,
+  Edit2,
+  Trash2,
+} from "lucide-react";
 import Layout from "../../../components/Layout";
 import { getScenario, updateScenario, getGoal } from "../../../api/api";
 import "./EditScenarioPage.css";
@@ -35,20 +49,15 @@ function EditScenarioPage() {
       setLoading(true);
       setError("");
       
-      // Сначала пытаемся загрузить сценарий из API
       let scenarioData;
       try {
         scenarioData = await getScenario(scenarioId);
         
-        // Проверяем, что данные корректные
         if (!scenarioData || !scenarioData.name) {
           throw new Error("Некорректные данные сценария");
         }
-        
       } catch (apiError) {
-        console.warn("Не удалось загрузить сценарий из API, используем mock-данные:", apiError);
-        
-        // Используем mock-данные для разработки
+        console.warn("Используем mock-данные:", apiError);
         scenarioData = {
           scenario_id: scenarioId,
           goal_id: 1,
@@ -65,7 +74,6 @@ function EditScenarioPage() {
       
       setScenario(scenarioData);
       
-      // Заполняем форму данными
       setFormData({
         name: scenarioData.name || "",
         monthly_contribution: scenarioData.monthly_contribution || "",
@@ -75,7 +83,6 @@ function EditScenarioPage() {
         description: scenarioData.description || "",
       });
       
-      // Загружаем цель
       try {
         const goalData = await getGoal(scenarioData.goal_id);
         setGoal(goalData);
@@ -101,7 +108,6 @@ function EditScenarioPage() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     
-    // Форматирование числовых полей
     if (["monthly_contribution", "expected_return", "inflation_rate", "target_amount"].includes(name)) {
       const numericValue = value.replace(/[^\d.]/g, '');
       setFormData(prev => ({
@@ -117,29 +123,29 @@ function EditScenarioPage() {
   };
 
   const validateForm = () => {
-    const errors = {};
+    const errorsList = {};
     
     if (!formData.name.trim()) {
-      errors.name = "Введите название сценария";
+      errorsList.name = "Введите название сценария";
     }
     
     if (!formData.monthly_contribution || parseFloat(formData.monthly_contribution) <= 0) {
-      errors.monthly_contribution = "Введите корректный ежемесячный взнос";
+      errorsList.monthly_contribution = "Введите корректный ежемесячный взнос";
     }
     
     if (!formData.expected_return || parseFloat(formData.expected_return) < 0) {
-      errors.expected_return = "Введите корректную доходность";
+      errorsList.expected_return = "Введите корректную доходность";
     }
     
     if (!formData.inflation_rate || parseFloat(formData.inflation_rate) < 0) {
-      errors.inflation_rate = "Введите корректную инфляцию";
+      errorsList.inflation_rate = "Введите корректную инфляцию";
     }
     
     if (!formData.target_amount || parseFloat(formData.target_amount) <= 0) {
-      errors.target_amount = "Введите корректную целевую сумму";
+      errorsList.target_amount = "Введите корректную целевую сумму";
     }
     
-    return errors;
+    return errorsList;
   };
 
   const handleSubmit = async (e) => {
@@ -147,7 +153,7 @@ function EditScenarioPage() {
     
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length > 0) {
-      alert("Пожалуйста, исправьте ошибки в форме");
+      setError("Пожалуйста, исправьте ошибки в форме");
       return;
     }
     
@@ -163,15 +169,11 @@ function EditScenarioPage() {
       };
       
       if (useMockData) {
-        // Для mock-данных просто показываем сообщение
         console.log("Обновляем mock-данные:", updates);
         alert("В демо-режиме данные не сохраняются на сервере");
         navigate(`/scenarios/detail/${scenarioId}`);
       } else {
-        // Реальный запрос к API
-        const updatedScenario = await updateScenario(scenarioId, updates);
-        setScenario(updatedScenario);
-        alert("Сценарий успешно обновлен!");
+        await updateScenario(scenarioId, updates);
         navigate(`/scenarios/detail/${scenarioId}`);
       }
       
@@ -179,9 +181,9 @@ function EditScenarioPage() {
       console.error("Ошибка обновления сценария:", error);
       
       if (error.message.includes("Сценарий с таким названием уже существует")) {
-        alert("Сценарий с таким названием уже существует для этой цели. Пожалуйста, выберите другое название.");
+        setError("Сценарий с таким названием уже существует для этой цели. Пожалуйста, выберите другое название.");
       } else {
-        alert(`Ошибка обновления сценария: ${error.message}`);
+        setError(`Ошибка обновления сценария: ${error.message}`);
       }
     } finally {
       setSaving(false);
@@ -208,39 +210,40 @@ function EditScenarioPage() {
     const monthly = parseFloat(formData.monthly_contribution) || 0;
     
     if (monthly <= 0) return 0;
-    
     const remaining = target - current;
     return Math.ceil(remaining / monthly);
   };
 
   const calculateRiskLevel = (expectedReturn) => {
     const returnValue = parseFloat(expectedReturn) || 0;
-    if (returnValue < 5) return { level: "Низкий", color: "#4caf50" };
-    if (returnValue < 10) return { level: "Средний", color: "#ff9800" };
-    return { level: "Высокий", color: "#f44336" };
+    if (returnValue < 5) return { level: "Низкий", color: "#2E7D32", icon: <Shield size={14} /> };
+    if (returnValue < 10) return { level: "Средний", color: "#F5A623", icon: <Activity size={14} /> };
+    return { level: "Высокий", color: "#E35D5D", icon: <Zap size={14} /> };
   };
 
   if (loading) {
     return (
       <Layout>
         <div className="loadingContainer">
-          <div className="loadingSpinner"></div>
+          <div className="loadingSpinner" />
           <p>Загружаем данные сценария...</p>
         </div>
       </Layout>
     );
   }
 
-  if (error) {
+  if (error && !scenario) {
     return (
       <Layout>
-        <div className="editScenarioContainer">
-          <div className="errorMessage">
-            <strong>Внимание:</strong> {error}
+        <div className="editScenarioPage">
+          <div className="errorCard">
+            <AlertCircle size={48} />
+            <h2>Ошибка</h2>
+            <p>{error}</p>
+            <button onClick={() => navigate(-1)} className="backButton">
+              ← Назад
+            </button>
           </div>
-          <button onClick={() => navigate(-1)} className="backButton">
-            ← Назад
-          </button>
         </div>
       </Layout>
     );
@@ -252,79 +255,66 @@ function EditScenarioPage() {
 
   return (
     <Layout>
-      <div className="editScenarioContainer">
-        {/* Хлебные крошки */}
-        <div className="breadcrumb">
-          <span onClick={() => navigate("/")} style={{cursor: "pointer", color: "#495631"}}>Главная</span>
-          {" > "}
-          <span onClick={() => navigate("/goals")} style={{cursor: "pointer", color: "#495631"}}>Цели</span>
-          {" > "}
-          {goal && (
-            <>
-              <span onClick={() => navigate(`/goals/${goal.goal_id}`)} style={{cursor: "pointer", color: "#495631"}}>
-                {goal.title}
-              </span>
-              {" > "}
-            </>
-          )}
-          <span onClick={() => navigate(`/scenarios/${scenario?.goal_id}`)} style={{cursor: "pointer", color: "#495631"}}>
-            Сценарии
-          </span>
-          {" > "}
-          {scenario && (
-            <span onClick={() => navigate(`/scenarios/detail/${scenarioId}`)} style={{cursor: "pointer", color: "#495631"}}>
-              {scenario.name}
-            </span>
-          )}
-          {" > "}
-          <span>Редактирование</span>
-        </div>
+      <div className="editScenarioPage">
+        <button onClick={() => navigate(-1)} className="backButtonNav">
+          <ArrowLeft size={16} />
+          Назад
+        </button>
 
-        {/* Заголовок */}
-        <div className="pageHeaderEdit">
+        <div className="pageHeaderEditScenario">
           <h1>Редактирование сценария</h1>
-          <p className="subtitle">
+          <p>
             {scenario ? `Изменение параметров сценария "${scenario.name}"` : "Редактирование сценария"}
           </p>
           {useMockData && (
             <div className="demoWarning">
-              ⚠️ Работаем в демо-режиме. Данные не сохраняются на сервере.
+              <AlertCircle size={14} />
+              Работаем в демо-режиме. Данные не сохраняются на сервере.
             </div>
           )}
         </div>
 
-        {/* Информация о цели */}
         {goal && (
-          <div className="goalInfo">
-            <h3>🎯 Цель: {goal.title}</h3>
-            <div className="goalStatsEdit">
-              <div className="goalStat">
-                <span>Целевая сумма:</span>
-                <strong>{formatCurrency(goal.target_amount)} ₽</strong>
+          <div className="goalInfoCard">
+            <div className="goalInfoHeader">
+              <Target size={20} />
+              <h3>{goal.title}</h3>
+              <span className={`goalStatus status-${goal.status}`}>
+                {goal.status === "active" ? "Активна" : goal.status === "completed" ? "Выполнена" : "Приостановлена"}
+              </span>
+            </div>
+            <div className="goalInfoStatsEdit">
+              <div className="stat">
+                <span className="statLabel">Целевая сумма</span>
+                <span className="statValue">{formatCurrency(goal.target_amount)} ₽</span>
               </div>
-              <div className="goalStat">
-                <span>Текущий прогресс:</span>
-                <strong>{formatCurrency(goal.current_amount)} ₽</strong>
+              <div className="stat">
+                <span className="statLabel">Текущая сумма</span>
+                <span className="statValue">{formatCurrency(goal.current_amount)} ₽</span>
               </div>
-              <div className="goalStat">
-                <span>Прогресс:</span>
-                <strong>
+              <div className="stat">
+                <span className="statLabel">Прогресс</span>
+                <span className="statValue">
                   {goal.target_amount > 0 
                     ? `${Math.round((parseFloat(goal.current_amount) / parseFloat(goal.target_amount)) * 100)}%`
                     : "0%"}
-                </strong>
+                </span>
               </div>
+            </div>
+            <div className="progressBar">
+              <div 
+                className="progressFill" 
+                style={{ width: `${Math.round((parseFloat(goal.current_amount) / parseFloat(goal.target_amount)) * 100)}%` }}
+              />
             </div>
           </div>
         )}
 
-        {/* Форма редактирования */}
         <div className="editFormContainer">
           <form onSubmit={handleSubmit} className="editForm">
-            {/* Название сценария */}
             <div className="formGroup">
               <label className="formLabel">
-                Название сценария *
+                Название сценария <span className="required">*</span>
               </label>
               <input
                 type="text"
@@ -342,18 +332,18 @@ function EditScenarioPage() {
               )}
             </div>
 
-            {/* Параметры */}
             <div className="formRow">
               <div className="formColumn">
                 <label className="formLabel">
-                  Ежемесячный взнос (₽) *
+                  <DollarSign size={14} />
+                  Ежемесячный взнос (₽) <span className="required">*</span>
                 </label>
                 <input
                   type="text"
                   name="monthly_contribution"
                   value={formData.monthly_contribution}
                   onChange={handleChange}
-                  placeholder="15000"
+                  placeholder="15 000"
                   className="formInput"
                   required
                 />
@@ -368,7 +358,8 @@ function EditScenarioPage() {
             <div className="formRow">
               <div className="formColumn">
                 <label className="formLabel">
-                  Ожидаемая доходность (%) *
+                  <TrendingUp size={14} />
+                  Ожидаемая доходность (%) <span className="required">*</span>
                 </label>
                 <input
                   type="text"
@@ -388,7 +379,8 @@ function EditScenarioPage() {
 
               <div className="formColumn">
                 <label className="formLabel">
-                  Ожидаемая инфляция (%) *
+                  <Activity size={14} />
+                  Ожидаемая инфляция (%) <span className="required">*</span>
                 </label>
                 <input
                   type="text"
@@ -410,14 +402,15 @@ function EditScenarioPage() {
             <div className="formRow">
               <div className="formColumn">
                 <label className="formLabel">
-                  Целевая сумма (₽) *
+                  <Target size={14} />
+                  Целевая сумма (₽) <span className="required">*</span>
                 </label>
                 <input
                   type="text"
                   name="target_amount"
                   value={formData.target_amount}
                   onChange={handleChange}
-                  placeholder="1000000"
+                  placeholder="1 000 000"
                   className="formInput"
                   required
                 />
@@ -429,11 +422,8 @@ function EditScenarioPage() {
               </div>
             </div>
 
-            {/* Описание */}
             <div className="formGroup">
-              <label className="formLabel">
-                Описание сценария
-              </label>
+              <label className="formLabel">Описание сценария</label>
               <textarea
                 name="description"
                 value={formData.description}
@@ -444,64 +434,63 @@ function EditScenarioPage() {
               />
               {scenario && (
                 <div className="inputHint">
-                  {scenario.description ? "Текущее описание" : "Описание отсутствует"}
+                  {scenario.description ? "Текущее описание присутствует" : "Описание отсутствует"}
                 </div>
               )}
             </div>
 
-            {/* Предварительный расчет */}
             {formData.monthly_contribution && formData.expected_return && (
               <div className="previewSection">
                 <h4>Новый расчет</h4>
                 <div className="previewGrid">
                   <div className="previewItem">
-                    <span className="previewLabel">Срок достижения:</span>
-                    <span className="previewValue">
-                      {isFinite(monthsToGoal) ? (
-                        <>
-                          <strong>{monthsToGoal}</strong> месяцев
-                          <small>({Math.floor(monthsToGoal / 12)} г. {monthsToGoal % 12} мес.)</small>
-                        </>
-                      ) : "Недостижимо"}
-                    </span>
+                    <span className="previewLabel">Срок достижения</span>
+                    <strong className="previewValue">
+                      {isFinite(monthsToGoal) && monthsToGoal > 0 ? `${monthsToGoal} мес.` : "Недостижимо"}
+                    </strong>
+                    {isFinite(monthsToGoal) && monthsToGoal > 0 && (
+                      <small>({Math.floor(monthsToGoal / 12)} г. {monthsToGoal % 12} мес.)</small>
+                    )}
                   </div>
                   <div className="previewItem">
-                    <span className="previewLabel">Уровень риска:</span>
-                    <span className="previewValue" style={{ color: risk.color }}>
-                      {risk.level}
-                    </span>
+                    <span className="previewLabel">Уровень риска</span>
+                    <strong className="previewValue" style={{ color: risk.color }}>
+                      {risk.icon} {risk.level}
+                    </strong>
                   </div>
                   <div className="previewItem">
-                    <span className="previewLabel">Эффективная доходность:</span>
-                    <span className="previewValue">
-                      {effectiveReturn}%
-                    </span>
+                    <span className="previewLabel">Эффективная доходность</span>
+                    <strong className="previewValue">{effectiveReturn}%</strong>
+                    <small>(с учетом инфляции)</small>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Кнопки действий */}
-            <div className="actionButtons">
+            {error && (
+              <div className="errorMessage">
+                <AlertCircle size={16} />
+                {error}
+              </div>
+            )}
+
+            <div className="formButtons">
               <button
                 type="button"
                 onClick={handleCancel}
-                className="actionButtonEdit cancelButtonEdit"
+                className="formButton cancelButton"
                 disabled={saving}
               >
+                <X size={14} />
                 Отмена
               </button>
               <button
                 type="submit"
-                className="actionButtonEdit saveButtonEdit"
+                className="formButton submitButton"
                 disabled={saving}
               >
-                {saving ? (
-                  <>
-                    <span className="spinner"></span>
-                    Сохранение...
-                  </>
-                ) : useMockData ? "Продолжить (демо)" : "Сохранить изменения"}
+                <Save size={14} />
+                {saving ? "Сохранение..." : useMockData ? "Продолжить (демо)" : "Сохранить изменения"}
               </button>
             </div>
           </form>

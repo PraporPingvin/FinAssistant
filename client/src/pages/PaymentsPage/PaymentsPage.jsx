@@ -1,5 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
+import {
+  ChevronLeft,
+  Home,
+  Target,
+  CreditCard,
+  Wallet,
+  TrendingUp,
+  Plus,
+  RefreshCw,
+  BarChart3,
+  Clock,
+  AlertCircle,
+} from "lucide-react";
 import Layout from "../../components/Layout";
 import { getGoal, getPayments, createPayment, updatePayment, deletePayment } from "../../api/api";
 import PaymentForm from "../../components/Payment/PaymentForm/PaymentForm";
@@ -60,42 +73,36 @@ function PaymentsPage() {
 
   const handleAddPayment = async (paymentData) => {
     try {
-      const newPayment = await createPayment({
+      await createPayment({
         ...paymentData,
         goal_id: parseInt(goalId)
       });
-
-      await loadData(); // Перезагружаем все данные
+      await loadData();
       setShowForm(false);
-
-      alert("Платеж успешно добавлен!");
-
     } catch (error) {
       console.error("Ошибка добавления платежа:", error);
-      alert("Не удалось добавить платеж");
+      setError("Не удалось добавить платеж");
     }
   };
 
   const handleEditPayment = async (paymentData) => {
     try {
       await updatePayment(editingPayment.payment_id, paymentData);
-      await loadData(); // Перезагружаем все данные
+      await loadData();
       setEditingPayment(null);
-      alert("Платеж успешно обновлен!");
     } catch (error) {
       console.error("Ошибка обновления платежа:", error);
-      alert("Не удалось обновить платеж");
+      setError("Не удалось обновить платеж");
     }
   };
 
   const handleDeletePayment = async (paymentId) => {
     try {
       await deletePayment(paymentId);
-      await loadData(); // Перезагружаем все данные
-      alert("Платеж успешно удален!");
+      await loadData();
     } catch (error) {
       console.error("Ошибка удаления платежа:", error);
-      alert("Не удалось удалить платеж");
+      setError("Не удалось удалить платеж");
     }
   };
 
@@ -131,7 +138,7 @@ function PaymentsPage() {
     return (
       <Layout>
         <div className="loadingContainer">
-          <div className="loadingAnimation"></div>
+          <div className="loadingSpinner" />
           <p>Загружаем данные...</p>
         </div>
       </Layout>
@@ -141,13 +148,13 @@ function PaymentsPage() {
   if (error || !goal) {
     return (
       <Layout>
-        <div className="paymentsContainer">
-          <div className="errorMessage">
-            <strong>Внимание:</strong> {error || "Цель не найдена"}
+        <div className="paymentsPage">
+          <div className="errorCard">
+            <AlertCircle size={48} />
+            <h2>Ошибка</h2>
+            <p>{error || "Цель не найдена"}</p>
+            <Link to="/goals" className="backButtonLink">← Вернуться к списку целей</Link>
           </div>
-          <Link to="/goals" className="backButton">
-            ← Вернуться к списку целей
-          </Link>
         </div>
       </Layout>
     );
@@ -155,66 +162,77 @@ function PaymentsPage() {
 
   return (
     <Layout>
-      <div className="paymentsContainer">
+      <div className="paymentsPage">
         <div className="breadcrumb">
-          <Link to="/">Главная</Link>
-          {" > "}
-          <Link to="/goals">Цели</Link>
-          {" > "}
-          <Link to={`/goals/${goalId}`}>
-            {goal.title}
-          </Link>
-          {" > "}
-          <span>Платежи</span>
+          <Link to="/"><Home size={14} /> Главная</Link>
+          <span>/</span>
+          <Link to="/goals"><Target size={14} /> Цели</Link>
+          <span>/</span>
+          <Link to={`/goals/${goalId}`}>{goal.title}</Link>
+          <span>/</span>
+          <span className="current">Платежи</span>
         </div>
 
         <div className="paymentsHeader">
-          <div className="headerContent">
-            <h1>Управление платежами</h1>
-            <p className="headerSubtitle">
-              Цель: {goal.title}
-            </p>
+          <div>
+            <h1 className="pageTitle">Управление платежами</h1>
+            <p className="pageSubtitle">Цель: {goal.title}</p>
           </div>
         </div>
 
         <div className="goalInfoCard">
           <div className="goalInfoRow">
-            <div className="goalInfoLeft">
-              <div className="goalInfoLabel">Цель:</div>
-              <div className="goalInfoValue">{goal.title}</div>
-
-              <div className="goalInfoLabel" style={{ marginTop: "10px" }}>Прогресс:</div>
-              <div className="goalInfoValue">
-                {progressPercent}% ({formatCurrency(goal.current_amount)} / {formatCurrency(goal.target_amount)} ₽)
+            <div className="goalInfoItem">
+              <Target size={18} />
+              <div>
+                <span className="goalInfoLabel">Цель</span>
+                <span className="goalInfoValue">{goal.title}</span>
               </div>
             </div>
-
-            <div className="goalInfoRight">
-              <div className="goalInfoLabel">Ежемесячный взнос:</div>
-              <div className="goalInfoValue">{formatCurrency(goal.monthly_contribution)} ₽</div>
-
-              <div className="goalInfoLabel" style={{ marginTop: "10px" }}>Статус:</div>
-              <div className="goalInfoValue">{getStatusText(goal.status)}</div>
+            <div className="goalInfoItem">
+              <TrendingUp size={18} />
+              <div>
+                <span className="goalInfoLabel">Прогресс</span>
+                <span className="goalInfoValue">{progressPercent}% ({formatCurrency(goal.current_amount)} / {formatCurrency(goal.target_amount)} ₽)</span>
+              </div>
+            </div>
+            <div className="goalInfoItem">
+              <CreditCard size={18} />
+              <div>
+                <span className="goalInfoLabel">Взнос</span>
+                <span className="goalInfoValue">{formatCurrency(goal.monthly_contribution)} ₽/мес</span>
+              </div>
+            </div>
+            <div className="goalInfoItem">
+              <Clock size={18} />
+              <div>
+                <span className="goalInfoLabel">Статус</span>
+                <span className="goalInfoValue">{getStatusText(goal.status)}</span>
+              </div>
             </div>
           </div>
         </div>
 
         <div className="statsContainer">
           <div className="statCard">
-            <h3>Всего платежей</h3>
+            <Wallet size={24} />
             <div className="statNumber">{payments.length}</div>
+            <div className="statLabel">Всего платежей</div>
           </div>
           <div className="statCard">
-            <h3>Общая сумма</h3>
-            <div className="statNumber">{formatCurrency(stats.totalAmount)}<span className="currency"> ₽</span></div>
+            <CreditCard size={24} />
+            <div className="statNumber">{formatCurrency(stats.totalAmount)} ₽</div>
+            <div className="statLabel">Общая сумма</div>
           </div>
           <div className="statCard">
-            <h3>Средний платеж</h3>
-            <div className="statNumber">{formatCurrency(stats.averagePayment)}<span className="currency"> ₽</span></div>
+            <BarChart3 size={24} />
+            <div className="statNumber">{formatCurrency(stats.averagePayment)} ₽</div>
+            <div className="statLabel">Средний платеж</div>
           </div>
           <div className="statCard">
-            <h3>Осталось до цели</h3>
-            <div className="statNumber">{formatCurrency(stats.remainingAmount)}<span className="currency"> ₽</span></div>
+            <Target size={24} />
+            <div className="statNumber">{formatCurrency(stats.remainingAmount)} ₽</div>
+            <div className="statLabel">Осталось до цели</div>
           </div>
         </div>
 
@@ -224,16 +242,17 @@ function PaymentsPage() {
               setShowForm(!showForm);
               setEditingPayment(null);
             }}
-            className={`addPaymentButton ${showForm ? 'addPaymentButtonActive' : ''}`}
+            className={`addPaymentButton ${showForm ? 'active' : ''}`}
           >
-            {showForm ? "✖️ Скрыть форму" : "＋ Добавить платеж"}
+            <Plus size={18} />
+            {showForm ? "Скрыть форму" : "Добавить платеж"}
           </button>
         </div>
-        
+
         <div className="contentGrid">
           <div className="contentSection infoSection">
             <h2 className="sectionTitle">
-              {editingPayment ? "✏️ Редактирование платежа" : (showForm ? "➕ Новый платеж" : "📋 Информация")}
+              {editingPayment ? "Редактирование платежа" : (showForm ? "Новый платеж" : "Информация")}
             </h2>
 
             {editingPayment ? (
@@ -253,19 +272,15 @@ function PaymentsPage() {
               <div>
                 <p className="infoText">
                   Для добавления нового платежа нажмите кнопку "Добавить платеж".
+                  Платежи автоматически увеличивают текущую сумму цели.
                 </p>
-
                 <div className="tipSection">
-                  <strong>💡 Подсказка:</strong> Платежи автоматически увеличивают текущую сумму цели.
-
-                  <div style={{ marginTop: "15px" }}>
-                    <strong>Доступные действия:</strong>
-                    <ul className="requirementsList">
-                      <li>✏️ Нажмите на кнопку с карандашом, чтобы отредактировать платеж</li>
-                      <li>🗑️ Нажмите на корзину, чтобы удалить платеж</li>
-                      <li>При удалении сумма платежа вычитается из текущего прогресса цели</li>
-                    </ul>
-                  </div>
+                  <strong>💡 Доступные действия:</strong>
+                  <ul>
+                    <li>Нажмите на кнопку с карандашом, чтобы отредактировать платеж</li>
+                    <li>Нажмите на корзину, чтобы удалить платеж</li>
+                    <li>При удалении сумма платежа вычитается из текущего прогресса цели</li>
+                  </ul>
                 </div>
               </div>
             )}
@@ -273,12 +288,10 @@ function PaymentsPage() {
 
           <div className="contentSection">
             <div className="paymentsListHeader">
-              <h2 className="sectionTitle">📋 История платежей</h2>
-              <button
-                onClick={loadData}
-                className="refreshButton"
-              >
-                ⟳ Обновить
+              <h2 className="sectionTitle">История платежей</h2>
+              <button onClick={loadData} className="refreshButton">
+                <RefreshCw size={14} />
+                Обновить
               </button>
             </div>
 
@@ -290,12 +303,11 @@ function PaymentsPage() {
               />
             ) : (
               <div className="emptyState">
-                <h3 className="emptyStateTitle">Платежей пока нет</h3>
+                <Wallet size={48} />
+                <h3>Платежей пока нет</h3>
                 <p>Добавьте первый платеж для вашей цели</p>
-                <button
-                  onClick={() => setShowForm(true)}
-                  className="emptyStateButton"
-                >
+                <button onClick={() => setShowForm(true)} className="emptyStateButton">
+                  <Plus size={16} />
                   Добавить первый платеж
                 </button>
               </div>
@@ -304,11 +316,9 @@ function PaymentsPage() {
         </div>
 
         <div className="backButtonSection">
-          <button
-            onClick={handleBack}
-            className="backButton"
-          >
-            ← Вернуться к цели
+          <button onClick={handleBack} className="backButton">
+            <ChevronLeft size={16} />
+            Вернуться к цели
           </button>
         </div>
       </div>

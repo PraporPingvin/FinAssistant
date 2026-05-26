@@ -1,287 +1,339 @@
-/* client/src/pages/CheckpointsPage/CheckpointsCalendar.css */
+:root {
+  --primary-dark: #495631;
+  --primary-accent: #EAED74;
+  --primary-light: #EFF2DD;
 
-.calendar-page {
+  --card-bg: rgba(255, 255, 255, 0.72);
+  --border-color: rgba(73, 86, 49, 0.08);
+
+  --text-main: #495631;
+  --text-muted: #7B8465;
+
+  --success-color: #2E7D32;
+  --danger-color: #E35D5D;
+  --warning-color: #F5A623;
+
+  --shadow-sm: 0 8px 24px rgba(73, 86, 49, 0.06);
+  --shadow-md: 0 10px 30px rgba(73, 86, 49, 0.08);
+
+  --radius-sm: 12px;
+  --radius-md: 18px;
+  --radius-lg: 24px;
+  --radius-full: 999px;
+
+  --transition: all 0.28s ease;
+}
+
+.calendarPage {
   padding: 20px 0;
 }
 
-.calendar-container {
-  background: white;
-  border-radius: 16px;
-  padding: 25px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  margin-bottom: 30px;
+.calendarContainer {
+  padding: 28px;
+  margin-bottom: 32px;
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
 }
 
-/* Заголовок календаря */
-.calendar-header {
+.calendarHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 30px;
+  margin-bottom: 28px;
 }
 
-.month-nav {
+.monthNav {
   width: 40px;
   height: 40px;
-  border: 1px solid #e0e0e0;
-  background: white;
-  border-radius: 50%;
-  font-size: 18px;
-  cursor: pointer;
-  transition: all 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.75);
+  color: var(--text-main);
+  cursor: pointer;
+  transition: var(--transition);
 }
 
-.month-nav:hover {
-  background: #495631;
-  color: white;
-  border-color: #495631;
+.monthNav:hover {
+  background: var(--primary-dark);
+  color: var(--primary-accent);
+  border-color: var(--primary-dark);
 }
 
-.current-month {
-  font-size: 24px;
-  font-weight: 600;
-  color: #333;
+.currentMonth {
   margin: 0;
+  color: var(--text-main);
+  font-size: 1.3rem;
+  font-weight: 500;
 }
 
-/* Дни недели */
-.calendar-weekdays {
+.calendarWeekdays {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 5px;
-  margin-bottom: 10px;
+  gap: 8px;
+  margin-bottom: 12px;
 }
 
 .weekday {
   text-align: center;
-  font-weight: 600;
-  color: #666;
   padding: 10px;
-  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+  font-size: 0.85rem;
 }
 
-/* Сетка календаря */
-.calendar-grid {
+.calendarGrid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 5px;
+  gap: 8px;
 }
 
-.calendar-day {
+.calendarDay {
   aspect-ratio: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  padding: 10px;
-  background: #f8f9fa;
-  border-radius: 8px;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px;
+  border-radius: var(--radius-sm);
+  background: rgba(73, 86, 49, 0.04);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: var(--transition);
   position: relative;
-  border: 2px solid transparent;
 }
 
-.calendar-day:hover {
-  background: #e8f0e0;
+.calendarDay:hover {
+  background: rgba(234, 237, 116, 0.2);
   transform: scale(1.02);
 }
 
-.calendar-day.empty {
+.calendarDay.empty {
   background: transparent;
   cursor: default;
 }
 
-.calendar-day.today {
-  border-color: #495631;
-  background: #e8f0e0;
+.calendarDay.empty:hover {
+  transform: none;
+  background: transparent;
 }
 
-.calendar-day.selected {
-  border-color: #495631;
-  background: #d4e0c8;
-  transform: scale(1.02);
+.calendarDay.today {
+  border: 2px solid var(--primary-accent);
+  background: rgba(234, 237, 116, 0.15);
 }
 
-.calendar-day.has-checkpoints {
-  background: #fff3e0;
+.calendarDay.selected {
+  background: var(--primary-dark);
+  color: white;
 }
 
-.day-number {
-  font-size: 16px;
+.calendarDay.selected .dayNumber {
+  color: white;
+}
+
+.calendarDay.hasCheckpoints {
+  background: rgba(245, 166, 35, 0.1);
+}
+
+.dayNumber {
+  font-size: 1rem;
   font-weight: 500;
-  color: #333;
-  margin-bottom: 5px;
+  color: var(--text-main);
 }
 
-.checkpoints-indicator {
+.checkpointsIndicator {
   display: inline-block;
   padding: 2px 6px;
-  background: #495631;
-  color: white;
-  border-radius: 12px;
-  font-size: 11px;
+  background: var(--primary-dark);
+  color: var(--primary-accent);
+  border-radius: var(--radius-full);
+  font-size: 0.7rem;
   font-weight: 600;
-  min-width: 20px;
+  min-width: 22px;
   text-align: center;
 }
 
-/* Секция выбранной даты */
-.selected-date-checkpoints {
-  background: white;
-  border-radius: 16px;
-  padding: 25px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+.selectedDateCheckpoints {
+  padding: 28px;
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
 }
 
-.selected-date-checkpoints h3 {
-  font-size: 20px;
-  color: #333;
-  margin: 0 0 20px 0;
-  padding-bottom: 15px;
-  border-bottom: 2px solid #f0f0f0;
-}
-
-/* Список контрольных точек для выбранной даты */
-.checkpoints-mini-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 15px;
-}
-
-.calendar-checkpoint-item {
-  padding: 15px;
-  background: #f8f9fa;
-  border-radius: 12px;
-  border: 1px solid #f0f0f0;
-  transition: transform 0.2s;
-}
-
-.calendar-checkpoint-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-.checkpoint-mini-header {
+.selectedDateCheckpoints h3 {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  gap: 10px;
+  margin: 0 0 20px;
+  color: var(--text-main);
+  font-size: 1.1rem;
+  font-weight: 500;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
 }
 
-.checkpoint-mini-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: #333;
+.checkpointsMiniList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
 }
 
-.checkpoint-mini-status {
-  font-size: 16px;
+.calendarCheckpointItem {
+  padding: 18px;
+  border-radius: var(--radius-md);
+  background: rgba(73, 86, 49, 0.03);
+  border: 1px solid var(--border-color);
+  transition: var(--transition);
 }
 
-.checkpoint-mini-details {
+.calendarCheckpointItem:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.checkpointMiniHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 12px;
-  font-size: 14px;
-  color: #666;
 }
 
-.checkpoint-amount {
+.checkpointMiniTitle {
+  font-size: 1rem;
   font-weight: 600;
-  color: #495631;
+  color: var(--text-main);
 }
 
-.view-button {
+.checkpointMiniStatus {
+  font-size: 1.1rem;
+}
+
+.checkpointMiniDetails {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.checkpointMiniDetails span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.checkpointAmount {
+  font-weight: 600;
+  color: var(--primary-dark);
+}
+
+.viewButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   width: 100%;
-  padding: 8px;
-  background: #495631;
-  color: white;
+  padding: 10px;
+  border-radius: var(--radius-full);
+  background: var(--primary-dark);
+  color: var(--primary-accent);
   border: none;
-  border-radius: 6px;
-  font-size: 13px;
   cursor: pointer;
-  transition: background 0.2s;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: var(--transition);
 }
 
-.view-button:hover {
-  background: #2d3a1f;
+.viewButton:hover {
+  transform: translateY(-2px);
+  background: var(--primary-accent);
+  color: var(--primary-dark);
+  box-shadow: var(--shadow-sm);
 }
 
-/* Статусы */
-.status-pending .checkpoint-mini-status {
-  color: #f57c00;
-}
-
-.status-completed .checkpoint-mini-status {
-  color: #2e7d32;
-}
-
-.status-overdue .checkpoint-mini-status {
-  color: #c62828;
-}
-
-/* Загрузка */
-.calendar-loading {
+.calendarLoading {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   min-height: 400px;
+  gap: 16px;
 }
 
-/* Адаптивность */
-@media (max-width: 768px) {
-  .calendar-header {
-    flex-wrap: wrap;
-    gap: 15px;
+.loadingSpinner {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 3px solid rgba(73, 86, 49, 0.12);
+  border-top-color: var(--primary-dark);
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
-  
-  .current-month {
+}
+
+@media (max-width: 768px) {
+  .calendarContainer,
+  .selectedDateCheckpoints {
+    padding: 20px;
+  }
+
+  .calendarHeader {
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: center;
+  }
+
+  .currentMonth {
     order: -1;
     width: 100%;
     text-align: center;
+    font-size: 1.1rem;
   }
-  
-  .calendar-weekdays .weekday {
-    font-size: 12px;
-    padding: 5px;
+
+  .calendarWeekdays .weekday {
+    font-size: 0.7rem;
+    padding: 6px;
   }
-  
-  .calendar-day {
-    padding: 5px;
+
+  .calendarDay {
+    padding: 4px;
+    min-height: 50px;
+    aspect-ratio: auto;
   }
-  
-  .day-number {
-    font-size: 14px;
+
+  .dayNumber {
+    font-size: 0.8rem;
   }
-  
-  .checkpoints-indicator {
-    font-size: 10px;
+
+  .checkpointsIndicator {
+    font-size: 0.6rem;
     padding: 1px 4px;
-    min-width: 16px;
+    min-width: 18px;
   }
-  
-  .checkpoints-mini-list {
+
+  .checkpointsMiniList {
     grid-template-columns: 1fr;
   }
-}
 
-@media (max-width: 480px) {
-  .calendar-weekdays {
-    display: none;
-  }
-  
-  .calendar-grid {
-    gap: 2px;
-  }
-  
-  .calendar-day {
-    aspect-ratio: auto;
-    min-height: 60px;
+  .checkpointMiniDetails {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }

@@ -1,5 +1,27 @@
-// client/src/pages/CheckpointsPage/CheckpointsStats.jsx
 import React, { useEffect, useState } from "react";
+import {
+  Target,
+  CheckCircle,
+  Clock,
+  AlertCircle,
+  DollarSign,
+  TrendingUp,
+  BarChart3,
+  PieChart,
+  List,
+  Award,
+  Flame,
+  Calendar,
+  Activity,
+  Circle,
+  CircleDot,
+  CircleCheck,
+  Loader,
+  AlertTriangle,
+  Wallet,
+  LineChart,
+  Flag,
+} from "lucide-react";
 import { getGoals, getCheckpoints, getScenarios } from "../../../api/api";
 import "./CheckpointsStats.css";
 
@@ -61,6 +83,7 @@ function CheckpointsStats() {
     const lowPriority = checkpoints.filter(cp => cp.priority === "low").length;
     
     const totalScenarios = Object.values(scenariosMap).reduce((sum, arr) => sum + arr.length, 0);
+    const goalsWithScenarios = goals.filter(g => (scenariosMap[g.goal_id] || []).length > 0).length;
     
     const totalTarget = goals.reduce((sum, g) => sum + (parseFloat(g.target_amount) || 0), 0);
     const totalCurrent = goals.reduce((sum, g) => sum + (parseFloat(g.current_amount) || 0), 0);
@@ -76,7 +99,7 @@ function CheckpointsStats() {
         completionRate: totalCheckpoints > 0 ? Math.round((completedCheckpoints / totalCheckpoints) * 100) : 0
       },
       priorities: { high: highPriority, medium: mediumPriority, low: lowPriority },
-      scenarios: { total: totalScenarios },
+      scenarios: { total: totalScenarios, goalsWithScenarios },
       finances: {
         totalTarget,
         totalCurrent,
@@ -88,8 +111,8 @@ function CheckpointsStats() {
 
   if (loading) {
     return (
-      <div className="stats-loading">
-        <div className="loading-spinner"></div>
+      <div className="statsLoading">
+        <div className="loadingSpinner" />
         <p>Загрузка статистики...</p>
       </div>
     );
@@ -98,157 +121,159 @@ function CheckpointsStats() {
   const stats = calculateStats();
 
   return (
-    <div className="stats-page">
-      <div className="stats-section">
-        <h3>🎯 Цели</h3>
-        <div className="stats-grid">
-          <div className="stat-card">
-            <div className="stat-icon">📊</div>
-            <div className="stat-content">
-              <div className="stat-value">{stats.goals.total}</div>
-              <div className="stat-label">Всего целей</div>
+    <div className="statsPage">
+      {/* Цели */}
+      <div className="statsSection">
+        <h3><Target size={18} /> Цели</h3>
+        <div className="statsGrid">
+          <div className="statCard">
+            <div className="statIcon"><BarChart3 size={24} /></div>
+            <div className="statContent">
+              <div className="statValue">{stats.goals.total}</div>
+              <div className="statLabel">Всего целей</div>
             </div>
           </div>
-          <div className="stat-card">
-            <div className="stat-icon">✅</div>
-            <div className="stat-content">
-              <div className="stat-value">{stats.goals.active}</div>
-              <div className="stat-label">Активных</div>
+          <div className="statCard">
+            <div className="statIcon"><Activity size={24} /></div>
+            <div className="statContent">
+              <div className="statValue">{stats.goals.active}</div>
+              <div className="statLabel">Активных</div>
             </div>
           </div>
-          <div className="stat-card">
-            <div className="stat-icon">🏆</div>
-            <div className="stat-content">
-              <div className="stat-value">{stats.goals.completed}</div>
-              <div className="stat-label">Выполнено</div>
+          <div className="statCard">
+            <div className="statIcon"><Award size={24} /></div>
+            <div className="statContent">
+              <div className="statValue">{stats.goals.completed}</div>
+              <div className="statLabel">Выполнено</div>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="stats-section">
-        <h3>📌 Контрольные точки</h3>
-        <div className="stats-grid">
-          <div className="stat-card">
-            <div className="stat-icon">📋</div>
-            <div className="stat-content">
-              <div className="stat-value">{stats.checkpoints.total}</div>
-              <div className="stat-label">Всего точек</div>
+      {/* Контрольные точки */}
+      <div className="statsSection">
+        <h3><CheckCircle size={18} /> Контрольные точки</h3>
+        <div className="statsGrid">
+          <div className="statCard">
+            <div className="statIcon"><List size={24} /></div>
+            <div className="statContent">
+              <div className="statValue">{stats.checkpoints.total}</div>
+              <div className="statLabel">Всего точек</div>
             </div>
           </div>
-          <div className="stat-card">
-            <div className="stat-icon">✅</div>
-            <div className="stat-content">
-              <div className="stat-value">{stats.checkpoints.completed}</div>
-              <div className="stat-label">Выполнено</div>
+          <div className="statCard">
+            <div className="statIcon"><CheckCircle size={24} /></div>
+            <div className="statContent">
+              <div className="statValue">{stats.checkpoints.completed}</div>
+              <div className="statLabel">Выполнено</div>
             </div>
           </div>
-          <div className="stat-card">
-            <div className="stat-icon">⏳</div>
-            <div className="stat-content">
-              <div className="stat-value">{stats.checkpoints.pending}</div>
-              <div className="stat-label">В процессе</div>
+          <div className="statCard">
+            <div className="statIcon"><Loader size={24} /></div>
+            <div className="statContent">
+              <div className="statValue">{stats.checkpoints.pending}</div>
+              <div className="statLabel">В процессе</div>
             </div>
           </div>
-          <div className="stat-card warning">
-            <div className="stat-icon">⚠️</div>
-            <div className="stat-content">
-              <div className="stat-value">{stats.checkpoints.overdue}</div>
-              <div className="stat-label">Просрочено</div>
+          <div className="statCard warning">
+            <div className="statIcon"><AlertTriangle size={24} /></div>
+            <div className="statContent">
+              <div className="statValue">{stats.checkpoints.overdue}</div>
+              <div className="statLabel">Просрочено</div>
             </div>
           </div>
         </div>
 
-        <div className="progress-bar-container">
-          <div className="progress-label">
+        <div className="progressBarContainer">
+          <div className="progressLabel">
             <span>Прогресс выполнения</span>
             <span>{stats.checkpoints.completionRate}%</span>
           </div>
-          <div className="progress-bar">
-            <div 
-              className="progress-fill"
-              style={{ width: `${stats.checkpoints.completionRate}%` }}
-            />
+          <div className="progressBar">
+            <div className="progressFill" style={{ width: `${stats.checkpoints.completionRate}%` }} />
           </div>
         </div>
       </div>
 
-      <div className="stats-section">
-        <h3>⚡ Приоритеты</h3>
-        <div className="stats-grid priorities">
-          <div className="priority-card high">
-            <div className="priority-icon">🔴</div>
-            <div className="priority-content">
-              <div className="priority-value">{stats.priorities.high}</div>
-              <div className="priority-label">Высокий</div>
+      {/* Приоритеты */}
+      <div className="statsSection">
+        <h3><Flag size={18} /> Приоритеты</h3>
+        <div className="statsGrid priorities">
+          <div className="priorityCard high">
+            <div className="priorityIcon"><CircleDot size={24} color="#E35D5D" /></div>
+            <div className="priorityContent">
+              <div className="priorityValue">{stats.priorities.high}</div>
+              <div className="priorityLabel">Высокий</div>
             </div>
           </div>
-          <div className="priority-card medium">
-            <div className="priority-icon">🟡</div>
-            <div className="priority-content">
-              <div className="priority-value">{stats.priorities.medium}</div>
-              <div className="priority-label">Средний</div>
+          <div className="priorityCard medium">
+            <div className="priorityIcon"><Circle size={24} color="#F5A623" /></div>
+            <div className="priorityContent">
+              <div className="priorityValue">{stats.priorities.medium}</div>
+              <div className="priorityLabel">Средний</div>
             </div>
           </div>
-          <div className="priority-card low">
-            <div className="priority-icon">🟢</div>
-            <div className="priority-content">
-              <div className="priority-value">{stats.priorities.low}</div>
-              <div className="priority-label">Низкий</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="stats-section">
-        <h3>💰 Финансы</h3>
-        <div className="stats-grid">
-          <div className="stat-card">
-            <div className="stat-icon">🎯</div>
-            <div className="stat-content">
-              <div className="stat-value">{formatCurrency(stats.finances.totalTarget)} ₽</div>
-              <div className="stat-label">Всего нужно</div>
-            </div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-icon">💵</div>
-            <div className="stat-content">
-              <div className="stat-value">{formatCurrency(stats.finances.totalCurrent)} ₽</div>
-              <div className="stat-label">Накоплено</div>
-            </div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-icon">📈</div>
-            <div className="stat-content">
-              <div className="stat-value">{stats.finances.totalProgress}%</div>
-              <div className="stat-label">Общий прогресс</div>
-            </div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-icon">⏳</div>
-            <div className="stat-content">
-              <div className="stat-value">{formatCurrency(stats.finances.remaining)} ₽</div>
-              <div className="stat-label">Осталось</div>
+          <div className="priorityCard low">
+            <div className="priorityIcon"><CircleCheck size={24} color="#2E7D32" /></div>
+            <div className="priorityContent">
+              <div className="priorityValue">{stats.priorities.low}</div>
+              <div className="priorityLabel">Низкий</div>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="stats-section">
-        <h3>📈 Сценарии</h3>
-        <div className="stats-grid">
-          <div className="stat-card">
-            <div className="stat-icon">📊</div>
-            <div className="stat-content">
-              <div className="stat-value">{stats.scenarios.total}</div>
-              <div className="stat-label">Всего сценариев</div>
+      {/* Финансы */}
+      <div className="statsSection">
+        <h3><DollarSign size={18} /> Финансы</h3>
+        <div className="statsGrid">
+          <div className="statCard">
+            <div className="statIcon"><Target size={24} /></div>
+            <div className="statContent">
+              <div className="statValue">{formatCurrency(stats.finances.totalTarget)} ₽</div>
+              <div className="statLabel">Всего нужно</div>
             </div>
           </div>
-          <div className="stat-card">
-            <div className="stat-icon">🎯</div>
-            <div className="stat-content">
-              <div className="stat-value">{goals.filter(g => (scenariosMap[g.goal_id] || []).length > 0).length}</div>
-              <div className="stat-label">Целей с прогнозом</div>
+          <div className="statCard">
+            <div className="statIcon"><Wallet size={24} /></div>
+            <div className="statContent">
+              <div className="statValue">{formatCurrency(stats.finances.totalCurrent)} ₽</div>
+              <div className="statLabel">Накоплено</div>
+            </div>
+          </div>
+          <div className="statCard">
+            <div className="statIcon"><LineChart size={24} /></div>
+            <div className="statContent">
+              <div className="statValue">{stats.finances.totalProgress}%</div>
+              <div className="statLabel">Общий прогресс</div>
+            </div>
+          </div>
+          <div className="statCard">
+            <div className="statIcon"><Clock size={24} /></div>
+            <div className="statContent">
+              <div className="statValue">{formatCurrency(stats.finances.remaining)} ₽</div>
+              <div className="statLabel">Осталось</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Сценарии */}
+      <div className="statsSection">
+        <h3><BarChart3 size={18} /> Сценарии</h3>
+        <div className="statsGrid">
+          <div className="statCard">
+            <div className="statIcon"><TrendingUp size={24} /></div>
+            <div className="statContent">
+              <div className="statValue">{stats.scenarios.total}</div>
+              <div className="statLabel">Всего сценариев</div>
+            </div>
+          </div>
+          <div className="statCard">
+            <div className="statIcon"><Target size={24} /></div>
+            <div className="statContent">
+              <div className="statValue">{stats.scenarios.goalsWithScenarios}</div>
+              <div className="statLabel">Целей с прогнозом</div>
             </div>
           </div>
         </div>

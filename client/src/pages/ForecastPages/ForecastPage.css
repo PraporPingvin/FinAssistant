@@ -1,349 +1,807 @@
-/* Дополнительные стили для селектора целей */
 :root {
   --primary-dark: #495631;
   --primary-accent: #EAED74;
   --primary-light: #EFF2DD;
-  --card-bg: #FFFFFF;
-  --border-color: #DDE0C5;
-  --text-muted: #717959;
-  --text-dark: #3A3F29;
-  --shadow: 0 4px 12px rgba(73, 86, 49, 0.08);
-  --shadow-hover: 0 8px 24px rgba(73, 86, 49, 0.12);
-  --success-color: #4caf50;
-  --warning-color: #ff9800;
-  --danger-color: #f44336;
+
+  --card-bg: rgba(255, 255, 255, 0.72);
+  --border-color: rgba(73, 86, 49, 0.08);
+
+  --text-main: #495631;
+  --text-muted: #7B8465;
+
+  --success-color: #2E7D32;
+  --danger-color: #E35D5D;
+  --warning-color: #F5A623;
+
+  --shadow-sm: 0 8px 24px rgba(73, 86, 49, 0.06);
+  --shadow-md: 0 10px 30px rgba(73, 86, 49, 0.08);
+  --shadow-lg: 0 18px 40px rgba(73, 86, 49, 0.12);
+
+  --radius-xl: 32px;
+  --radius-lg: 24px;
+  --radius-md: 18px;
+  --radius-sm: 12px;
+
+  --transition: all 0.28s ease;
 }
 
-.goalSelectorSection {
-  background: white;
-  border-radius: 12px;
-  padding: 25px;
-  margin-bottom: 30px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+.forecastPage {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 42px 24px 80px;
 }
 
-.selectorContainer {
+/* Breadcrumb */
+.breadcrumb {
   display: flex;
   align-items: center;
-  gap: 20px;
   flex-wrap: wrap;
-  margin-bottom: 20px;
+  gap: 12px;
+  margin-bottom: 36px;
+  color: var(--text-muted);
+  font-size: 0.92rem;
 }
 
-.selectorLabel {
-  font-size: 1rem;
-  font-weight: 500;
-  color: #333;
-  min-width: 200px;
-}
-
-.selectorWrapper {
-  position: relative;
-  flex: 1;
-  min-width: 300px;
-}
-
-.goalSelect {
-  width: 100%;
-  padding: 12px 40px 12px 15px;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
-  font-size: 1rem;
-  color: #333;
-  background: white;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  appearance: none;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-  background-repeat: no-repeat;
-  background-position: right 15px center;
-  background-size: 15px;
-}
-
-.goalSelect:hover {
-  border-color: #495631;
-}
-
-.goalSelect:focus {
-  outline: none;
-  border-color: #495631;
-  box-shadow: 0 0 0 3px rgba(73, 86, 49, 0.1);
-}
-
-.clearSelectionButton {
-  position: absolute;
-  right: 40px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  color: #999;
-  font-size: 16px;
-  cursor: pointer;
-  padding: 5px;
-  transition: color 0.3s ease;
-}
-
-.clearSelectionButton:hover {
-  color: #f44336;
-}
-
-.goalsStats {
+.breadcrumb a {
   display: flex;
-  gap: 30px;
-  padding-top: 20px;
-  border-top: 1px solid #eee;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: var(--transition);
 }
 
-.statItem {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
+.breadcrumb a:hover {
+  color: var(--primary-dark);
 }
 
-.statLabel {
-  font-size: 0.9rem;
-  color: #666;
-}
-
-.statValue {
-  font-size: 1.2rem;
+.breadcrumb .current {
+  color: var(--text-main);
   font-weight: 600;
-  color: #495631;
 }
 
-/* Сетка целей */
-.goalsFlex {
+/* Header */
+.pageHeaderForecast {
+  text-align: center;
+  margin-bottom: 42px;
+}
+
+.pageHeaderForecast h1 {
+  margin: 0 0 8px;
+  color: var(--text-main);
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  font-weight: 300;
+  letter-spacing: -1px;
+}
+
+.pageHeaderForecast p {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+/* Goal Selector */
+.goalSelector {
+  padding: 24px;
+  margin-bottom: 32px;
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.goalSelector label {
+  display: block;
+  margin-bottom: 12px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.goalSelector select {
+  width: 100%;
+  padding: 14px 18px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.75);
+  color: var(--text-main);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.goalSelector select:focus {
+  outline: none;
+  border-color: var(--primary-accent);
+  box-shadow: 0 0 0 4px rgba(234, 237, 116, 0.18);
+}
+
+/* Error Card */
+.errorCard {
   display: flex;
-  flex-direction: column;
-  margin-top: 20px;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 24px;
+  margin-bottom: 28px;
+  border-radius: var(--radius-md);
+  background: rgba(227, 93, 93, 0.1);
+  color: var(--danger-color);
+  border-left: 4px solid var(--danger-color);
 }
 
-.goalsGrid h2 {
-  margin-bottom: 20px;
-  color: #333;
+/* Goals List */
+.goalsList h2 {
+  margin: 0 0 24px;
+  color: var(--text-main);
   font-size: 1.5rem;
+  font-weight: 300;
 }
 
-.goalsCardFlex {
+.goalsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 20px;
+  gap: 24px;
 }
 
 .goalCard {
-  background: white;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  padding: 24px;
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
   cursor: pointer;
-  transition: all 0.3s ease;
-  border: 2px solid transparent;
+  transition: var(--transition);
 }
 
 .goalCard:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-  border-color: #495631;
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary-accent);
 }
 
-.goalCard.active {
-  border-left: 4px solid #4caf50;
-}
-
-.goalCard.completed {
-  border-left: 4px solid #2196f3;
-  opacity: 0.8;
-}
-
-.goalCardHeader {
+.goalCardHeaderForecast {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
+  margin-bottom: 16px;
 }
 
-.goalCardHeader h3 {
-  font-size: 1.2rem;
-  color: #333;
+.goalCardHeaderForecast h3 {
   margin: 0;
+  color: var(--text-main);
+  font-size: 1.1rem;
+  font-weight: 600;
 }
 
-.goalStatusBadge {
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  font-weight: 500;
+.goalStatus {
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
 }
 
-.goalStatusBadge.active {
-  background: #e8f5e8;
-  color: #2e7d32;
+.goalStatus.active {
+  background: rgba(234, 237, 116, 0.2);
+  color: #6B7400;
 }
 
-.goalStatusBadge.completed {
-  background: #e3f2fd;
-  color: #1976d2;
+.goalStatus.completed {
+  background: rgba(46, 125, 50, 0.1);
+  color: var(--success-color);
 }
 
 .goalCardBody {
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
 
 .goalCardRow {
   display: flex;
   justify-content: space-between;
   padding: 8px 0;
-  border-bottom: 1px dashed #eee;
-}
-
-.goalCardRow:last-child {
-  border-bottom: none;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .goalCardRow span {
-  color: #666;
-  font-size: 0.9rem;
+  color: var(--text-muted);
 }
 
 .goalCardRow strong {
-  color: #333;
-  font-size: 1rem;
-}
-
-.goalCardFooter {
-  text-align: right;
+  color: var(--text-main);
 }
 
 .selectGoalButton {
-  padding: 8px 16px;
-  background: transparent;
-  border: 1px solid #495631;
-  border-radius: 6px;
-  color: #495631;
-  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px;
+  background: rgba(73, 86, 49, 0.06);
+  border: none;
+  border-radius: 999px;
+  color: var(--text-main);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: var(--transition);
 }
 
 .selectGoalButton:hover {
-  background: #495631;
-  color: white;
+  background: var(--primary-dark);
+  color: var(--primary-accent);
 }
 
-/* Информация о цели */
-.goalLink {
-  display: inline-block;
-  margin-top: 5px;
-  color: #495631;
-  text-decoration: none;
-  font-size: 0.9rem;
-  transition: color 0.3s ease;
-}
-
-.goalLink:hover {
-  color: #5a6b3d;
-  text-decoration: underline;
-}
-
-/* Кнопка обновления анализа */
-.refreshAnalysisButton {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 20px;
-}
-
-.loadingSubtext {
-  color: #666;
-  font-size: 0.9rem;
-  margin-top: 10px;
-}
-
-.headerContentForecast {
+/* Empty State */
+.emptyState {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  text-align: center;
+  gap: 20px;
+  padding: 64px 40px;
+  border-radius: var(--radius-xl);
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+  margin-top: 32px;
 }
 
-.goalInfoFlex {
+.emptyState h2 {
+  margin: 0;
+  color: var(--text-main);
+  font-size: 1.5rem;
+  font-weight: 300;
+}
+
+.emptyState p {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.createButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: var(--primary-dark);
+  color: var(--primary-accent);
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.createButton:hover {
+  transform: translateY(-2px);
+  background: var(--primary-accent);
+  color: var(--primary-dark);
+}
+
+/* Loading */
+.forecastLoading,
+.calculatingState {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-bottom: 20px;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  min-height: 400px;
 }
 
-.tabsContainer {
-  margin-bottom: 30px;
+.loadingSpinner {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 3px solid rgba(73, 86, 49, 0.12);
+  border-top-color: var(--primary-dark);
+  animation: spin 0.9s linear infinite;
 }
 
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Goal Info Card */
+.goalInfoCard {
+  padding: 28px;
+  margin-bottom: 32px;
+  border-radius: var(--radius-xl);
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.goalInfoHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.goalInfoHeader h2 {
+  margin: 0;
+  color: var(--text-main);
+  font-size: 1.3rem;
+  font-weight: 500;
+}
+
+.statusBadge {
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.status-active {
+  background: rgba(234, 237, 116, 0.2);
+  color: #6B7400;
+}
+
+.status-completed {
+  background: rgba(46, 125, 50, 0.1);
+  color: var(--success-color);
+}
+
+.goalInfoStatsForecast {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.statItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.statItem svg {
+  color: var(--primary-dark);
+}
+
+.statItem div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.statItem span {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.statItem strong {
+  font-size: 1rem;
+  color: var(--text-main);
+}
+
+.progressBar {
+  height: 8px;
+  background: rgba(73, 86, 49, 0.08);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary-accent), var(--primary-dark));
+  border-radius: 999px;
+  transition: width 1s ease;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 28px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: var(--transition);
+  border-bottom: 2px solid transparent;
+}
+
+.tab:hover {
+  color: var(--text-main);
+}
+
+.tab.active {
+  color: var(--primary-dark);
+  border-bottom-color: var(--primary-accent);
+}
+
+/* Summary Card */
+.summaryCard {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  padding: 28px;
+  margin-bottom: 28px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, rgba(234, 237, 116, 0.1), rgba(234, 237, 116, 0.05));
+  border: 1px solid rgba(234, 237, 116, 0.3);
+}
+
+.summaryIcon svg {
+  color: var(--primary-dark);
+}
+
+.summaryText h3 {
+  margin: 0 0 8px;
+  color: var(--text-main);
+  font-size: 1.1rem;
+}
+
+.summaryText p {
+  margin: 0;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* Optimal Strategy */
 .optimalStrategyCard {
-  margin-bottom: 20px;
-  margin-top: 20px;
-}
-
-.comparisonTableForecast {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.95rem;
-}
-
-.comparisonTableForecast td {
-  padding: 14px 12px;
-  border-bottom: 1px solid rgba(221, 224, 197, 0.5);
-  vertical-align: middle;
-}
-
-.tableContainerForecast {
-  overflow-x: auto;
-  background: var(--bg-white);
-  border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow);
+  padding: 28px;
+  margin-bottom: 28px;
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
   border: 1px solid var(--border-color);
 }
 
-.recalculateButton{
-  margin-top: 30px;
+.optimalStrategyCard h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 20px;
+  color: var(--text-main);
+  font-size: 1rem;
 }
 
-/* Адаптивность */
-@media (max-width: 768px) {
-  .selectorContainer {
-    flex-direction: column;
-    align-items: stretch;
-  }
+.strategyName {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--primary-dark);
+  margin-bottom: 16px;
+}
 
-  .selectorLabel {
-    min-width: auto;
-  }
+.strategyDetails {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
 
-  .selectorWrapper {
-    min-width: auto;
-  }
+.strategyDetails .detail {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
 
-  .goalsStats {
-    flex-direction: column;
-    gap: 15px;
-  }
+.strategyDetails .detail span {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
 
-  .goalsCardGrid {
+.strategyDetails .detail strong {
+  font-size: 1.1rem;
+  color: var(--text-main);
+}
+
+/* Chart Card */
+.chartCardForecast {
+  padding: 24px;
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+}
+
+.chartCardForecast h3 {
+  margin: 0 0 20px;
+  color: var(--text-main);
+  font-size: 1rem;
+}
+
+.chartContainer {
+  height: 400px;
+  width: 100%;
+}
+
+/* Scenarios Grid */
+.scenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 24px;
+}
+
+.scenarioCard {
+  padding: 24px;
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+  transition: var(--transition);
+}
+
+.scenarioCard:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.scenarioHeaderForecast {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.scenarioHeaderForecast h3 {
+  margin: 0;
+  color: var(--text-main);
+  font-size: 1.1rem;
+}
+
+.optimalBadge {
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--primary-accent);
+  color: var(--primary-dark);
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.scenarioParams {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.param {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.param span {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.param strong {
+  font-size: 1rem;
+  color: var(--text-main);
+}
+
+.scenarioResults {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.result {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.result span:first-child {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.result .value {
+  color: var(--text-main);
+  font-weight: 500;
+}
+
+.result .value.highlight {
+  color: var(--success-color);
+  font-weight: 600;
+}
+
+.scenarioRisk {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+}
+
+.riskLow {
+  background: rgba(46, 125, 50, 0.1);
+  color: var(--success-color);
+}
+
+.riskMedium {
+  background: rgba(245, 166, 35, 0.1);
+  color: var(--warning-color);
+}
+
+.riskHigh {
+  background: rgba(227, 93, 93, 0.1);
+  color: var(--danger-color);
+}
+
+/* Comparison Table */
+.comparisonTable {
+  padding: 24px;
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+  margin-top: 28px;
+}
+
+.comparisonTable h3 {
+  margin: 0 0 20px;
+  color: var(--text-main);
+  font-size: 1rem;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.comparisonTable table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.comparisonTable th,
+.comparisonTable td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.comparisonTable th {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.optimalRow {
+  background: rgba(234, 237, 116, 0.08);
+}
+
+.amount {
+  font-weight: 600;
+  color: var(--success-color);
+}
+
+.confidenceBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(73, 86, 49, 0.08);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.confidenceFill {
+  height: 6px;
+  background: var(--success-color);
+  border-radius: 999px;
+  transition: width 0.5s ease;
+}
+
+.confidenceBar span {
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.riskBadge {
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+}
+
+/* Recalculate */
+.recalculateSection {
+  display: flex;
+  justify-content: center;
+  margin-top: 48px;
+  padding-top: 32px;
+  border-top: 1px solid var(--border-color);
+}
+
+.recalculateButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 32px;
+  background: transparent;
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: var(--transition);
+}
+
+.recalculateButton:hover:not(:disabled) {
+  background: var(--primary-accent);
+  border-color: var(--primary-accent);
+  color: var(--primary-dark);
+  transform: translateY(-2px);
+}
+
+.recalculateButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+/* Mobile */
+@media (max-width: 900px) {
+  .goalsGrid,
+  .scenariosGrid {
     grid-template-columns: 1fr;
   }
-
-  .goalCardHeader {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
 }
 
-@media (max-width: 480px) {
-  .goalSelectorSection {
-    padding: 15px;
+@media (max-width: 768px) {
+  .forecastPage {
+    padding: 28px 18px 60px;
   }
 
-  .statItem {
+  .goalInfoStatsForecast {
+    flex-wrap: wrap;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .summaryCard {
     flex-direction: column;
-    gap: 4px;
+    text-align: center;
+  }
+
+  .strategyDetails {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .tabs {
+    flex-wrap: wrap;
+    justify-content: stretch;
+  }
+
+  .tab {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .chartContainer {
+    height: 300px;
+  }
+
+  .comparisonTable th,
+  .comparisonTable td {
+    padding: 8px;
+    font-size: 0.75rem;
   }
 }

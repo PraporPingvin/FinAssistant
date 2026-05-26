@@ -1,11 +1,11 @@
-// src/pages/Profile/Profile.jsx
 import React, { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import Layout from "../../components/Layout";
+import { User, Mail, Edit2, Save, X, CheckCircle, AlertCircle } from "lucide-react";
 import "./Profile.css";
 
 function Profile() {
-  const { user, login } = useAuth(); // Добавили login для обновления контекста
+  const { user, login } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     first_name: user?.first_name || "",
@@ -30,8 +30,6 @@ function Profile() {
 
     try {
       const token = localStorage.getItem("token");
-      console.log("📤 Отправка запроса на обновление профиля");
-      console.log("📦 Данные:", formData);
       
       const response = await fetch("http://localhost:5000/api/user/profile", {
         method: "PATCH",
@@ -43,22 +41,17 @@ function Profile() {
       });
 
       const data = await response.json();
-      console.log("📥 Ответ сервера:", data);
 
       if (response.ok) {
-        // Обновляем данные пользователя в localStorage и контексте
         const updatedUser = { ...user, ...formData };
         localStorage.setItem("user", JSON.stringify(updatedUser));
         
-        // Обновляем контекст через login с существующим токеном
-        // Просто обновляем user объект
         user.first_name = formData.first_name;
         user.last_name = formData.last_name;
         
         setMessage({ type: "success", text: "Профиль успешно обновлен!" });
         setIsEditing(false);
         
-        // Перезагружаем страницу через 1 секунду для обновления данных
         setTimeout(() => {
           window.location.reload();
         }, 1000);
@@ -66,89 +59,110 @@ function Profile() {
         setMessage({ type: "error", text: data.error || "Ошибка при обновлении" });
       }
     } catch (error) {
-      console.error("❌ Ошибка:", error);
+      console.error("Ошибка:", error);
       setMessage({ type: "error", text: "Ошибка соединения с сервером" });
     } finally {
       setLoading(false);
     }
   };
 
+  const getInitials = () => {
+    if (user.first_name) return user.first_name[0].toUpperCase();
+    if (user.email) return user.email[0].toUpperCase();
+    return "U";
+  };
+
   return (
     <Layout>
-      <div className="profile-container">
-        <h1>Профиль пользователя</h1>
-        
-        <div className="profile-card">
-          <div className="profile-avatar">
-            {user.first_name?.[0] || user.email[0]}
+      <div className="profilePage">
+        <div className="pageHeaderProfile">
+          <h1>Профиль пользователя</h1>
+          <p>Управление личной информацией</p>
+        </div>
+
+        <div className="profileCard">
+          <div className="profileAvatar">
+            {getInitials()}
           </div>
-          
+
           {message.text && (
-            <div className={`profile-message ${message.type}`}>
+            <div className={`message ${message.type}`}>
+              {message.type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
               {message.text}
             </div>
           )}
-          
+
           {!isEditing ? (
             <>
-              <div className="profile-info">
-                <div className="info-row">
-                  <label>Имя:</label>
-                  <span>{user.first_name || "Не указано"}</span>
+              <div className="profileInfo">
+                <div className="infoRow">
+                  <div className="infoLabel">
+                    <User size={14} />
+                    Имя
+                  </div>
+                  <div className="infoValue">{user.first_name || "Не указано"}</div>
                 </div>
+
+                <div className="infoRow">
+                  <div className="infoLabel">
+                    <User size={14} />
+                    Фамилия
+                  </div>
+                  <div className="infoValue">{user.last_name || "Не указано"}</div>
+                </div>
+
+                <div className="infoRow">
+                  <div className="infoLabel">
+                    <Mail size={14} />
+                    Email
+                  </div>
+                  <div className="infoValue">{user.email}</div>
+                </div>
+
                 
-                <div className="info-row">
-                  <label>Фамилия:</label>
-                  <span>{user.last_name || "Не указано"}</span>
-                </div>
-                
-                <div className="info-row">
-                  <label>Email:</label>
-                  <span>{user.email}</span>
-                </div>
-                
-                <div className="info-row">
-                  <label>ID:</label>
-                  <span>{user.id}</span>
-                </div>
               </div>
-              
-              <div className="profile-actions">
-                <button onClick={() => setIsEditing(true)} className="edit-button">
-                  ✏️ Редактировать профиль
+
+              <div className="profileActions">
+                <button onClick={() => setIsEditing(true)} className="editButton">
+                  <Edit2 size={16} />
+                  Редактировать профиль
                 </button>
               </div>
             </>
           ) : (
-            <form onSubmit={handleUpdateProfile} className="profile-form">
-              <div className="form-group">
-                <label>Имя</label>
+            <form onSubmit={handleUpdateProfile} className="profileForm">
+              <div className="formGroup">
+                <label className="formLabel">Имя</label>
                 <input
                   type="text"
                   name="first_name"
                   value={formData.first_name}
                   onChange={handleChange}
                   placeholder="Введите имя"
+                  className="formInput"
                 />
               </div>
-              
-              <div className="form-group">
-                <label>Фамилия</label>
+
+              <div className="formGroup">
+                <label className="formLabel">Фамилия</label>
                 <input
                   type="text"
                   name="last_name"
                   value={formData.last_name}
                   onChange={handleChange}
                   placeholder="Введите фамилию"
+                  className="formInput"
                 />
               </div>
-              
-              <div className="profile-form-actions">
-                <button type="submit" disabled={loading} className="save-button">
-                  {loading ? "Сохранение..." : "💾 Сохранить"}
+
+              <div className="formActions">
+                <button type="button" onClick={() => setIsEditing(false)} className="cancelButton" disabled={loading}>
+                  <X size={14} />
+                  Отмена
                 </button>
-                <button type="button" onClick={() => setIsEditing(false)} className="cancel-button">
-                  ❌ Отмена
+                <button type="submit" className="saveButton" disabled={loading}>
+                  <Save size={14} />
+                  {loading ? "Сохранение..." : "Сохранить"}
                 </button>
               </div>
             </form>

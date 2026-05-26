@@ -1,33 +1,25 @@
-// client/src/pages/CheckpointsPage/CheckpointsForecast.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getGoals, getScenarios } from "../../../api/api";
 import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler
-} from 'chart.js';
-import { Line, Bar } from 'react-chartjs-2';
+  Target,
+  TrendingUp,
+  DollarSign,
+  Calendar,
+  Eye,
+  BarChart3,
+  Clock,
+  AlertCircle,
+  ChevronDown,
+  ChevronRight,
+  PieChart,
+  CheckCircle,
+  Timer,
+  ChartNoAxesCombined,
+  Plus,
+  Sparkles,
+} from "lucide-react";
+import { getGoals, getScenarios } from "../../../api/api";
 import "./CheckpointsForecast.css";
-
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler
-);
 
 function CheckpointsForecast() {
   const navigate = useNavigate();
@@ -37,7 +29,6 @@ function CheckpointsForecast() {
   const [loading, setLoading] = useState(true);
   const [expandedForecast, setExpandedForecast] = useState(null);
   const [showCharts, setShowCharts] = useState(true);
-  const [selectedGoalForChart, setSelectedGoalForChart] = useState("all");
 
   useEffect(() => {
     loadData();
@@ -126,260 +117,98 @@ function CheckpointsForecast() {
     return new Intl.NumberFormat('ru-RU').format(amount || 0);
   };
 
-  // Данные для графиков
-  const getForecastComparisonData = () => {
-    const goalsWithForecast = goals.filter(g => forecastsMap[g.goal_id] && !forecastsMap[g.goal_id].achieved);
-    
-    return {
-      labels: goalsWithForecast.map(g => g.title.length > 20 ? g.title.substring(0, 20) + '...' : g.title),
-      datasets: [
-        {
-          label: 'Прогнозируемый срок (мес.)',
-          data: goalsWithForecast.map(g => forecastsMap[g.goal_id]?.monthsRemaining || 0),
-          backgroundColor: 'rgba(73, 86, 49, 0.7)',
-          borderColor: '#495631',
-          borderWidth: 1
-        },
-        {
-          label: 'Текущий прогресс (%)',
-          data: goalsWithForecast.map(g => forecastsMap[g.goal_id]?.progress || 0),
-          backgroundColor: 'rgba(33, 150, 243, 0.7)',
-          borderColor: '#2196f3',
-          borderWidth: 1
-        }
-      ]
-    };
-  };
-
-  const getProgressDistributionData = () => {
-    const progressRanges = {
-      '0-25%': 0,
-      '26-50%': 0,
-      '51-75%': 0,
-      '76-99%': 0,
-      '100%': 0
-    };
-
-    goals.forEach(goal => {
-      const progress = forecastsMap[goal.goal_id]?.progress || 0;
-      if (progress === 100) progressRanges['100%']++;
-      else if (progress >= 76) progressRanges['76-99%']++;
-      else if (progress >= 51) progressRanges['51-75%']++;
-      else if (progress >= 26) progressRanges['26-50%']++;
-      else progressRanges['0-25%']++;
-    });
-
-    return {
-      labels: Object.keys(progressRanges),
-      datasets: [{
-        data: Object.values(progressRanges),
-        backgroundColor: ['#f44336', '#ff9800', '#2196f3', '#4caf50', '#9c27b0'],
-        borderWidth: 1
-      }]
-    };
-  };
-
-  const timelineForecastData = () => {
-    const months = ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'];
-    const currentYear = new Date().getFullYear();
-    
-    return {
-      labels: months.map(m => `${m} ${currentYear}`),
-      datasets: goals.slice(0, 5).map((goal, index) => ({
-        label: goal.title.length > 15 ? goal.title.substring(0, 15) + '...' : goal.title,
-        data: months.map((_, i) => {
-          const forecast = forecastsMap[goal.goal_id];
-          if (!forecast || forecast.achieved) return null;
-          const progress = forecast.progress;
-          const monthlyIncrease = 100 / (forecast.monthsRemaining || 12);
-          return Math.min(100, progress + (i * monthlyIncrease));
-        }),
-        borderColor: `hsl(${index * 60}, 70%, 50%)`,
-        backgroundColor: 'transparent',
-        tension: 0.4,
-        pointRadius: 3
-      }))
-    };
-  };
-
   if (loading) {
     return (
-      <div className="forecast-loading">
-        <div className="loading-spinner"></div>
+      <div className="forecastLoading">
+        <div className="loadingSpinner" />
         <p>Загрузка прогнозов...</p>
       </div>
     );
   }
 
   const goalsWithForecast = goals.filter(g => forecastsMap[g.goal_id]);
-  const forecastComparisonData = getForecastComparisonData();
-  const progressDistributionData = getProgressDistributionData();
-  const timelineData = timelineForecastData();
 
   if (goalsWithForecast.length === 0) {
     return (
-      <div className="forecast-empty">
-        <div className="empty-icon">🔮</div>
+      <div className="forecastEmpty">
+        <div className="emptyIcon">
+          <Sparkles size={48} />
+        </div>
         <h3>Нет данных для прогнозов</h3>
         <p>Создайте цели и сценарии для получения прогнозов</p>
-        <button 
-          className="create-button"
-          onClick={() => navigate("/goals/new")}
-        >
+        <button className="createButton" onClick={() => navigate("/goals/new")}>
+          <Plus size={16} />
           Создать цель
         </button>
       </div>
     );
   }
 
+  const stats = {
+    totalGoals: goalsWithForecast.length,
+    achievedGoals: goals.filter(g => forecastsMap[g.goal_id]?.achieved).length,
+    avgMonths: Math.round(goalsWithForecast.reduce((sum, g) => 
+      sum + (forecastsMap[g.goal_id]?.monthsRemaining || 0), 0) / goalsWithForecast.length),
+    avgProgress: Math.round(goalsWithForecast.reduce((sum, g) => 
+      sum + (forecastsMap[g.goal_id]?.progress || 0), 0) / goalsWithForecast.length)
+  };
+
   return (
-    <div className="forecast-page">
-      {/* Общая статистика прогнозов */}
-      <div className="forecast-summary">
-        <div className="summary-card">
-          <div className="summary-icon">🎯</div>
-          <div className="summary-content">
-            <div className="summary-label">Целей с прогнозом</div>
-            <div className="summary-value">{goalsWithForecast.length}</div>
+    <div className="forecastPage">
+      <div className="forecastSummary">
+        <div className="summaryCardCheckpoint">
+          <div className="summaryIcon">
+            <Target size={28} />
+          </div>
+          <div className="summaryContent">
+            <div className="summaryLabel">Целей с прогнозом</div>
+            <div className="summaryValue">{stats.totalGoals}</div>
           </div>
         </div>
-        <div className="summary-card">
-          <div className="summary-icon">✅</div>
-          <div className="summary-content">
-            <div className="summary-label">Достигнуто целей</div>
-            <div className="summary-value">{goals.filter(g => forecastsMap[g.goal_id]?.achieved).length}</div>
+        <div className="summaryCardCheckpoint">
+          <div className="summaryIcon">
+            <CheckCircle size={28} />
+          </div>
+          <div className="summaryContent">
+            <div className="summaryLabel">Достигнуто целей</div>
+            <div className="summaryValue">{stats.achievedGoals}</div>
           </div>
         </div>
-        <div className="summary-card">
-          <div className="summary-icon">⏱️</div>
-          <div className="summary-content">
-            <div className="summary-label">Средний срок</div>
-            <div className="summary-value">
-              {Math.round(goalsWithForecast.reduce((sum, g) => 
-                sum + (forecastsMap[g.goal_id]?.monthsRemaining || 0), 0) / goalsWithForecast.length)} мес.
-            </div>
+        <div className="summaryCardCheckpoint">
+          <div className="summaryIcon">
+            <Timer size={28} />
+          </div>
+          <div className="summaryContent">
+            <div className="summaryLabel">Средний срок</div>
+            <div className="summaryValue">{stats.avgMonths} мес.</div>
           </div>
         </div>
-        <div className="summary-card">
-          <div className="summary-icon">📊</div>
-          <div className="summary-content">
-            <div className="summary-label">Средний прогресс</div>
-            <div className="summary-value highlight">
-              {Math.round(goalsWithForecast.reduce((sum, g) => 
-                sum + (forecastsMap[g.goal_id]?.progress || 0), 0) / goalsWithForecast.length)}%
-            </div>
+        <div className="summaryCardCheckpoint">
+          <div className="summaryIcon">
+            <ChartNoAxesCombined size={28} />
+          </div>
+          <div className="summaryContent">
+            <div className="summaryLabel">Средний прогресс</div>
+            <div className="summaryValue highlight">{stats.avgProgress}%</div>
           </div>
         </div>
       </div>
 
-      {/* Графики */}
       {showCharts && (
-        <div className="charts-section">
-          <div className="charts-header">
-            <h3>📊 Аналитика прогнозов</h3>
-            {/* <div className="chart-controls">
-              <select 
-                value={selectedGoalForChart}
-                onChange={(e) => setSelectedGoalForChart(e.target.value)}
-                className="chart-select"
-              >
-                <option value="all">Все цели</option>
-                {goalsWithForecast.map(goal => (
-                  <option key={goal.goal_id} value={goal.goal_id}>
-                    {goal.title}
-                  </option>
-                ))}
-              </select>
-              <button 
-                className="toggle-charts"
-                onClick={() => setShowCharts(false)}
-              >
-                Скрыть
-              </button>
-            </div> */}
+        <div className="chartsSection">
+          <div className="chartsHeader">
+            <h3><BarChart3 size={16} /> Аналитика прогнозов</h3>
+            <button className="toggleCharts" onClick={() => setShowCharts(false)}>Скрыть</button>
           </div>
-
-          <div className="charts-grid">
-            <div className="chart-card">
+          <div className="chartsGrid">
+            <div className="chartCardCheckpointF">
               <h4>Распределение по прогрессу</h4>
-              <div className="chart-container">
-                <Bar data={progressDistributionData} options={{
-                  plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                      callbacks: {
-                        label: (context) => {
-                          return `${context.raw} целей`;
-                        }
-                      }
-                    }
-                  },
-                  scales: {
-                    y: {
-                      beginAtZero: true,
-                      ticks: {
-                        stepSize: 1
-                      }
-                    }
-                  }
-                }} />
-              </div>
-            </div>
-
-            <div className="chart-card">
-              <h4>Сравнение прогнозов</h4>
-              <div className="chart-container">
-                <Bar data={forecastComparisonData} options={{
-                  plugins: {
-                    legend: { position: 'top' },
-                    tooltip: {
-                      callbacks: {
-                        label: (context) => {
-                          if (context.dataset.label.includes('срок')) {
-                            return `${context.raw} месяцев`;
-                          } else {
-                            return `${context.raw}%`;
-                          }
-                        }
-                      }
-                    }
-                  },
-                  scales: {
-                    y: {
-                      beginAtZero: true
-                    }
-                  }
-                }} />
-              </div>
-            </div>
-
-            <div className="chart-card full-width">
-              <h4>Прогноз достижения целей (временная шкала)</h4>
-              <div className="chart-container" style={{ height: '400px' }}>
-                <Line data={timelineData} options={{
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  plugins: {
-                    legend: { position: 'top' },
-                    tooltip: {
-                      callbacks: {
-                        label: (context) => {
-                          return `${context.dataset.label}: ${Math.round(context.raw)}%`;
-                        }
-                      }
-                    }
-                  },
-                  scales: {
-                    y: {
-                      beginAtZero: true,
-                      max: 100,
-                      title: {
-                        display: true,
-                        text: 'Прогресс (%)'
-                      }
-                    }
-                  }
-                }} />
+              <div className="simpleChart">
+                <div>0-25%: {goalsWithForecast.filter(g => forecastsMap[g.goal_id]?.progress < 25).length}</div>
+                <div>26-50%: {goalsWithForecast.filter(g => forecastsMap[g.goal_id]?.progress >= 25 && forecastsMap[g.goal_id]?.progress < 50).length}</div>
+                <div>51-75%: {goalsWithForecast.filter(g => forecastsMap[g.goal_id]?.progress >= 50 && forecastsMap[g.goal_id]?.progress < 75).length}</div>
+                <div>76-99%: {goalsWithForecast.filter(g => forecastsMap[g.goal_id]?.progress >= 75 && forecastsMap[g.goal_id]?.progress < 100).length}</div>
+                <div>100%: {stats.achievedGoals}</div>
               </div>
             </div>
           </div>
@@ -387,24 +216,20 @@ function CheckpointsForecast() {
       )}
 
       {!showCharts && (
-        <button 
-          className="show-charts-button"
-          onClick={() => setShowCharts(true)}
-        >
-          📊 Показать графики
+        <button className="showChartsButton" onClick={() => setShowCharts(true)}>
+          <BarChart3 size={14} /> Показать графики
         </button>
       )}
 
-      {/* Таблица прогнозов */}
-      <div className="forecast-table-section">
-        <h3>📋 Детальные прогнозы по целям</h3>
-        <div className="table-container">
-          <table className="forecast-table">
+      <div className="forecastTableSection">
+        <h3><PieChart size={16} /> Детальные прогнозы по целям</h3>
+        <div className="tableContainer">
+          <table className="forecastTable">
             <thead>
               <tr>
                 <th>Цель</th>
                 <th>Прогресс</th>
-                <th>Осталось накопить</th>
+                <th>Осталось</th>
                 <th>Сценариев</th>
                 <th>Оптимальный срок</th>
                 <th>Прогнозируемая дата</th>
@@ -414,62 +239,27 @@ function CheckpointsForecast() {
             <tbody>
               {goalsWithForecast.map(goal => {
                 const forecast = forecastsMap[goal.goal_id];
-                
                 return (
                   <tr key={goal.goal_id}>
+                    <td><strong>{goal.title}</strong></td>
                     <td>
-                      <strong>{goal.title}</strong>
-                    </td>
-                    <td>
-                      <div className="table-progress">
-                        <div className="table-progress-bar">
-                          <div 
-                            className="table-progress-fill"
-                            style={{ width: `${forecast.progress}%` }}
-                          />
+                      <div className="tableProgress">
+                        <div className="tableProgressBar">
+                          <div className="tableProgressFill" style={{ width: `${forecast.progress}%` }} />
                         </div>
-                        <span className="table-progress-text">{forecast.progress}%</span>
+                        <span>{forecast.progress}%</span>
                       </div>
                     </td>
-                    <td className="amount-cell">
-                      {formatCurrency(forecast.remainingAmount)} ₽
-                    </td>
-                    <td className="center-cell">
-                      <span className="scenarios-count">{forecast.scenariosCount}</span>
-                    </td>
-                    <td>
-                      {forecast.fastest ? (
-                        <span className="months-badge">
-                          {forecast.monthsRemaining} мес.
-                        </span>
-                      ) : (
-                        <span className="no-data">—</span>
-                      )}
-                    </td>
-                    <td>
-                      {forecast.targetDate || '—'}
-                    </td>
-                    <td className="table-actions">
-                      <button 
-                        className="table-action view"
-                        onClick={() => navigate(`/goals/${goal.goal_id}`)}
-                        title="Детали цели"
-                      >
-                        👁️
+                    <td className="amountCell">{formatCurrency(forecast.remainingAmount)} ₽</td>
+                    <td className="centerCell"><span className="scenariosCount">{forecast.scenariosCount}</span></td>
+                    <td>{forecast.monthsRemaining ? `${forecast.monthsRemaining} мес.` : "—"}</td>
+                    <td>{forecast.targetDate || "—"}</td>
+                    <td className="tableActions">
+                      <button className="tableAction view" onClick={() => navigate(`/goals/${goal.goal_id}`)} title="Детали">
+                        <Eye size={14} />
                       </button>
-                      <button 
-                        className="table-action scenarios"
-                        onClick={() => navigate(`/scenarios/${goal.goal_id}`)}
-                        title="Сценарии"
-                      >
-                        📈
-                      </button>
-                      <button 
-                        className="table-action forecast"
-                        onClick={() => navigate(`/forecast/${goal.goal_id}`)}
-                        title="Детальный прогноз"
-                      >
-                        🔮
+                      <button className="tableAction scenarios" onClick={() => navigate(`/scenarios/${goal.goal_id}`)} title="Сценарии">
+                        <BarChart3 size={14} />
                       </button>
                     </td>
                   </tr>
@@ -479,101 +269,6 @@ function CheckpointsForecast() {
           </table>
         </div>
       </div>
-
-      {/* Детальные карточки прогнозов (как было) */}
-      {/* <div className="forecast-grid">
-        {goalsWithForecast.map(goal => {
-          const forecast = forecastsMap[goal.goal_id];
-          const isExpanded = expandedForecast === goal.goal_id;
-          
-          return (
-            <div key={goal.goal_id} className="forecast-card">
-              <div 
-                className="forecast-card-header"
-                onClick={() => setExpandedForecast(isExpanded ? null : goal.goal_id)}
-              >
-                <div className="forecast-title-section">
-                  <h3 className="forecast-title">{goal.title}</h3>
-                  <span className="forecast-progress">{forecast.progress}%</span>
-                </div>
-                
-                <div className="forecast-status">
-                  {forecast.achieved ? (
-                    <span className="achieved-badge">✅ Достигнута</span>
-                  ) : forecast.fastest ? (
-                    <span className="forecast-badge">
-                      ~{forecast.monthsRemaining} мес.
-                    </span>
-                  ) : (
-                    <span className="forecast-badge warning">
-                      Нет прогноза
-                    </span>
-                  )}
-                  <span className="expand-icon">{isExpanded ? "▼" : "▶"}</span>
-                </div>
-              </div>
-
-              <div className="forecast-progress-bar">
-                <div 
-                  className="progress-fill"
-                  style={{ width: `${forecast.progress}%` }}
-                />
-              </div>
-
-              {isExpanded && forecast.fastest && (
-                <div className="forecast-details">
-                  <div className="fastest-scenario">
-                    <h4>⚡ Самый быстрый сценарий</h4>
-                    <div className="scenario-detail">
-                      <span className="scenario-name">{forecast.fastest.scenarioName}</span>
-                      <div className="scenario-metrics">
-                        <div className="metric">
-                          <span className="metric-label">Срок:</span>
-                          <span className="metric-value">{forecast.fastest.monthsToGoal} мес.</span>
-                        </div>
-                        <div className="metric">
-                          <span className="metric-label">Дата:</span>
-                          <span className="metric-value">{forecast.fastest.predictedDate}</span>
-                        </div>
-                        <div className="metric">
-                          <span className="metric-label">Взнос:</span>
-                          <span className="metric-value">{formatCurrency(forecast.fastest.monthlyContribution)} ₽</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="forecast-stats">
-                    <div className="stat">
-                      <span className="stat-label">Осталось накопить:</span>
-                      <span className="stat-value">{formatCurrency(forecast.remainingAmount)} ₽</span>
-                    </div>
-                    <div className="stat">
-                      <span className="stat-label">Сценариев:</span>
-                      <span className="stat-value">{forecast.scenariosCount}</span>
-                    </div>
-                  </div>
-
-                  <div className="forecast-actions">
-                    <button 
-                      className="action-button"
-                      onClick={() => navigate(`/scenarios/${goal.goal_id}`)}
-                    >
-                      📈 Все сценарии
-                    </button>
-                    <button 
-                      className="action-button primary"
-                      onClick={() => navigate(`/forecast/${goal.goal_id}`)}
-                    >
-                      📊 Детальный прогноз
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div> */}
     </div>
   );
 }

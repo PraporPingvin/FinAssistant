@@ -1,6 +1,6 @@
-// src/components/Auth/ForgotPassword.jsx
 import React, { useState } from "react";
 import { resetPassword } from "../../api/auth";
+import { Mail, Lock, Eye, EyeOff, ArrowLeft, Key } from "lucide-react";
 import "./Auth.css";
 
 function ForgotPassword({ onBackToLogin }) {
@@ -11,6 +11,7 @@ function ForgotPassword({ onBackToLogin }) {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const validateForm = () => {
     if (!email.trim()) {
@@ -56,7 +57,6 @@ function ForgotPassword({ onBackToLogin }) {
       
       if (result.success) {
         setSuccess(true);
-        // Автоматически возвращаемся ко входу через 2 секунды
         setTimeout(() => {
           onBackToLogin();
         }, 2000);
@@ -72,9 +72,9 @@ function ForgotPassword({ onBackToLogin }) {
 
   if (success) {
     return (
-      <div className="auth-form">
-        <div className="success-message">
-          <div className="success-icon">✅</div>
+      <div className="authForm">
+        <div className="successMessage">
+          <div className="successIcon">✅</div>
           <h3>Пароль успешно изменен!</h3>
           <p>Теперь вы можете войти с новым паролем.</p>
           <p className="note">Перенаправление на страницу входа...</p>
@@ -84,13 +84,20 @@ function ForgotPassword({ onBackToLogin }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="auth-form">
-      <h2>Сброс пароля</h2>
+    <form onSubmit={handleSubmit} className="authForm">
+      <div className="authHeader">
+        <div className="authLogo">🔐</div>
+        <h2>Сброс пароля</h2>
+        <p>Введите email и новый пароль</p>
+      </div>
       
-      {error && <div className="auth-error">{error}</div>}
+      {error && <div className="authError">{error}</div>}
       
-      <div className="form-group">
-        <label htmlFor="email">Email</label>
+      <div className="formGroup">
+        <label htmlFor="email" className="formLabel">
+          <Mail size={16} />
+          Email
+        </label>
         <input
           id="email"
           type="email"
@@ -99,13 +106,17 @@ function ForgotPassword({ onBackToLogin }) {
           onChange={(e) => setEmail(e.target.value)}
           disabled={loading}
           autoComplete="email"
+          className="formInput"
           required
         />
       </div>
       
-      <div className="form-group">
-        <label htmlFor="newPassword">Новый пароль</label>
-        <div className="password-input-wrapper">
+      <div className="formGroup">
+        <label htmlFor="newPassword" className="formLabel">
+          <Key size={16} />
+          Новый пароль
+        </label>
+        <div className="passwordWrapper">
           <input
             id="newPassword"
             type={showPassword ? "text" : "password"}
@@ -114,55 +125,58 @@ function ForgotPassword({ onBackToLogin }) {
             onChange={(e) => setNewPassword(e.target.value)}
             disabled={loading}
             autoComplete="new-password"
+            className="formInput"
             required
           />
           <button
             type="button"
-            className="password-toggle"
+            className="passwordToggle"
             onClick={() => setShowPassword(!showPassword)}
             tabIndex="-1"
           >
-            {showPassword ? "👁️" : "👁️‍🗨️"}
+            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
         </div>
       </div>
       
-      <div className="form-group">
-        <label htmlFor="confirmPassword">Подтвердите пароль</label>
-        <div className="password-input-wrapper">
+      <div className="formGroup">
+        <label htmlFor="confirmPassword" className="formLabel">
+          <Lock size={16} />
+          Подтвердите пароль
+        </label>
+        <div className="passwordWrapper">
           <input
             id="confirmPassword"
-            type={showPassword ? "text" : "password"}
+            type={showConfirmPassword ? "text" : "password"}
             placeholder="••••••••"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             disabled={loading}
             autoComplete="new-password"
+            className="formInput"
             required
           />
+          <button
+            type="button"
+            className="passwordToggle"
+            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+            tabIndex="-1"
+          >
+            {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+          </button>
         </div>
       </div>
       
-      <p className="form-hint">
-        Пароль должен содержать не менее 6 символов
-      </p>
+      <p className="formHint">Пароль должен содержать не менее 6 символов</p>
       
-      <button 
-        type="submit" 
-        disabled={loading}
-        className="auth-button"
-      >
+      <button type="submit" disabled={loading} className="authButton">
         {loading ? "Сохранение..." : "Сбросить пароль"}
       </button>
       
-      <div className="auth-switch">
-        <button 
-          type="button" 
-          onClick={onBackToLogin} 
-          className="switch-button"
-          disabled={loading}
-        >
-          ← Вернуться ко входу
+      <div className="authSwitch">
+        <button type="button" onClick={onBackToLogin} className="backLink" disabled={loading}>
+          <ArrowLeft size={14} />
+          Вернуться ко входу
         </button>
       </div>
     </form>
