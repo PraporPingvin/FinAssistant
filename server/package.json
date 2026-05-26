@@ -8,7 +8,7 @@
     "dev": "nodemon index.js",
     "migrate": "node database/migrate.js",
     "seed": "node database/seed.js",
-    "setup-db": "npm run migrate && npm run seed"
+    "db:setup": "npm run migrate && npm run seed"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",

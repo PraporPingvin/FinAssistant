@@ -127,24 +127,29 @@ export async function deleteCheckpoint(checkpointId) {
 
 // ============ ПРОГНОЗЫ (FORECASTS) ============
 
-// Получить прогноз для цели
+// Получить прогноз (последний сохранённый)
 export async function getForecast(goalId) {
-  return apiClient.get(`/forecast/${goalId}`);
+    return apiClient.get(`/forecast/${goalId}`);
 }
 
-// Создать прогноз
-export async function createForecast(forecastData) {
-  return apiClient.post('/forecast', forecastData);
+// Рассчитать новый прогноз (без сохранения)
+export async function calculateForecast(goalId, scenarioId = null) {
+    return apiClient.post(`/forecast/calculate/${goalId}`, { scenarioId });
 }
 
-// Обновить прогноз
-export async function updateForecast(forecastId, forecastData) {
-  return apiClient.patch(`/forecast/${forecastId}`, forecastData);
+// Рассчитать и сохранить прогноз
+export async function createForecast(goalId, scenarioId = null) {
+    return apiClient.post(`/forecast/${goalId}`, { scenarioId });
+}
+
+// Сравнить прогнозы по разным сценариям
+export async function compareForecasts(goalId) {
+    return apiClient.get(`/forecast/compare/${goalId}`);
 }
 
 // Удалить прогноз
 export async function deleteForecast(forecastId) {
-  return apiClient.delete(`/forecast/${forecastId}`);
+    return apiClient.delete(`/forecast/${forecastId}`);
 }
 
 // ============ СТАТИСТИКА ============

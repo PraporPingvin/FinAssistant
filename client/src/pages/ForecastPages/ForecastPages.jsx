@@ -47,7 +47,6 @@ function ForecastPage() {
   const [timelineData, setTimelineData] = useState(null);
   const [comparisonData, setComparisonData] = useState(null);
   const [activeTab, setActiveTab] = useState("overview");
-  const [dataLoaded, setDataLoaded] = useState(false);
 
   // Загружаем список всех целей при монтировании
   useEffect(() => {
@@ -64,24 +63,19 @@ function ForecastPage() {
       setGoal(null);
       setScenarios([]);
       setForecast(null);
-      setDataLoaded(false);
     }
   }, [selectedGoalId]);
 
-  // Когда данные цели и сценарии загружены - рассчитываем прогноз
+  // Когда данные цели и сценарии загружены - загружаем или рассчитываем прогноз
   useEffect(() => {
-    if (dataLoaded && goal && scenarios.length > 0) {
-      console.log("🧮 Данные загружены, запускаем расчет прогноза");
-      calculateForecast();
-    } else if (dataLoaded && goal && scenarios.length === 0) {
-      console.log("⚠️ Цель загружена, но нет сценариев");
-      setCalculating(false);
+    if (goal && scenarios.length > 0) {
+      loadOrCalculateForecast();
     }
-  }, [dataLoaded, goal, scenarios]);
+  }, [goal, scenarios]);
 
   const loadAllGoals = async () => {
     try {
-      const goalsData = await getGoals(1); // userId = 1 для демо
+      const goalsData = await getGoals();
       console.log(`✅ Загружено ${goalsData.length} целей`);
       setAllGoals(goalsData);
     } catch (error) {
@@ -95,7 +89,6 @@ function ForecastPage() {
       setLoading(true);
       setError("");
       setForecast(null);
-      setDataLoaded(false);
 
       console.log(`🔄 Загружаем данные цели ID: ${id}`);
       
@@ -114,9 +107,6 @@ function ForecastPage() {
       const scenariosData = await getScenarios(id);
       console.log(`✅ Загружено ${scenariosData.length} сценариев`);
       setScenarios(scenariosData || []);
-      
-      // Помечаем, что все данные загружены
-      setDataLoaded(true);
 
     } catch (error) {
       console.error("❌ Ошибка загрузки данных:", error);
@@ -124,6 +114,110 @@ function ForecastPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Загрузка сохранённого прогноза или расчёт нового
+  const loadOrCalculateForecast = async () => {
+    if (!goal || scenarios.length === 0) return;
+    
+    setCalculating(true);
+    
+    try {
+      const token = localStorage.getItem('token');
+      
+      // Сначала пробуем получить сохранённый прогноз
+      const getResponse = await fetch(`http://localhost:5000/api/forecast/${goal.goal_id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      const getData = await getResponse.json();
+      
+      // Если есть сохранённый прогноз - используем его
+      if (getResponse.ok && getData && !getData.error) {
+        console.log("📦 Используем сохранённый прогноз");
+        
+        // Если прогноз сохранён в JSON формате
+        if (getData.detailed_forecast) {
+          setForecast(getData.detailed_forecast);
+          generateChartsFromForecast(getData.detailed_forecast);
+        } else {
+          // Если прогноз в простом формате, конвертируем
+          const convertedForecast = convertStoredForecast(getData);
+          setForecast(convertedForecast);
+          generateChartsFromForecast(convertedForecast);
+        }
+      } else {
+        // Нет сохранённого прогноза - рассчитываем новый через backend
+        console.log("🧮 Сохранённого прогноза нет, рассчитываем через backend...");
+        
+        const postResponse = await fetch(`http://localhost:5000/api/forecast/${goal.goal_id}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        const postData = await postResponse.json();
+        
+        if (postResponse.ok && postData.success) {
+          console.log("✅ Прогноз рассчитан backend-ом");
+          setForecast(postData.forecast);
+          generateChartsFromForecast(postData.forecast);
+        } else {
+          throw new Error(postData.error || "Ошибка расчёта прогноза");
+        }
+      }
+      
+    } catch (error) {
+      console.error("❌ Ошибка получения/расчёта прогноза:", error);
+      setError("Не удалось получить прогноз: " + error.message);
+    } finally {
+      setCalculating(false);
+    }
+  };
+
+  // Конвертация сохранённого прогноза из БД в формат для отображения
+  const convertStoredForecast = (storedForecast) => {
+    return {
+      goal: {
+        id: storedForecast.goal_id,
+        title: goal?.title,
+        current_amount: parseFloat(storedForecast.current_amount),
+        target_amount: parseFloat(storedForecast.target_amount),
+        remaining: parseFloat(storedForecast.target_amount) - parseFloat(storedForecast.current_amount)
+      },
+      optimalStrategy: storedForecast.remaining_months ? 
+        `Достижение через ${storedForecast.remaining_months} месяцев` : 
+        "Прогноз рассчитан",
+      summary: `При текущем прогрессе ${Math.round((parseFloat(storedForecast.current_amount) / parseFloat(storedForecast.target_amount)) * 100)}% ` +
+               `цель будет достигнута через ${storedForecast.remaining_months || '?'} месяцев`,
+      scenarios: scenarios.map(scenario => ({
+        name: scenario.name,
+        monthlyContribution: parseFloat(scenario.monthly_contribution),
+        expectedReturn: parseFloat(scenario.expected_return),
+        monthsToGoal: storedForecast.remaining_months || 12,
+        predictedDate: storedForecast.predicted_finish_date?.split('T')[0] || new Date().toISOString().split('T')[0],
+        finalAmount: parseFloat(storedForecast.target_amount),
+        confidence: 85,
+        risk: 'средний'
+      })),
+      recommendations: [],
+      risks: []
+    };
+  };
+
+  // Генерация графиков из полученного прогноза
+  const generateChartsFromForecast = (forecastData) => {
+    if (!forecastData || !forecastData.scenarios) return;
+    
+    // Генерация данных для графика динамики
+    generateTimelineData(forecastData.scenarios);
+    
+    // Генерация данных для сравнительной диаграммы
+    generateComparisonData(forecastData.scenarios);
   };
 
   const handleGoalSelect = (e) => {
@@ -138,199 +232,52 @@ function ForecastPage() {
     }
   };
 
-  /**
-   * ОСНОВНАЯ ЛОГИКА РАСЧЕТА ПРОГНОЗА
-   */
-  const calculateForecast = () => {
-    if (!goal) {
-      console.error("❌ Нет данных цели для расчета");
-      return;
-    }
+  // Принудительный пересчёт прогноза
+  const handleRecalculate = async () => {
+    if (!goal) return;
     
-    if (scenarios.length === 0) {
-      console.error("❌ Нет сценариев для расчета");
-      return;
-    }
-
-    console.log("🧮 Начинаем расчет прогноза...");
     setCalculating(true);
-
-    const today = new Date();
-    const currentAmount = parseFloat(goal.current_amount || 0);
-    const targetAmount = parseFloat(goal.target_amount);
     
-    console.log(`📊 Текущая сумма: ${currentAmount}, Целевая: ${targetAmount}`);
-
-    // Расчет для каждого сценария
-    const scenariosForecast = scenarios.map(scenario => {
-      const monthlyContribution = parseFloat(scenario.monthly_contribution);
-      const expectedReturn = parseFloat(scenario.expected_return) / 100; // годовая доходность
-      const monthlyReturn = expectedReturn / 12; // месячная доходность
+    try {
+      const token = localStorage.getItem('token');
       
-      let monthsToGoal = 0;
-      let runningAmount = currentAmount;
+      const response = await fetch(`http://localhost:5000/api/forecast/${goal.goal_id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
       
-      console.log(`  Расчет сценария "${scenario.name}": взнос ${monthlyContribution}, доходность ${expectedReturn*100}%`);
+      const data = await response.json();
       
-      // Симуляция по месяцам до достижения цели
-      while (runningAmount < targetAmount && monthsToGoal < 1200) {
-        // Добавляем ежемесячный взнос
-        runningAmount += monthlyContribution;
-        
-        // Начисляем проценты (сложный процент)
-        runningAmount *= (1 + monthlyReturn);
-        
-        monthsToGoal++;
-        
-        // Защита от бесконечного цикла
-        if (monthsToGoal > 1200) break;
+      if (response.ok && data.success) {
+        console.log("✅ Прогноз пересчитан");
+        setForecast(data.forecast);
+        generateChartsFromForecast(data.forecast);
+      } else {
+        throw new Error(data.error || "Ошибка пересчёта");
       }
       
-      // Прогнозируемая дата достижения
-      const predictedDate = new Date(today);
-      predictedDate.setMonth(predictedDate.getMonth() + monthsToGoal);
-      
-      // Уровень риска на основе доходности
-      let risk = 'средний';
-      if (expectedReturn > 0.15) risk = 'высокий';
-      else if (expectedReturn < 0.05) risk = 'низкий';
-      
-      // Уверенность в прогнозе
-      let confidence = 85;
-      if (monthsToGoal > 120) confidence -= 15; // >10 лет
-      else if (monthsToGoal > 60) confidence -= 5; // >5 лет
-      if (expectedReturn > 0.15) confidence -= 10; // высокорисковые
-
-      return {
-        id: scenario.scenario_id,
-        name: scenario.name,
-        monthlyContribution,
-        expectedReturn: expectedReturn * 100,
-        inflationRate: scenario.inflation_rate,
-        monthsToGoal,
-        predictedDate: predictedDate.toISOString().split('T')[0],
-        finalAmount: Math.round(runningAmount),
-        confidence: Math.max(50, Math.min(99, confidence)),
-        risk
-      };
-    });
-
-    console.log(`✅ Рассчитано ${scenariosForecast.length} сценариев`);
-
-    // Определение оптимальной стратегии (по скорости)
-    const optimalBySpeed = [...scenariosForecast].sort((a, b) => a.monthsToGoal - b.monthsToGoal)[0];
-    
-    // Генерация рекомендаций
-    const recommendations = generateRecommendations(goal, scenariosForecast);
-
-    // Анализ рисков
-    const risks = analyzeRisks(goal, scenariosForecast);
-
-    const forecastResult = {
-      scenarios: scenariosForecast,
-      optimalStrategy: optimalBySpeed.name,
-      recommendations,
-      risks,
-      summary: generateSummary(goal, optimalBySpeed, scenariosForecast)
-    };
-
-    console.log("📊 Прогноз рассчитан:", forecastResult);
-    setForecast(forecastResult);
-
-    // Генерация данных для графиков
-    generateTimelineData(scenariosForecast);
-    generateComparisonData(scenariosForecast);
-
-    setCalculating(false);
-  };
-
-  /**
-   * Генерация рекомендаций
-   */
-  const generateRecommendations = (goal, scenarios) => {
-    const recommendations = [];
-    const targetAmount = parseFloat(goal.target_amount);
-    
-    // Самая быстрая стратегия
-    const fastest = [...scenarios].sort((a, b) => a.monthsToGoal - b.monthsToGoal)[0];
-    recommendations.push({
-      text: `Самый быстрый способ: "${fastest.name}" достигнет цели через ${fastest.monthsToGoal} месяцев`,
-      impact: 'высокий',
-      savings: 0
-    });
-
-    // Самая надежная стратегия
-    const safest = [...scenarios].filter(s => s.risk === 'низкий')
-      .sort((a, b) => a.monthsToGoal - b.monthsToGoal)[0];
-    
-    if (safest) {
-      recommendations.push({
-        text: `Самый надежный вариант: "${safest.name}" с низким уровнем риска`,
-        impact: 'средний',
-        savings: 0
-      });
+    } catch (error) {
+      console.error("❌ Ошибка пересчёта:", error);
+      setError("Не удалось пересчитать прогноз: " + error.message);
+    } finally {
+      setCalculating(false);
     }
-
-    return recommendations;
-  };
-
-  /**
-   * Анализ рисков
-   */
-  const analyzeRisks = (goal, scenarios) => {
-    const risks = [];
-    
-    // Риск инфляции
-    risks.push({
-      factor: 'Инфляция',
-      probability: 85,
-      impact: 'Снижение покупательной способности накоплений'
-    });
-
-    // Риск длительного срока
-    const slowestMonths = Math.max(...scenarios.map(s => s.monthsToGoal));
-    if (slowestMonths > 120) {
-      risks.push({
-        factor: 'Длительный срок',
-        probability: 60,
-        impact: `Цель может быть не достигнута в течение ${Math.round(slowestMonths/12)} лет`
-      });
-    }
-
-    return risks;
-  };
-
-  /**
-   * Генерация резюме
-   */
-  const generateSummary = (goal, optimalScenario, allScenarios) => {
-    const targetAmount = parseFloat(goal.target_amount);
-    const currentAmount = parseFloat(goal.current_amount || 0);
-    const progress = Math.round((currentAmount / targetAmount) * 100);
-    
-    const fastestMonths = optimalScenario.monthsToGoal;
-    const fastestYears = Math.floor(fastestMonths / 12);
-    const fastestRemainingMonths = fastestMonths % 12;
-    
-    const timeText = fastestYears > 0 
-      ? `${fastestYears} г. ${fastestRemainingMonths} мес.` 
-      : `${fastestMonths} мес.`;
-
-    return `При текущем прогрессе ${progress}% и оптимальном сценарии "${optimalScenario.name}" цель будет достигнута через ${timeText}. ` +
-           `Рассмотрено ${allScenarios.length} различных стратегий.`;
   };
 
   /**
    * Генерация данных для графика динамики
    */
   const generateTimelineData = (scenariosForecast) => {
-    if (!goal || scenariosForecast.length === 0) return;
+    if (!goal || !scenariosForecast || scenariosForecast.length === 0) return;
 
     const today = new Date();
     const months = [];
-    const maxMonths = Math.max(...scenariosForecast.map(s => s.monthsToGoal)) + 6;
+    const maxMonths = Math.max(...scenariosForecast.map(s => s.monthsToGoal || 24)) + 6;
     
-    for (let i = 0; i <= maxMonths; i += 3) {
+    for (let i = 0; i <= Math.min(maxMonths, 120); i += 3) {
       const date = new Date(today);
       date.setMonth(date.getMonth() + i);
       months.push(date.toLocaleDateString('ru-RU', { month: 'short', year: 'numeric' }));
@@ -339,12 +286,13 @@ function ForecastPage() {
     const datasets = scenariosForecast.map(scenario => {
       const data = [];
       let currentAmount = parseFloat(goal.current_amount || 0);
-      const monthlyContribution = scenario.monthlyContribution;
-      const monthlyReturn = scenario.expectedReturn / 100 / 12;
+      const monthlyContribution = scenario.monthlyContribution || 0;
+      const monthlyReturn = (scenario.expectedReturn || 0) / 100 / 12;
 
-      for (let i = 0; i <= maxMonths; i += 3) {
+      for (let i = 0; i <= months.length - 1; i++) {
         let simulatedAmount = currentAmount;
-        for (let j = 0; j < i; j++) {
+        const monthsPassed = i * 3;
+        for (let j = 0; j < monthsPassed; j++) {
           simulatedAmount += monthlyContribution;
           simulatedAmount *= (1 + monthlyReturn);
         }
@@ -380,19 +328,21 @@ function ForecastPage() {
    * Генерация данных для сравнительной диаграммы
    */
   const generateComparisonData = (scenariosForecast) => {
+    if (!scenariosForecast || scenariosForecast.length === 0) return;
+    
     setComparisonData({
-      labels: scenariosForecast.map(s => s.name),
+      labels: scenariosForecast.map(s => s.name.length > 20 ? s.name.substring(0, 17) + '...' : s.name),
       datasets: [
         {
           label: 'Срок достижения (мес.)',
-          data: scenariosForecast.map(s => s.monthsToGoal),
+          data: scenariosForecast.map(s => s.monthsToGoal || 0),
           backgroundColor: 'rgba(33, 150, 243, 0.7)',
           borderColor: '#1976d2',
           borderWidth: 1
         },
         {
           label: 'Уверенность (%)',
-          data: scenariosForecast.map(s => s.confidence),
+          data: scenariosForecast.map(s => s.confidence || 80),
           backgroundColor: 'rgba(76, 175, 80, 0.7)',
           borderColor: '#388e3c',
           borderWidth: 1
@@ -524,6 +474,13 @@ function ForecastPage() {
           </div>
         </div>
 
+        {/* Ошибка */}
+        {error && (
+          <div className="errorMessage">
+            <strong>❌ Ошибка:</strong> {error}
+          </div>
+        )}
+
         {/* Если цель не выбрана - показываем список целей */}
         {!selectedGoalId && allGoals.length > 0 && (
           <div className="goalsFlex">
@@ -581,7 +538,7 @@ function ForecastPage() {
         {selectedGoalId && calculating && (
           <div className="loadingContainer">
             <div className="loadingAnimation"></div>
-            <p>🧮 Выполняем математические расчеты...</p>
+            <p>🧮 Выполняем математические расчеты на сервере...</p>
           </div>
         )}
 
@@ -650,14 +607,14 @@ function ForecastPage() {
                   <div className="summaryIcon">📊</div>
                   <div className="summaryText">
                     <h3>Резюме прогноза</h3>
-                    <p>{forecast.summary}</p>
+                    <p>{forecast.summary || `Прогноз рассчитан на основе ${scenarios.length} сценариев`}</p>
                   </div>
                 </div>
 
                 <div className="optimalStrategyCard">
                   <h3>🎯 Оптимальная стратегия</h3>
                   <div className="optimalStrategyContent">
-                    <div className="strategyName">{forecast.optimalStrategy}</div>
+                    <div className="strategyName">{forecast.optimalStrategy || forecast.scenarios?.[0]?.name || "Рекомендуемый план"}</div>
                     <div className="strategyDetails">
                       {forecast.scenarios?.find(s => s.name === forecast.optimalStrategy) && (
                         <>
@@ -695,8 +652,8 @@ function ForecastPage() {
             {activeTab === 'scenarios' && (
               <div className="tabContent">
                 <div className="scenariosGrid">
-                  {forecast.scenarios?.map(scenario => (
-                    <div key={scenario.name} className="scenarioDetailCard">
+                  {forecast.scenarios?.map((scenario, idx) => (
+                    <div key={idx} className="scenarioDetailCard">
                       <div className="scenarioDetailHeader">
                         <h3>{scenario.name}</h3>
                         {scenario.name === forecast.optimalStrategy && (
@@ -731,8 +688,9 @@ function ForecastPage() {
                       </div>
                       
                       <div className="scenarioRisk">
-                        <span className={`riskIndicator ${scenario.risk}`}>
-                          {scenario.risk === 'низкий' ? '🟢' : scenario.risk === 'средний' ? '🟡' : '🔴'} Риск: {scenario.risk}
+                        <span className={`riskIndicator ${scenario.risk || 'средний'}`}>
+                          {scenario.risk === 'низкий' ? '🟢' : scenario.risk === 'средний' ? '🟡' : '🔴'} 
+                          Риск: {scenario.risk || 'средний'}
                         </span>
                       </div>
                     </div>
@@ -754,7 +712,7 @@ function ForecastPage() {
                 <div className="comparisonTable">
                   <h3>📋 Детальное сравнение</h3>
                   <div className="tableContainer">
-                    <table>
+                    <table className="comparisonTableElement">
                       <thead>
                         <tr>
                           <th>Сценарий</th>
@@ -766,21 +724,21 @@ function ForecastPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {forecast.scenarios?.map(scenario => (
-                          <tr key={scenario.name} className={scenario.name === forecast.optimalStrategy ? 'optimalRow' : ''}>
+                        {forecast.scenarios?.map((scenario, idx) => (
+                          <tr key={idx} className={scenario.name === forecast.optimalStrategy ? 'optimalRow' : ''}>
                             <td><strong>{scenario.name}</strong></td>
                             <td>{scenario.monthsToGoal}</td>
                             <td>{formatDate(scenario.predictedDate)}</td>
                             <td className="amount">{formatCurrency(scenario.finalAmount)}</td>
                             <td>
                               <div className="confidenceBar">
-                                <div className="confidenceFill" style={{ width: `${scenario.confidence}%` }} />
-                                <span>{scenario.confidence}%</span>
+                                <div className="confidenceFill" style={{ width: `${scenario.confidence || 85}%` }} />
+                                <span>{scenario.confidence || 85}%</span>
                               </div>
                             </td>
                             <td>
-                              <span className={`riskBadge ${scenario.risk}`}>
-                                {scenario.risk}
+                              <span className={`riskBadge ${scenario.risk || 'средний'}`}>
+                                {scenario.risk || 'средний'}
                               </span>
                             </td>
                           </tr>
@@ -792,15 +750,16 @@ function ForecastPage() {
               </div>
             )}
 
-            {/* Кнопка пересчета
+            {/* Кнопка пересчета */}
             <div className="recalculateButton">
               <button
-                onClick={calculateForecast}
+                onClick={handleRecalculate}
                 className="actionButton secondaryButton"
+                disabled={calculating}
               >
-                🔄 Пересчитать прогноз
+                {calculating ? '🔄 Пересчёт...' : '🔄 Пересчитать прогноз'}
               </button>
-            </div> */}
+            </div>
           </>
         )}
       </div>

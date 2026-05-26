@@ -63,21 +63,6 @@ CREATE TABLE forecasts (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Таблица контрольных точек
--- CREATE TABLE checkpoints (
---     checkpoint_id SERIAL PRIMARY KEY,
---     goal_id INTEGER REFERENCES goals(goal_id) ON DELETE CASCADE,
---     checkpoint_date DATE NOT NULL,
---     expected_amount DECIMAL(15,2) NOT NULL,
---     actual_amount DECIMAL(15,2),
---     status VARCHAR(50) DEFAULT 'pending',
---     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
--- );
-
-/*
-DROP TABLE IF EXISTS checkpoints CASCADE;
-*/
-
 CREATE TABLE checkpoints (
     checkpoint_id SERIAL PRIMARY KEY,
     goal_id INTEGER REFERENCES goals(goal_id) ON DELETE CASCADE,
@@ -102,14 +87,3 @@ CREATE INDEX idx_scenarios_goal_id ON scenarios(goal_id);
 CREATE INDEX idx_payments_goal_id ON payments(goal_id);
 CREATE INDEX idx_forecasts_goal_id ON forecasts(goal_id);
 CREATE INDEX idx_checkpoints_goal_id ON checkpoints(goal_id);
-
--- Тестовые данные (опционально)
-INSERT INTO users (email, password_hash, first_name, last_name) 
-VALUES ('demo@example.com', 'hashed_password', 'Иван', 'Иванов');
-
-INSERT INTO goals (user_id, title, target_amount, current_amount, initial_amount, monthly_contribution, start_date, status)
-VALUES 
-(1, 'Накопить на машину', 1000000, 250000, 100000, 15000, '2024-01-01', 'active'),
-(1, 'Отпуск на Бали', 300000, 120000, 50000, 10000, '2024-02-01', 'active');
-
-COMMIT;

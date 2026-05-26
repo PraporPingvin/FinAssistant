@@ -160,7 +160,6 @@ function Dashboard() {
           <>
             <div className="goalsTitle">
               Ваши цели
-              <span className="goalCount">{goals.length}</span>
             </div>
             <div className="goalsGrid">
               {goals.map(goal => (

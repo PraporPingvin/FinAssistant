@@ -1,367 +1,270 @@
-/* GoalDetailCard.css - стили для детальной карточки цели */
-
 :root {
   --primary-dark: #495631;
   --primary-accent: #EAED74;
   --primary-light: #EFF2DD;
-  --card-bg: #FFFFFF;
-  --border-color: #DDE0C5;
-  --text-muted: #717959;
-  --text-dark: #3A3F29;
-  --danger-color: #f44336;
-  --success-color: #4caf50;
-  --input-border: #DDE0C5;
-  --input-focus: #EAED74;
+
+  --card-bg: rgba(255, 255, 255, 0.72);
+  --border-color: rgba(73, 86, 49, 0.08);
+
+  --text-main: #495631;
+  --text-muted: #7B8465;
+
+  --danger-color: #E35D5D;
+
+  --shadow-sm: 0 8px 24px rgba(73, 86, 49, 0.06);
+  --shadow-lg: 0 18px 40px rgba(73, 86, 49, 0.12);
+
+  --radius-xl: 30px;
+  --radius-lg: 22px;
+  --radius-md: 16px;
+
+  --transition: all 0.28s ease;
 }
 
-.goal-detail-card {
-  background: white;
-  border-radius: 20px;
-  padding: 30px;
-  box-shadow: 0 10px 30px rgba(73, 86, 49, 0.08);
-  border: 1px solid #DDE0C5;
-  animation: slideIn 0.5s ease;
+/* FORM */
+
+.goalForm {
+  width: 100%;
+  max-width: 760px;
+
+  margin: 0 auto;
+
+  padding: 42px;
+
+  border-radius: var(--radius-xl);
+
+  background: var(--card-bg);
+  backdrop-filter: blur(18px);
+
+  border: 1px solid var(--border-color);
+
+  box-shadow: var(--shadow-sm);
+
+  animation: fadeUp 0.45s ease;
 }
 
-@keyframes slideIn {
+@keyframes fadeUp {
   from {
     opacity: 0;
-    transform: translateX(-20px);
+    transform: translateY(18px);
   }
+
   to {
     opacity: 1;
-    transform: translateX(0);
+    transform: translateY(0);
   }
 }
 
-/* Прогресс бар */
-.progress-container {
-  margin-bottom: 35px;
-  padding: 20px;
-  background: linear-gradient(135deg, #EFF2DD, #ffffff);
-  border-radius: 16px;
-}
+/* TITLE */
 
-.progress-bar {
-  height: 12px;
-  background: #DDE0C5;
-  border-radius: 6px;
-  margin: 15px 0 10px;
-  overflow: hidden;
-  position: relative;
-}
+.formTitle {
+  margin: 0 0 36px;
 
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #EAED74, #495631);
-  border-radius: 6px;
-  transition: width 1s cubic-bezier(0.22, 0.61, 0.36, 1);
-  position: relative;
-}
+  color: var(--text-main);
 
-.progress-fill::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: 20px;
-  background: rgba(255, 255, 255, 0.3);
-  transform: skewX(-20deg);
-  animation: shimmer 2s infinite;
-}
-
-@keyframes shimmer {
-  0% { transform: translateX(-100%) skewX(-20deg); }
-  100% { transform: translateX(500%) skewX(-20deg); }
-}
-
-.progress-text {
-  display: flex;
-  justify-content: space-between;
-  font-size: 1rem;
-  color: #717959;
+  font-size: clamp(2rem, 3vw, 2.6rem);
   font-weight: 300;
+
+  letter-spacing: -1px;
+  line-height: 1.1;
 }
 
-.progress-percent {
-  color: #495631;
-  font-weight: 500;
-  font-size: 1.2rem;
+/* FIELD */
+
+.formField {
+  margin-bottom: 28px;
 }
 
-/* Горизонтальное расположение деталей */
-.details-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  margin-top: 30px;
-  justify-content: space-between;
+/* GRID */
+
+.formRow {
+  display: grid;
+
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+
+  gap: 22px;
+
+  margin-bottom: 28px;
 }
 
-/* Элемент детали */
-.detail-item {
-  flex: 1 1 180px;
-  margin-bottom: 0;
-  padding: 20px;
-  background: #f8faf5;
-  border-radius: 12px;
-  transition: all 0.3s ease;
-  border: 1px solid transparent;
-  min-width: 160px;
-}
-
-.detail-item:hover {
-  border-color: #EAED74;
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(73, 86, 49, 0.05);
-}
-
-.detail-label {
-  display: block;
-  font-size: 0.9rem;
-  color: #717959;
-  margin-bottom: 8px;
-  font-weight: 300;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.detail-value {
-  font-size: 1.2rem;
-  font-weight: 400;
-  color: #495631;
-  line-height: 1.4;
-}
-
-.detail-value small {
-  font-size: 0.9rem;
-  color: #8f9b7c;
-  margin-left: 5px;
-}
-
-/* Бейдж статуса */
-.status-badge {
-  display: inline-block;
-  padding: 8px 20px;
-  border-radius: 30px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-}
-
-.status-active {
-  background: linear-gradient(135deg, rgba(234, 237, 116, 0.3), rgba(234, 237, 116, 0.1));
-  color: #495631;
-  border: 1px solid #EAED74;
-}
-
-.status-completed {
-  background: linear-gradient(135deg, rgba(73, 86, 49, 0.1), rgba(73, 86, 49, 0.05));
-  color: #495631;
-  border: 1px solid #495631;
-}
-
-.status-paused {
-  background: linear-gradient(135deg, rgba(255, 152, 0, 0.1), rgba(255, 152, 0, 0.05));
-  color: #ff9800;
-  border: 1px solid #ff9800;
-}
-
-/* Форма редактирования */
-.edit-form {
-  background: white;
-  padding: 30px;
-  border-radius: 16px;
-}
-
-/* Горизонтальное расположение полей формы */
-.form-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  margin-top: 20px;
-}
-
-.form-group {
-  flex: 1 1 200px;
-  min-width: 180px;
-}
-
-.form-label {
-  display: block;
-  font-size: 0.9rem;
-  color: #717959;
-  margin-bottom: 8px;
-  font-weight: 400;
-}
-
-.form-input {
+.formColumn {
   width: 100%;
-  padding: 12px 16px;
-  border: 2px solid #DDE0C5;
-  border-radius: 10px;
+}
+
+/* LABEL */
+
+.formLabel {
+  display: block;
+
+  margin-bottom: 10px;
+
+  color: var(--text-muted);
+
+  font-size: 0.9rem;
+  font-weight: 500;
+
+  letter-spacing: 0.2px;
+}
+
+.required {
+  color: var(--danger-color);
+}
+
+/* INPUT */
+
+.formInput {
+  width: 100%;
+
+  padding: 16px 18px;
+
+  border-radius: 18px;
+
+  border: 1px solid rgba(73, 86, 49, 0.08);
+
+  background: rgba(255, 255, 255, 0.75);
+
+  color: var(--text-main);
+
   font-size: 1rem;
-  font-weight: 300;
-  color: #495631;
-  background: white;
-  transition: all 0.3s ease;
+  font-weight: 500;
+
+  transition: var(--transition);
+
   box-sizing: border-box;
 }
 
-.form-input:focus {
+.formInput::placeholder {
+  color: rgba(73, 86, 49, 0.35);
+}
+
+.formInput:hover {
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.formInput:focus {
   outline: none;
-  border-color: #EAED74;
-  box-shadow: 0 0 0 4px rgba(234, 237, 116, 0.2);
+
+  border-color: rgba(234, 237, 116, 0.8);
+
+  box-shadow:
+    0 0 0 4px rgba(234, 237, 116, 0.18);
 }
 
-.form-input:hover {
-  border-color: #b8c09c;
+/* ERROR */
+
+.formInputError {
+  border-color: rgba(227, 93, 93, 0.5);
 }
 
-.form-select {
-  width: 100%;
-  padding: 12px 16px;
-  border: 2px solid #DDE0C5;
-  border-radius: 10px;
-  font-size: 1rem;
-  font-weight: 300;
-  color: #495631;
-  background: white;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-sizing: border-box;
-  appearance: none;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23495631' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-  background-repeat: no-repeat;
-  background-position: right 15px center;
-  background-size: 15px;
+.formInputError:focus {
+  box-shadow:
+    0 0 0 4px rgba(227, 93, 93, 0.12);
 }
 
-.form-select:focus {
-  outline: none;
-  border-color: #EAED74;
-  box-shadow: 0 0 0 4px rgba(234, 237, 116, 0.2);
+.formError {
+  margin-top: 8px;
+
+  color: var(--danger-color);
+
+  font-size: 0.82rem;
+  font-weight: 500;
 }
 
-/* Горизонтальное расположение кнопок */
-.edit-buttons {
+/* CURRENCY PREVIEW */
+
+.currencyPreview {
+  margin-top: 10px;
+
+  color: var(--text-muted);
+
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+
+/* BUTTONS */
+
+.formButtons {
   display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
   justify-content: flex-end;
-  margin-top: 35px;
-  padding-top: 25px;
-  border-top: 2px solid #DDE0C5;
+
+  gap: 14px;
+
+  margin-top: 40px;
 }
 
-.edit-button {
-  flex: 0 1 auto;
-  padding: 12px 28px;
+/* BUTTON */
+
+.formButton {
+  padding: 15px 26px;
+
   border: none;
-  border-radius: 12px;
+  border-radius: 999px;
+
   cursor: pointer;
-  font-size: 1rem;
-  font-weight: 400;
-  transition: all 0.3s ease;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 120px;
-  position: relative;
-  overflow: hidden;
-  white-space: nowrap;
+
+  font-size: 0.95rem;
+  font-weight: 600;
+
+  transition: var(--transition);
 }
 
-.edit-button::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
-  transform: translate(-50%, -50%);
-  transition: width 0.5s, height 0.5s;
+/* SUBMIT */
+
+.submitButton {
+  background: var(--primary-dark);
+
+  color: var(--primary-accent);
+
+  box-shadow: var(--shadow-sm);
 }
 
-.edit-button:hover::before {
-  width: 200px;
-  height: 200px;
+.submitButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+
+  background: var(--primary-accent);
+  color: var(--primary-dark);
+
+  box-shadow: var(--shadow-lg);
 }
 
-.save-button {
-  background: linear-gradient(135deg, #495631, #5a6b3d);
-  color: #EAED74;
+/* CANCEL */
+
+.cancelButton {
+  background: rgba(73, 86, 49, 0.06);
+
+  color: var(--text-main);
 }
 
-.save-button:hover {
-  background: linear-gradient(135deg, #EAED74, #d4d95e);
-  color: #495631;
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(73, 86, 49, 0.2);
+.cancelButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+
+  background: rgba(73, 86, 49, 0.12);
 }
 
-.cancel-button {
-  background: transparent;
-  color: #495631;
-  border: 2px solid #DDE0C5;
+/* DISABLED */
+
+.formButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
 }
 
-.cancel-button:hover {
-  background: #EFF2DD;
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-}
+/* MOBILE */
 
-/* Валюта */
-.currency {
-  color: #495631;
-  margin-left: 3px;
-  font-weight: 400;
-}
-
-/* Адаптивность */
 @media (max-width: 768px) {
-  .details-grid {
-    flex-direction: column;
+  .goalForm {
+    padding: 28px 22px;
   }
-  
-  .detail-item {
-    width: 100%;
-  }
-  
-  .form-grid {
-    flex-direction: column;
-  }
-  
-  .form-group {
-    width: 100%;
-  }
-}
 
-@media (max-width: 480px) {
-  .goal-detail-card {
-    padding: 20px;
-  }
-  
-  .edit-buttons {
+  .formButtons {
     flex-direction: column;
   }
-  
-  .edit-button {
+
+  .formButton {
     width: 100%;
-    min-width: 0;
-    white-space: normal;
   }
-  
-  .detail-value {
-    font-size: 1rem;
-  }
-  
-  .progress-container {
-    padding: 15px;
+
+  .formTitle {
+    margin-bottom: 28px;
   }
 }
