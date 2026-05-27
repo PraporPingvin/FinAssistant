@@ -9,6 +9,7 @@ const { authenticateToken } = require('../middleware/auth');
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'finroad_secret_key_2024';
 
+
 // Регистрация
 router.post('/register', validateRegistration, async (req, res) => {
     try {
