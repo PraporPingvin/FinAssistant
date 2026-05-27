@@ -12,54 +12,54 @@ class ForecastService {
                 'SELECT * FROM goals WHERE goal_id = $1 AND user_id = $2',
                 [goalId, userId]
             );
-            
+
             if (goalResult.rows.length === 0) {
                 throw new Error('Цель не найдена');
             }
-            
+
             const goal = goalResult.rows[0];
             console.log(`✅ Цель: ${goal.title}, сумма: ${goal.current_amount}/${goal.target_amount}`);
-            
+
             // 2. Получаем сценарии
             const scenariosResult = await pool.query(
                 'SELECT * FROM scenarios WHERE goal_id = $1',
                 [goalId]
             );
-            
+
             const scenarios = scenariosResult.rows;
             console.log(`📋 Найдено сценариев: ${scenarios.length}`);
-            
+
             if (scenarios.length === 0) {
                 throw new Error('Нет сценариев для расчёта прогноза');
             }
-            
+
             const currentAmount = parseFloat(goal.current_amount || 0);
             const targetAmount = parseFloat(goal.target_amount);
-            
+
             // 3. Рассчитываем прогноз для каждого сценария
             const scenariosForecast = [];
             let optimalScenario = null;
             let fastestMonths = Infinity;
-            
+
             for (const scenario of scenarios) {
                 const monthlyContribution = parseFloat(scenario.monthly_contribution);
                 const expectedReturn = parseFloat(scenario.expected_return || 0) / 100;
                 const monthlyReturn = expectedReturn / 12;
-                
+
                 let balance = currentAmount;
                 let months = 0;
-                
-                console.log(`  🔄 Сценарий "${scenario.name}": взнос ${monthlyContribution}, доходность ${expectedReturn*100}%`);
-                
+
+                console.log(`  🔄 Сценарий "${scenario.name}": взнос ${monthlyContribution}, доходность ${expectedReturn * 100}%`);
+
                 while (balance < targetAmount && months < 1200) {
                     balance += monthlyContribution;
                     balance *= (1 + monthlyReturn);
                     months++;
                 }
-                
+
                 const predictedDate = new Date();
                 predictedDate.setMonth(predictedDate.getMonth() + months);
-                
+
                 const forecastItem = {
                     id: scenario.scenario_id,
                     name: scenario.name,
@@ -71,15 +71,15 @@ class ForecastService {
                     confidence: months < 60 ? 85 : (months < 120 ? 70 : 50),
                     risk: expectedReturn > 0.1 ? 'высокий' : (expectedReturn < 0.04 ? 'низкий' : 'средний')
                 };
-                
+
                 scenariosForecast.push(forecastItem);
-                
+
                 if (months < fastestMonths) {
                     fastestMonths = months;
                     optimalScenario = forecastItem;
                 }
             }
-            
+
             // 4. Формируем результат
             const result = {
                 goal: {
@@ -93,14 +93,14 @@ class ForecastService {
                 scenarios: scenariosForecast,
                 optimalStrategy: optimalScenario ? optimalScenario.name : null,
                 summary: `При текущем прогрессе ${Math.round((currentAmount / targetAmount) * 100)}% ` +
-                         `и оптимальном сценарии "${optimalScenario?.name || 'не выбран'}" ` +
-                         `цель будет достигнута через ${optimalScenario?.monthsToGoal || '?'} месяцев. ` +
-                         `Рассмотрено ${scenariosForecast.length} различных стратегий.`,
+                    `и оптимальном сценарии "${optimalScenario?.name || 'не выбран'}" ` +
+                    `цель будет достигнута через ${optimalScenario?.monthsToGoal || '?'} месяцев. ` +
+                    `Рассмотрено ${scenariosForecast.length} различных стратегий.`,
                 calculated_at: new Date().toISOString()
             };
-            
+
             console.log(`✅ Прогноз рассчитан, оптимальный сценарий: ${optimalScenario?.name} (${optimalScenario?.monthsToGoal} мес.)`);
-            
+
             // 5. Пытаемся сохранить (без monthly_contribution)
             try {
                 await this.saveForecast(goalId, userId, result);
@@ -108,35 +108,35 @@ class ForecastService {
             } catch (saveError) {
                 console.warn(`⚠️ Не удалось сохранить прогноз: ${saveError.message}`);
             }
-            
+
             return result;
-            
+
         } catch (error) {
             console.error('❌ Ошибка расчёта прогноза:', error);
             throw error;
         }
     }
-    
+
     async saveForecast(goalId, userId, calculation) {
         try {
             const forecastDate = new Date().toISOString().split('T')[0];
-            const optimalMonths = calculation.optimalStrategy ? 
+            const optimalMonths = calculation.optimalStrategy ?
                 calculation.scenarios.find(s => s.name === calculation.optimalStrategy)?.monthsToGoal : null;
-            const predictedDate = optimalMonths ? 
+            const predictedDate = optimalMonths ?
                 calculation.scenarios.find(s => s.name === calculation.optimalStrategy)?.predictedDate : null;
-            
+
             // Проверяем существование колонок
             const tableCheck = await pool.query(`
                 SELECT column_name 
                 FROM information_schema.columns 
                 WHERE table_name = 'forecasts' AND column_name IN ('forecast_id', 'goal_id')
             `);
-            
+
             if (tableCheck.rows.length === 0) {
                 console.warn('⚠️ Таблица forecasts не найдена, пропускаем сохранение');
                 return null;
             }
-            
+
             // Сохраняем только существующие колонки (без monthly_contribution)
             const result = await pool.query(
                 `INSERT INTO forecasts 
@@ -153,33 +153,49 @@ class ForecastService {
                     calculation.goal.target_amount
                 ]
             );
-            
+
             return result.rows[0];
-            
+
         } catch (error) {
             console.error('Ошибка сохранения прогноза:', error.message);
             return null;
         }
     }
-    
+
+    // server/services/forecast.service.js
+
     async getLastForecast(goalId, userId) {
         try {
-            const result = await pool.query(
-                `SELECT * FROM forecasts 
-                 WHERE goal_id = $1 
-                 ORDER BY created_at DESC 
-                 LIMIT 1`,
-                [goalId]
+            // Сначала проверяем, что цель принадлежит пользователю
+            const goalCheck = await pool.query(
+                'SELECT goal_id FROM goals WHERE goal_id = $1 AND user_id = $2',
+                [goalId, userId]
             );
-            
-            if (result.rows.length === 0) {
+
+            if (goalCheck.rows.length === 0) {
+                console.log(`⚠️ Цель ${goalId} не найдена или не принадлежит пользователю ${userId}`);
                 return null;
             }
-            
+
+            // Получаем последний прогноз
+            const result = await pool.query(
+                `SELECT * FROM forecasts 
+             WHERE goal_id = $1 
+             ORDER BY created_at DESC 
+             LIMIT 1`,
+                [goalId]
+            );
+
+            if (result.rows.length === 0) {
+                console.log(`📊 Прогноз для цели ${goalId} не найден`);
+                return null;
+            }
+
+            console.log(`✅ Прогноз для цели ${goalId} получен`);
             return result.rows[0];
-            
+
         } catch (error) {
-            console.error('Ошибка получения прогноза:', error);
+            console.error('❌ Ошибка получения прогноза:', error);
             return null;
         }
     }
