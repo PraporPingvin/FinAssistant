@@ -128,7 +128,7 @@ function ForecastPage() {
     try {
       const token = localStorage.getItem("token");
 
-      const getResponse = await fetch(`http://localhost:5000/api/forecast/${goal.goal_id}`, {
+      const getResponse = await fetch(`/api/forecast/${goal.goal_id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -146,7 +146,7 @@ function ForecastPage() {
           generateChartsFromForecast(convertedForecast);
         }
       } else {
-        const postResponse = await fetch(`http://localhost:5000/api/forecast/${goal.goal_id}`, {
+        const postResponse = await fetch(`/api/forecast/${goal.goal_id}`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -322,7 +322,7 @@ function ForecastPage() {
 
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:5000/api/forecast/${goal.goal_id}`, {
+      const response = await fetch(`/api/forecast/${goal.goal_id}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
