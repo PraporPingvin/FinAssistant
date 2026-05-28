@@ -132,61 +132,117 @@ function GoalDetailPage() {
   };
 
   const calculations = useMemo(() => {
-    if (!goal) {
-      return {
-        currentAmount: 0,
-        targetAmount: 0,
-        remainingAmount: 0,
-        progress: 0,
-        estimatedMonths: null,
-      };
-    }
-
-    const currentAmount = Number(
-      goal.current_amount || 0
-    );
-
-    const targetAmount = Number(
-      goal.target_amount || 0
-    );
-
-    const monthlyContribution =
-      Number(
-        goal.monthly_contribution || 0
-      );
-
-    const remainingAmount = Math.max(
-      0,
-      targetAmount - currentAmount
-    );
-
-    const progress = targetAmount
-      ? Math.min(
-          100,
-          Math.round(
-            (currentAmount /
-              targetAmount) *
-              100
-          )
-        )
-      : 0;
-
-    const estimatedMonths =
-      monthlyContribution > 0
-        ? Math.ceil(
-            remainingAmount /
-              monthlyContribution
-          )
-        : null;
-
+  if (!goal) {
     return {
-      currentAmount,
-      targetAmount,
-      remainingAmount,
-      progress,
-      estimatedMonths,
+      currentAmount: 0,
+      targetAmount: 0,
+      remainingAmount: 0,
+      progress: 0,
+      estimatedTime: null,
+      estimatedTimeUnit: null,
     };
-  }, [goal]);
+  }
+
+  const currentAmount = Number(goal.current_amount || 0);
+  const targetAmount = Number(goal.target_amount || 0);
+  const monthlyContribution = Number(goal.monthly_contribution || 0);
+  const remainingAmount = Math.max(0, targetAmount - currentAmount);
+
+  const progress = targetAmount
+    ? Math.min(100, Math.round((currentAmount / targetAmount) * 100))
+    : 0;
+
+  let estimatedTime = null;
+  let estimatedTimeUnit = null;
+
+  // ✅ ЕСЛИ ЕСТЬ ДЕДЛАЙН - ИСПОЛЬЗУЕМ ЕГО
+  if (goal.deadline_date) {
+    const deadline = new Date(goal.deadline_date);
+    const today = new Date();
+    
+    today.setHours(0, 0, 0, 0);
+    deadline.setHours(0, 0, 0, 0);
+    
+    const diffDays = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
+    
+    if (diffDays > 0) {
+      if (diffDays < 30) {
+        estimatedTime = diffDays;
+        estimatedTimeUnit = getDayWord(diffDays);
+      } else {
+        const months = Math.floor(diffDays / 30);
+        const days = diffDays % 30;
+        
+        if (days === 0) {
+          estimatedTime = `${months} ${getMonthWord(months)}`;
+          estimatedTimeUnit = "";
+        } else {
+          estimatedTime = `${months} ${getMonthWord(months)} ${days} ${getDayWord(days)}`;
+          estimatedTimeUnit = "";
+        }
+      }
+    } else if (diffDays === 0) {
+      estimatedTime = "Сегодня";
+      estimatedTimeUnit = "";
+    } else {
+      estimatedTime = "Просрочена";
+      estimatedTimeUnit = "";
+    }
+  } 
+  // ✅ ЕСЛИ ДЕДЛАЙНА НЕТ, НО ЕСТЬ ЕЖЕМЕСЯЧНЫЙ ВЗНОС
+  else if (monthlyContribution > 0 && remainingAmount > 0) {
+    const monthsNeeded = remainingAmount / monthlyContribution;
+    
+    if (monthsNeeded < 1) {
+      const daysNeeded = Math.ceil(monthsNeeded * 30);
+      estimatedTime = daysNeeded;
+      estimatedTimeUnit = getDayWord(daysNeeded);
+    } else {
+      const fullMonths = Math.floor(monthsNeeded);
+      const remainingDays = Math.ceil((monthsNeeded - fullMonths) * 30);
+      
+      if (remainingDays === 0) {
+        estimatedTime = `${fullMonths} ${getMonthWord(fullMonths)}`;
+        estimatedTimeUnit = "";
+      } else {
+        estimatedTime = `${fullMonths} ${getMonthWord(fullMonths)} ${remainingDays} ${getDayWord(remainingDays)}`;
+        estimatedTimeUnit = "";
+      }
+    }
+  } 
+  else {
+    estimatedTime = "—";
+    estimatedTimeUnit = "";
+  }
+
+  return {
+    currentAmount,
+    targetAmount,
+    remainingAmount,
+    progress,
+    estimatedTime,
+    estimatedTimeUnit,
+  };
+}, [goal]);
+
+// Вспомогательные функции (разместите их ПЕРЕД компонентом GoalDetailPage)
+function getDayWord(days) {
+  if (days % 10 === 1 && days % 100 !== 11) return "день";
+  if (days % 10 >= 2 && days % 10 <= 4 && (days % 100 < 10 || days % 100 >= 20)) return "дня";
+  return "дней";
+}
+
+function getMonthWord(months) {
+  if (months % 10 === 1 && months % 100 !== 11) return "месяц";
+  if (months % 10 >= 2 && months % 10 <= 4 && (months % 100 < 10 || months % 100 >= 20)) return "месяца";
+  return "месяцев";
+}
+
+function getYearWord(years) {
+  if (years % 10 === 1 && years % 100 !== 11) return "год";
+  if (years % 10 >= 2 && years % 10 <= 4 && (years % 100 < 10 || years % 100 >= 20)) return "года";
+  return "лет";
+}
 
   if (loading) {
     return (
@@ -386,11 +442,12 @@ function GoalDetailPage() {
                 <div className="statLabel">
                   Примерный срок
                 </div>
-
                 <div className="statValue">
-                  {calculations.estimatedMonths
-                    ? `${calculations.estimatedMonths} мес.`
-                    : "—"}
+                  {calculations.estimatedTime ? (
+                    <>
+                      {calculations.estimatedTime} {calculations.estimatedTimeUnit}
+                    </>
+                  ) : "—"}
                 </div>
               </div>
 
@@ -447,8 +504,8 @@ function GoalDetailPage() {
               <div className="infoValue">
                 {goal.deadline_date
                   ? formatDate(
-                      goal.deadline_date
-                    )
+                    goal.deadline_date
+                  )
                   : "Не установлен"}
               </div>
             </div>
