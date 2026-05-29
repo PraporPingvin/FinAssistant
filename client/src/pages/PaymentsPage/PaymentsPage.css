@@ -1,716 +1,470 @@
-:root {
-  --primary-dark: #495631;
-  --primary-accent: #EAED74;
-  --primary-light: #EFF2DD;
-
-  --card-bg: rgba(255, 255, 255, 0.72);
-  --border-color: rgba(73, 86, 49, 0.08);
-
-  --text-main: #495631;
-  --text-muted: #7B8465;
-
-  --success-color: #2E7D32;
-  --danger-color: #E35D5D;
-
-  --shadow-sm: 0 8px 24px rgba(73, 86, 49, 0.06);
-  --shadow-md: 0 10px 30px rgba(73, 86, 49, 0.08);
-  --shadow-lg: 0 18px 40px rgba(73, 86, 49, 0.12);
-
-  --radius-xl: 32px;
-  --radius-lg: 24px;
-  --radius-md: 18px;
-  --radius-sm: 12px;
-
-  --transition: all 0.28s ease;
+﻿:root {
+  --payments-ink: #172014;
+  --payments-muted: #66715c;
+  --payments-card: rgba(255, 255, 255, 0.82);
+  --payments-line: rgba(24, 32, 22, 0.1);
+  --payments-lime: #e8f45d;
+  --payments-moss: #495631;
+  --payments-blue: #4f7cff;
+  --payments-green: #27a66a;
+  --payments-red: #ff6b5f;
+  --payments-shadow: 0 24px 70px rgba(44, 58, 35, 0.14);
+  --payments-radius-xl: 38px;
+  --payments-radius-lg: 28px;
+  --payments-radius-md: 18px;
+  --payments-transition: 220ms ease;
 }
 
 .paymentsPage {
-  max-width: 1240px;
+  max-width: 1440px;
   margin: 0 auto;
-  /* padding: 42px 24px 80px; */
+  color: var(--payments-ink);
 }
 
-/* BREADCRUMB */
-
-.breadcrumb {
+.paymentsBreadcrumb {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 36px;
-  color: var(--text-muted);
-  font-size: 0.92rem;
-}
-
-.breadcrumb a {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--text-muted);
-  text-decoration: none;
-  transition: var(--transition);
-}
-
-.breadcrumb a:hover {
-  color: var(--primary-dark);
-}
-
-.breadcrumb .current {
-  color: var(--text-main);
-  font-weight: 600;
-}
-
-/* HEADER */
-
-.paymentsHeader {
-  margin-bottom: 32px;
-}
-
-.pageTitle {
-  margin: 0 0 8px;
-  color: var(--text-main);
-  font-size: clamp(2rem, 4vw, 3rem);
-  font-weight: 300;
-  letter-spacing: -1.5px;
-}
-
-.pageSubtitle {
-  margin: 0;
-  color: var(--text-muted);
-  font-size: 1rem;
-}
-
-/* GOAL INFO CARD */
-
-.goalInfoCard {
-  padding: 24px 28px;
-  margin-bottom: 32px;
-  border-radius: var(--radius-lg);
-  background: var(--card-bg);
-  backdrop-filter: blur(16px);
-  border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-sm);
-}
-
-.goalInfoRow {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 24px;
-}
-
-.goalInfoItem {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  color: var(--text-muted);
-}
-
-.goalInfoItem > svg {
-  flex-shrink: 0;
-  color: var(--primary-dark);
-}
-
-.goalInfoItem > div {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.goalInfoLabel {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.goalInfoValue {
-  color: var(--text-main);
-  font-size: 0.95rem;
-  font-weight: 600;
-}
-
-/* STATS */
-
-.statsContainer {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
-  margin-bottom: 32px;
-}
-
-.statCard {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 12px;
-  padding: 24px 20px;
-  border-radius: var(--radius-lg);
-  background: var(--card-bg);
-  backdrop-filter: blur(16px);
-  border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-sm);
-  transition: var(--transition);
-}
-
-.statCard:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-md);
-}
-
-.statCard svg {
-  color: var(--primary-dark);
-}
-
-.statNumber {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--text-main);
-}
-
-.statLabel {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-/* ADD BUTTON */
-
-.addPaymentContainer {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 32px;
-}
-
-.addPaymentButton {
-  display: flex;
-  align-items: center;
   gap: 10px;
-  padding: 14px 28px;
-  background: var(--primary-dark);
-  color: var(--primary-accent);
-  border: none;
-  border-radius: 999px;
-  cursor: pointer;
-  font-size: 0.95rem;
-  font-weight: 600;
-  transition: var(--transition);
-  box-shadow: var(--shadow-sm);
+  margin-bottom: 22px;
+  color: var(--payments-muted);
+  font-size: 0.88rem;
+  font-weight: 750;
 }
 
-.addPaymentButton:hover {
-  transform: translateY(-2px);
-  background: var(--primary-accent);
-  color: var(--primary-dark);
-  box-shadow: var(--shadow-lg);
-}
-
-.addPaymentButton.active {
-  background: var(--text-muted);
-}
-
-.addPaymentButton.active:hover {
-  background: var(--danger-color);
-  color: white;
-}
-
-/* CONTENT GRID */
-
-.contentGrid {
-  display: grid;
-  grid-template-columns: 1fr 1.5fr;
-  gap: 28px;
-}
-
-@media (max-width: 900px) {
-  .contentGrid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.contentSection {
-  padding: 28px;
-  border-radius: var(--radius-xl);
-  background: var(--card-bg);
-  backdrop-filter: blur(16px);
-  border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-sm);
-}
-
-.infoSection {
-  background: rgba(255, 255, 255, 0.55);
-}
-
-.sectionTitle {
-  margin: 0 0 24px;
-  color: var(--text-main);
-  font-size: 1.25rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.infoText {
-  color: var(--text-muted);
-  line-height: 1.6;
-  margin-bottom: 20px;
-}
-
-.tipSection {
-  padding: 20px;
-  border-radius: var(--radius-md);
-  background: rgba(234, 237, 116, 0.12);
-  border: 1px solid rgba(234, 237, 116, 0.2);
-}
-
-.tipSection strong {
-  color: var(--primary-dark);
-}
-
-.tipSection ul {
-  margin: 12px 0 0 20px;
-  color: var(--text-muted);
-  font-size: 0.9rem;
-}
-
-.tipSection li {
-  margin: 8px 0;
-}
-
-/* PAYMENTS LIST HEADER */
-
-.paymentsListHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
-  gap: 16px;
-}
-
-.refreshButton {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  background: rgba(73, 86, 49, 0.06);
-  color: var(--text-main);
-  border: none;
-  border-radius: 999px;
-  cursor: pointer;
-  font-size: 0.85rem;
-  transition: var(--transition);
-}
-
-.refreshButton:hover {
-  background: var(--primary-dark);
-  color: var(--primary-accent);
-}
-
-/* EMPTY STATE */
-
-.emptyState {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 16px;
-  padding: 48px 24px;
-  color: var(--text-muted);
-}
-
-.emptyState svg {
-  color: var(--text-muted);
-}
-
-.emptyState h3 {
-  margin: 0;
-  color: var(--text-main);
-  font-size: 1.2rem;
-  font-weight: 500;
-}
-
-.emptyState p {
-  margin: 0;
-}
-
-.emptyStateButton {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 24px;
-  background: var(--primary-dark);
-  color: var(--primary-accent);
-  border: none;
-  border-radius: 999px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 600;
-  transition: var(--transition);
-}
-
-.emptyStateButton:hover {
-  transform: translateY(-2px);
-  background: var(--primary-accent);
-  color: var(--primary-dark);
-}
-
-/* BACK BUTTON */
-
-.backButtonSection {
-  text-align: center;
-  margin-top: 40px;
-  padding-top: 32px;
-  border-top: 1px solid var(--border-color);
-}
-
-.backButton {
+.paymentsBreadcrumb a {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 12px 28px;
-  background: transparent;
-  color: var(--text-main);
-  border: 1px solid var(--border-color);
-  border-radius: 999px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: var(--transition);
+  gap: 6px;
+  color: var(--payments-muted);
+  text-decoration: none;
+  transition: color var(--payments-transition), transform var(--payments-transition);
 }
 
-.backButton:hover {
-  background: var(--primary-accent);
-  border-color: var(--primary-accent);
-  color: var(--primary-dark);
-  transform: translateY(-2px);
+.paymentsBreadcrumb a:hover {
+  color: var(--payments-ink);
+  transform: translateY(-1px);
 }
 
-/* LOADING */
+.paymentsHero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(310px, 0.75fr);
+  gap: 24px;
+  overflow: hidden;
+  padding: clamp(28px, 5vw, 58px);
+  margin-bottom: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 44px;
+  background:
+    radial-gradient(circle at 86% 12%, rgba(232, 244, 93, 0.34), transparent 24rem),
+    radial-gradient(circle at 12% 96%, rgba(79, 124, 255, 0.2), transparent 22rem),
+    linear-gradient(125deg, rgba(23, 32, 20, 0.96), rgba(73, 86, 49, 0.9));
+  box-shadow: var(--payments-shadow);
+  isolation: isolate;
+}
 
-.loadingContainer {
-  min-height: 70vh;
+.paymentsHero::before {
+  content: "";
+  position: absolute;
+  inset: auto -120px -170px auto;
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
+  background: rgba(232, 244, 93, 0.18);
+  z-index: -1;
+}
+
+.paymentsEyebrow,
+.paymentsHistoryHeader span,
+.sidePanelHeader span,
+.paymentGuide span,
+.paymentsStatCard span,
+.goalSnapshotItem span {
+  color: var(--payments-muted);
+  font-size: 0.76rem;
+  font-weight: 900;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.paymentsHero .paymentsEyebrow {
+  color: rgba(255, 255, 255, 0.68);
+}
+
+.paymentsHero h1 {
+  max-width: 780px;
+  margin: 16px 0 12px;
+  color: #ffffff;
+  font-size: clamp(2.9rem, 7vw, 6rem);
+  font-weight: 950;
+  letter-spacing: -0.08em;
+  line-height: 0.92;
+}
+
+.paymentsHero p {
+  max-width: 680px;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.74);
+  font-size: clamp(1rem, 1.5vw, 1.18rem);
+  line-height: 1.65;
+}
+
+.heroActions {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 26px;
+}
+
+.heroPrimaryButton,
+.heroGhostButton,
+.togglePaymentButton,
+.refreshPaymentsButton,
+.emptyPaymentButton,
+.paymentsBackLink {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 20px;
+  gap: 9px;
+  min-height: 48px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 900;
+  text-decoration: none;
+  transition: transform var(--payments-transition), box-shadow var(--payments-transition), background var(--payments-transition), color var(--payments-transition);
 }
 
-.loadingSpinner {
-  width: 56px;
-  height: 56px;
+.heroPrimaryButton,
+.emptyPaymentButton,
+.paymentsBackLink {
+  color: var(--payments-ink);
+  background: var(--payments-lime);
+  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.14);
+}
+
+.heroGhostButton {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+}
+
+.heroPrimaryButton:hover,
+.heroGhostButton:hover,
+.togglePaymentButton:hover,
+.refreshPaymentsButton:hover,
+.emptyPaymentButton:hover,
+.paymentsBackLink:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 44px rgba(44, 58, 35, 0.15);
+}
+
+.paymentsHeroPanel {
+  align-self: center;
+  display: grid;
+  gap: 12px;
+  padding: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 32px;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(22px);
+}
+
+.paymentsHeroPanel span {
+  color: rgba(255, 255, 255, 0.66);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.paymentsHeroPanel strong {
+  font-size: clamp(3rem, 7vw, 5.3rem);
+  font-weight: 950;
+  letter-spacing: -0.08em;
+  line-height: 0.92;
+}
+
+.paymentsHeroPanel small {
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 800;
+}
+
+.paymentsProgressTrack {
+  height: 15px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.paymentsProgressTrack div {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--payments-lime), #b9dc48, #ffffff);
+  transition: width 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.paymentsStatsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.paymentsStatCard,
+.goalSnapshotCard,
+.paymentsSidePanel,
+.paymentsHistoryCard,
+.paymentsErrorCard {
+  border: 1px solid var(--payments-line);
+  background: var(--payments-card);
+  box-shadow: 0 18px 45px rgba(44, 58, 35, 0.08);
+  backdrop-filter: blur(18px);
+}
+
+.paymentsStatCard {
+  display: grid;
+  gap: 10px;
+  min-height: 132px;
+  padding: 22px;
+  border-radius: var(--payments-radius-lg);
+}
+
+.paymentsStatCard.accent {
+  background: linear-gradient(140deg, rgba(232, 244, 93, 0.62), rgba(255, 255, 255, 0.82));
+}
+
+.paymentsStatCard svg {
+  color: var(--payments-moss);
+}
+
+.paymentsStatCard strong {
+  align-self: end;
+  color: var(--payments-ink);
+  font-size: clamp(1.35rem, 2.4vw, 2.1rem);
+  font-weight: 950;
+  letter-spacing: -0.06em;
+}
+
+.goalSnapshotCard {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  padding: 18px;
+  margin-bottom: 22px;
+  border-radius: var(--payments-radius-lg);
+}
+
+.goalSnapshotItem {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 16px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.56);
+}
+
+.goalSnapshotItem svg {
+  color: var(--payments-moss);
+}
+
+.goalSnapshotItem strong {
+  overflow: hidden;
+  color: var(--payments-ink);
+  font-size: 1rem;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.paymentsWorkspace {
+  display: grid;
+  grid-template-columns: minmax(300px, 0.38fr) minmax(0, 1fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.paymentsSidePanel,
+.paymentsHistoryCard {
+  padding: clamp(22px, 3vw, 32px);
+  border-radius: var(--payments-radius-xl);
+}
+
+.paymentsSidePanel {
+  position: sticky;
+  top: 110px;
+}
+
+.sidePanelHeader,
+.paymentsHistoryHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.paymentsHistoryHeader h2,
+.paymentGuide h2 {
+  margin: 4px 0 0;
+  color: var(--payments-ink);
+  font-size: clamp(1.5rem, 3vw, 2.35rem);
+  font-weight: 950;
+  letter-spacing: -0.07em;
+}
+
+.togglePaymentButton,
+.refreshPaymentsButton {
+  min-height: 42px;
+  padding: 0 16px;
+  color: var(--payments-ink);
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid var(--payments-line);
+}
+
+.togglePaymentButton.active {
+  background: var(--payments-lime);
+}
+
+.paymentGuide {
+  display: grid;
+  gap: 16px;
+}
+
+.paymentGuide p {
+  margin: 0;
+  color: var(--payments-muted);
+  line-height: 1.65;
+}
+
+.guideList {
+  display: grid;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.guideList span {
+  display: block;
+  padding: 14px 16px;
+  border-radius: 18px;
+  color: var(--payments-muted);
+  background: rgba(232, 244, 93, 0.16);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.paymentsEmptyState,
+.paymentsLoading,
+.paymentsErrorCard {
+  display: grid;
+  place-items: center;
+  gap: 16px;
+  text-align: center;
+}
+
+.paymentsEmptyState {
+  min-height: 360px;
+  padding: 36px;
+  color: var(--payments-muted);
+}
+
+.paymentsEmptyState h3,
+.paymentsErrorCard h2 {
+  margin: 0;
+  color: var(--payments-ink);
+  font-size: 1.6rem;
+  font-weight: 950;
+  letter-spacing: -0.05em;
+}
+
+.paymentsEmptyState p,
+.paymentsErrorCard p {
+  max-width: 420px;
+  margin: 0;
+  color: var(--payments-muted);
+  line-height: 1.65;
+}
+
+.paymentsLoading {
+  min-height: 70vh;
+  color: var(--payments-muted);
+  font-weight: 850;
+}
+
+.paymentsSpinner {
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
-  border: 3px solid rgba(73, 86, 49, 0.12);
-  border-top-color: var(--primary-dark);
-  animation: spin 0.9s linear infinite;
+  border: 4px solid rgba(73, 86, 49, 0.12);
+  border-top-color: var(--payments-moss);
+  animation: paymentsSpin 0.85s linear infinite;
 }
 
-@keyframes spin {
+@keyframes paymentsSpin {
   to {
     transform: rotate(360deg);
   }
 }
 
-/* ERROR CARD */
-
-.errorCard {
-  max-width: 480px;
-  margin: 0 auto;
-  padding: 48px;
-  text-align: center;
-  border-radius: var(--radius-xl);
-  background: var(--card-bg);
-  backdrop-filter: blur(16px);
-  border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-sm);
+.paymentsErrorCard {
+  max-width: 560px;
+  min-height: 320px;
+  margin: 6vh auto;
+  padding: 40px;
+  border-radius: var(--payments-radius-xl);
 }
 
-.errorCard h2 {
-  margin: 16px 0 8px;
-  color: var(--danger-color);
+.paymentsErrorCard svg {
+  color: var(--payments-red);
 }
 
-.errorCard p {
-  margin: 0 0 24px;
-  color: var(--text-muted);
-}
-
-.backButtonLink {
-  display: inline-block;
-  padding: 12px 24px;
-  background: var(--primary-dark);
-  color: var(--primary-accent);
-  text-decoration: none;
-  border-radius: 999px;
-  transition: var(--transition);
-}
-
-.backButtonLink:hover {
-  background: var(--primary-accent);
-  color: var(--primary-dark);
-}
-
-/* MOBILE */
-
-@media (max-width: 768px) {
-  .paymentsPage {
-    padding: 28px 18px 60px;
-  }
-
-  .goalInfoRow {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-
-  .statsContainer {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .contentSection {
-    padding: 20px;
-  }
-
-  .statNumber {
-    font-size: 1.2rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .statsContainer {
+@media (max-width: 1160px) {
+  .paymentsHero,
+  .paymentsWorkspace {
     grid-template-columns: 1fr;
   }
+
+  .paymentsSidePanel {
+    position: static;
+  }
+
+  .paymentsStatsGrid,
+  .goalSnapshotCard {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
-@media (max-width: 440px) {
-  .paymentsPage {
-    padding: 16px 12px 50px;
+@media (max-width: 700px) {
+  .paymentsHero {
+    padding: 26px;
+    border-radius: 32px;
   }
 
-  .breadcrumb {
-    font-size: 0.7rem;
-    gap: 4px;
-    margin-bottom: 20px;
+  .paymentsStatsGrid,
+  .goalSnapshotCard {
+    grid-template-columns: 1fr;
   }
 
-  .breadcrumb a svg,
-  .breadcrumb svg {
-    width: 10px;
-    height: 10px;
+  .sidePanelHeader,
+  .paymentsHistoryHeader,
+  .heroActions {
+    align-items: stretch;
+    flex-direction: column;
   }
 
-  .pageTitle {
-    font-size: 1.3rem;
-    letter-spacing: -0.5px;
+  .heroPrimaryButton,
+  .heroGhostButton,
+  .togglePaymentButton,
+  .refreshPaymentsButton,
+  .emptyPaymentButton {
+    width: 100%;
   }
 
-  .pageSubtitle {
-    font-size: 0.8rem;
-  }
-
-  .goalInfoCard {
-    padding: 14px;
-    margin-bottom: 20px;
-  }
-
-  .goalInfoRow {
-    gap: 10px;
-  }
-
-  .goalInfoItem {
-    gap: 8px;
-  }
-
-  .goalInfoItem > svg {
-    width: 16px;
-    height: 16px;
-  }
-
-  .goalInfoLabel {
-    font-size: 0.6rem;
-  }
-
-  .goalInfoValue {
-    font-size: 0.75rem;
-  }
-
-  .statsContainer {
-    gap: 10px;
-    margin-bottom: 24px;
-  }
-
-  .statCard {
-    padding: 12px;
-    gap: 8px;
-  }
-
-  .statCard svg {
-    width: 24px;
-    height: 24px;
-  }
-
-  .statNumber {
-    font-size: 1rem;
-  }
-
-  .statLabel {
-    font-size: 0.65rem;
-  }
-
-  .addPaymentContainer {
-    margin-bottom: 24px;
-  }
-
-  .addPaymentButton {
-    padding: 10px 16px;
-    font-size: 0.8rem;
-  }
-
-  .addPaymentButton svg {
-    width: 16px;
-    height: 16px;
-  }
-
-  .contentGrid {
-    gap: 16px;
-  }
-
-  .contentSection {
-    width: 316px;
-    padding: 16px;
-    border-radius: var(--radius-lg);
-  }
-
-  .sectionTitle {
-    font-size: 1rem;
-    margin-bottom: 16px;
-  }
-
-  .sectionTitle svg {
-    width: 18px;
-    height: 18px;
-  }
-
-  .infoText {
-    font-size: 0.85rem;
-    margin-bottom: 16px;
-  }
-
-  .tipSection {
-    padding: 12px;
-  }
-
-  .tipSection strong {
-    font-size: 0.85rem;
-  }
-
-  .tipSection ul {
-    margin: 8px 0 0 16px;
-    font-size: 0.75rem;
-  }
-
-  .tipSection li {
-    margin: 6px 0;
-  }
-
-  .paymentsListHeader {
-    gap: 12px;
-    margin-bottom: 18px;
-  }
-
-  .paymentsListHeader h2 {
-    font-size: 0.95rem;
-  }
-
-  .paymentsListHeader h2 svg {
-    width: 16px;
-    height: 16px;
-  }
-
-  .refreshButton {
-    padding: 6px 12px;
-    font-size: 0.75rem;
-  }
-
-  .refreshButton svg {
-    width: 12px;
-    height: 12px;
-  }
-
-  .emptyState {
-    padding: 24px 16px;
-    gap: 12px;
-  }
-
-  .emptyState svg {
-    width: 40px;
-    height: 40px;
-  }
-
-  .emptyState h3 {
-    font-size: 0.9rem;
-  }
-
-  .emptyState p {
-    font-size: 0.75rem;
-  }
-
-  .emptyStateButton {
-    padding: 8px 16px;
-    font-size: 0.75rem;
-  }
-
-  .emptyStateButton svg {
-    width: 14px;
-    height: 14px;
-  }
-
-  .backButtonSection {
-    margin-top: 24px;
-    padding-top: 20px;
-  }
-
-  .backButton {
-    padding: 8px 20px;
-    font-size: 0.8rem;
-  }
-
-  .backButton svg {
-    width: 14px;
-    height: 14px;
-  }
-
-  .loadingContainer {
-    min-height: 50vh;
-    gap: 16px;
-  }
-
-  .loadingSpinner {
-    width: 40px;
-    height: 40px;
-  }
-
-  .errorCard {
-    padding: 24px 20px;
-  }
-
-  .errorCard svg {
-    width: 40px;
-    height: 40px;
-  }
-
-  .errorCard h2 {
-    font-size: 1.1rem;
-    margin: 12px 0 6px;
-  }
-
-  .errorCard p {
-    font-size: 0.8rem;
-    margin-bottom: 20px;
-  }
-
-  .backButtonLink {
-    padding: 8px 16px;
-    font-size: 0.8rem;
+  .paymentsSidePanel,
+  .paymentsHistoryCard {
+    padding: 22px;
   }
 }

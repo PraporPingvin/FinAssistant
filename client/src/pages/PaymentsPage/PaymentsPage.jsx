@@ -1,17 +1,16 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import {
+  AlertCircle,
+  BarChart3,
   ChevronLeft,
-  Home,
-  Target,
   CreditCard,
-  Wallet,
-  TrendingUp,
+  Home,
   Plus,
   RefreshCw,
-  BarChart3,
-  Clock,
-  AlertCircle,
+  Target,
+  TrendingUp,
+  Wallet,
 } from "lucide-react";
 import Layout from "../../components/Layout";
 import { getGoal, getPayments, createPayment, updatePayment, deletePayment } from "../../api/api";
@@ -45,7 +44,7 @@ function PaymentsPage() {
 
       const [goalData, paymentsData] = await Promise.all([
         getGoal(goalId),
-        getPayments(goalId).catch(() => [])
+        getPayments(goalId).catch(() => []),
       ]);
 
       if (!goalData) {
@@ -55,14 +54,7 @@ function PaymentsPage() {
 
       setGoal(goalData);
       setPayments(paymentsData);
-
-      const total = paymentsData.reduce((sum, payment) => {
-        const amount = parseFloat(payment.amount) || 0;
-        return sum + amount;
-      }, 0);
-
-      setTotalAmount(total);
-
+      setTotalAmount(paymentsData.reduce((sum, payment) => sum + (parseFloat(payment.amount) || 0), 0));
     } catch (error) {
       console.error("Ошибка загрузки данных:", error);
       setError("Не удалось загрузить данные");
@@ -75,7 +67,7 @@ function PaymentsPage() {
     try {
       await createPayment({
         ...paymentData,
-        goal_id: parseInt(goalId)
+        goal_id: parseInt(goalId),
       });
       await loadData();
       setShowForm(false);
@@ -112,34 +104,38 @@ function PaymentsPage() {
 
   const formatCurrency = (amount) => {
     const num = parseFloat(amount) || 0;
-    return new Intl.NumberFormat('ru-RU').format(num);
+    return new Intl.NumberFormat("ru-RU").format(num);
   };
 
   const getStatusText = (status) => {
     switch (status) {
-      case "active": return "В процессе";
-      case "completed": return "Выполнена";
-      case "paused": return "Приостановлена";
-      default: return status;
+      case "active":
+        return "В процессе";
+      case "completed":
+        return "Выполнена";
+      case "paused":
+        return "Приостановлена";
+      default:
+        return status || "Без статуса";
     }
   };
 
   const stats = {
-    totalAmount: totalAmount,
+    totalAmount,
     averagePayment: payments.length > 0 ? Math.round(totalAmount / payments.length) : 0,
-    remainingAmount: goal ? Math.max(0, (parseFloat(goal.target_amount) || 0) - (parseFloat(goal.current_amount) || 0)) : 0
+    remainingAmount: goal ? Math.max(0, (parseFloat(goal.target_amount) || 0) - (parseFloat(goal.current_amount) || 0)) : 0,
   };
 
   const progressPercent = goal?.target_amount > 0
-    ? Math.round(((parseFloat(goal?.current_amount) || 0) / parseFloat(goal.target_amount)) * 100)
+    ? Math.min(100, Math.round(((parseFloat(goal?.current_amount) || 0) / parseFloat(goal.target_amount)) * 100))
     : 0;
 
   if (loading) {
     return (
       <Layout>
-        <div className="loadingContainer">
-          <div className="loadingSpinner" />
-          <p>Загружаем данные...</p>
+        <div className="paymentsLoading">
+          <div className="paymentsSpinner" />
+          <p>Загружаем платежи и прогресс цели...</p>
         </div>
       </Layout>
     );
@@ -149,11 +145,11 @@ function PaymentsPage() {
     return (
       <Layout>
         <div className="paymentsPage">
-          <div className="errorCard">
+          <div className="paymentsErrorCard">
             <AlertCircle size={48} />
-            <h2>Ошибка</h2>
+            <h2>Не удалось открыть платежи</h2>
             <p>{error || "Цель не найдена"}</p>
-            <Link to="/goals" className="backButtonLink">← Вернуться к списку целей</Link>
+            <Link to="/goals" className="paymentsBackLink">Вернуться к целям</Link>
           </div>
         </div>
       </Layout>
@@ -163,97 +159,107 @@ function PaymentsPage() {
   return (
     <Layout>
       <div className="paymentsPage">
-        <div className="breadcrumb">
+        <nav className="paymentsBreadcrumb">
           <Link to="/"><Home size={14} /> Главная</Link>
           <span>/</span>
           <Link to="/goals"><Target size={14} /> Цели</Link>
           <span>/</span>
           <Link to={`/goals/${goalId}`}>{goal.title}</Link>
           <span>/</span>
-          <span className="current">Платежи</span>
-        </div>
+          <span>Платежи</span>
+        </nav>
 
-        <div className="paymentsHeader">
-          <div>
-            <h1 className="pageTitle">Управление платежами</h1>
-            <p className="pageSubtitle">Цель: {goal.title}</p>
-          </div>
-        </div>
-
-        <div className="goalInfoCard">
-          <div className="goalInfoRow">
-            <div className="goalInfoItem">
-              <Target size={18} />
-              <div>
-                <span className="goalInfoLabel">Цель</span>
-                <span className="goalInfoValue">{goal.title}</span>
-              </div>
-            </div>
-            <div className="goalInfoItem">
-              <TrendingUp size={18} />
-              <div>
-                <span className="goalInfoLabel">Прогресс</span>
-                <span className="goalInfoValue">{progressPercent}% ({formatCurrency(goal.current_amount)} / {formatCurrency(goal.target_amount)} ₽)</span>
-              </div>
-            </div>
-            <div className="goalInfoItem">
-              <CreditCard size={18} />
-              <div>
-                <span className="goalInfoLabel">Взнос</span>
-                <span className="goalInfoValue">{formatCurrency(goal.monthly_contribution)} ₽/мес</span>
-              </div>
-            </div>
-            <div className="goalInfoItem">
-              <Clock size={18} />
-              <div>
-                <span className="goalInfoLabel">Статус</span>
-                <span className="goalInfoValue">{getStatusText(goal.status)}</span>
-              </div>
+        <section className="paymentsHero">
+          <div className="paymentsHeroContent">
+            <span className="paymentsEyebrow">Денежный поток цели</span>
+            <h1>Платежи по цели</h1>
+            <p>{goal.title}</p>
+            <div className="heroActions">
+              <button
+                onClick={() => {
+                  setShowForm(true);
+                  setEditingPayment(null);
+                }}
+                className="heroPrimaryButton"
+              >
+                <Plus size={18} /> Добавить платеж
+              </button>
+              <button onClick={handleBack} className="heroGhostButton">
+                <ChevronLeft size={18} /> К цели
+              </button>
             </div>
           </div>
-        </div>
 
-        <div className="statsContainer">
-          <div className="statCard">
+          <div className="paymentsHeroPanel">
+            <span>Прогресс</span>
+            <strong>{progressPercent}%</strong>
+            <div className="paymentsProgressTrack">
+              <div style={{ width: `${progressPercent}%` }} />
+            </div>
+            <small>{formatCurrency(goal.current_amount)} из {formatCurrency(goal.target_amount)} ₽</small>
+          </div>
+        </section>
+
+        <section className="paymentsStatsGrid">
+          <article className="paymentsStatCard accent">
             <Wallet size={24} />
-            <div className="statNumber">{payments.length}</div>
-            <div className="statLabel">Всего платежей</div>
-          </div>
-          <div className="statCard">
+            <span>Платежей</span>
+            <strong>{payments.length}</strong>
+          </article>
+          <article className="paymentsStatCard">
             <CreditCard size={24} />
-            <div className="statNumber">{formatCurrency(stats.totalAmount)} ₽</div>
-            <div className="statLabel">Общая сумма</div>
-          </div>
-          <div className="statCard">
+            <span>Внесено</span>
+            <strong>{formatCurrency(stats.totalAmount)} ₽</strong>
+          </article>
+          <article className="paymentsStatCard">
             <BarChart3 size={24} />
-            <div className="statNumber">{formatCurrency(stats.averagePayment)} ₽</div>
-            <div className="statLabel">Средний платеж</div>
-          </div>
-          <div className="statCard">
+            <span>Средний платеж</span>
+            <strong>{formatCurrency(stats.averagePayment)} ₽</strong>
+          </article>
+          <article className="paymentsStatCard">
             <Target size={24} />
-            <div className="statNumber">{formatCurrency(stats.remainingAmount)} ₽</div>
-            <div className="statLabel">Осталось до цели</div>
+            <span>Осталось</span>
+            <strong>{formatCurrency(stats.remainingAmount)} ₽</strong>
+          </article>
+        </section>
+
+        <section className="goalSnapshotCard">
+          <div className="goalSnapshotItem">
+            <Target size={18} />
+            <span>Цель</span>
+            <strong>{goal.title}</strong>
           </div>
-        </div>
+          <div className="goalSnapshotItem">
+            <TrendingUp size={18} />
+            <span>Прогресс</span>
+            <strong>{progressPercent}%</strong>
+          </div>
+          <div className="goalSnapshotItem">
+            <CreditCard size={18} />
+            <span>Плановый взнос</span>
+            <strong>{formatCurrency(goal.monthly_contribution)} ₽/мес</strong>
+          </div>
+          <div className="goalSnapshotItem">
+            <Wallet size={18} />
+            <span>Статус</span>
+            <strong>{getStatusText(goal.status)}</strong>
+          </div>
+        </section>
 
-        <div className="addPaymentContainer">
-          <button
-            onClick={() => {
-              setShowForm(!showForm);
-              setEditingPayment(null);
-            }}
-            className={`addPaymentButton ${showForm ? 'active' : ''}`}
-          >
-            <Plus size={18} />
-            {showForm ? "Скрыть форму" : "Добавить платеж"}
-          </button>
-        </div>
-
-        <div className="contentGrid">
-          <div className="contentSection infoSection">
-            <h2 className="sectionTitle">
-              {editingPayment ? "Редактирование платежа" : (showForm ? "Новый платеж" : "Информация")}
-            </h2>
+        <section className="paymentsWorkspace">
+          <aside className="paymentsSidePanel">
+            <div className="sidePanelHeader">
+              <span>{editingPayment ? "Редактирование" : showForm ? "Новый платеж" : "Быстрое действие"}</span>
+              <button
+                onClick={() => {
+                  setShowForm(!showForm);
+                  setEditingPayment(null);
+                }}
+                className={`togglePaymentButton ${showForm ? "active" : ""}`}
+              >
+                <Plus size={16} /> {showForm ? "Скрыть" : "Добавить"}
+              </button>
+            </div>
 
             {editingPayment ? (
               <PaymentEditForm
@@ -269,58 +275,50 @@ function PaymentsPage() {
                 onCancel={() => setShowForm(false)}
               />
             ) : (
-              <div>
-                <p className="infoText">
-                  Для добавления нового платежа нажмите кнопку "Добавить платеж".
-                  Платежи автоматически увеличивают текущую сумму цели.
-                </p>
-                <div className="tipSection">
-                  <strong>💡 Доступные действия:</strong>
-                  <ul>
-                    <li>Нажмите на кнопку с карандашом, чтобы отредактировать платеж</li>
-                    <li>Нажмите на корзину, чтобы удалить платеж</li>
-                    <li>При удалении сумма платежа вычитается из текущего прогресса цели</li>
-                  </ul>
+              <div className="paymentGuide">
+                <h2>Пополняйте цель без лишних шагов</h2>
+                <p>Добавленный платеж сразу обновит текущую сумму цели. История ниже поможет быстро найти, изменить или удалить любой взнос.</p>
+                <div className="guideList">
+                  <span>Редактируйте платежи через кнопку карандаша</span>
+                  <span>Удаление вычитает сумму из прогресса цели</span>
+                  <span>Суммы и даты проверяются перед сохранением</span>
                 </div>
               </div>
             )}
-          </div>
+          </aside>
 
-          <div className="contentSection">
-            <div className="paymentsListHeader">
-              <h2 className="sectionTitle">История платежей</h2>
-              <button onClick={loadData} className="refreshButton">
-                <RefreshCw size={14} />
-                Обновить
+          <main className="paymentsHistoryCard">
+            <div className="paymentsHistoryHeader">
+              <div>
+                <span>История</span>
+                <h2>Все платежи</h2>
+              </div>
+              <button onClick={loadData} className="refreshPaymentsButton">
+                <RefreshCw size={15} /> Обновить
               </button>
             </div>
 
             {payments.length > 0 ? (
-              <PaymentList 
-                payments={payments} 
-                onEdit={setEditingPayment}
+              <PaymentList
+                payments={payments}
+                onEdit={(payment) => {
+                  setEditingPayment(payment);
+                  setShowForm(false);
+                }}
                 onDelete={handleDeletePayment}
               />
             ) : (
-              <div className="emptyState">
+              <div className="paymentsEmptyState">
                 <Wallet size={48} />
                 <h3>Платежей пока нет</h3>
-                <p>Добавьте первый платеж для вашей цели</p>
-                <button onClick={() => setShowForm(true)} className="emptyStateButton">
-                  <Plus size={16} />
-                  Добавить первый платеж
+                <p>Добавьте первый платеж, чтобы увидеть историю пополнений и статистику.</p>
+                <button onClick={() => setShowForm(true)} className="emptyPaymentButton">
+                  <Plus size={16} /> Добавить первый платеж
                 </button>
               </div>
             )}
-          </div>
-        </div>
-
-        <div className="backButtonSection">
-          <button onClick={handleBack} className="backButton">
-            <ChevronLeft size={16} />
-            Вернуться к цели
-          </button>
-        </div>
+          </main>
+        </section>
       </div>
     </Layout>
   );

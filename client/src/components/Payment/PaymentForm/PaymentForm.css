@@ -1,158 +1,202 @@
-:root {
-  --primary-dark: #495631;
-  --primary-accent: #EAED74;
-  --primary-light: #EFF2DD;
-
-  --card-bg: rgba(255, 255, 255, 0.72);
-  --border-color: rgba(73, 86, 49, 0.08);
-
-  --text-main: #495631;
-  --text-muted: #7B8465;
-
-  --danger-color: #E35D5D;
-  --success-color: #2E7D32;
-
-  --shadow-sm: 0 8px 24px rgba(73, 86, 49, 0.06);
-  --shadow-lg: 0 18px 40px rgba(73, 86, 49, 0.12);
-
-  --radius-md: 18px;
-  --radius-sm: 12px;
-
-  --transition: all 0.28s ease;
-}
-
-.paymentForm {
+﻿.paymentForm,
+.paymentEditForm {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 20px;
 }
 
-.formGroup {
+.paymentFormIntro {
+  display: grid;
+  gap: 6px;
+  padding: 18px;
+  border: 1px solid rgba(24, 32, 22, 0.08);
+  border-radius: 22px;
+  background: linear-gradient(135deg, rgba(232, 244, 93, 0.2), rgba(255, 255, 255, 0.72));
+}
+
+.paymentFormIntro span {
+  color: #66715c;
+  font-size: 0.74rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.paymentFormIntro strong {
+  overflow: hidden;
+  color: #172014;
+  font-size: 1.2rem;
+  font-weight: 950;
+  letter-spacing: -0.05em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.paymentForm .formGroup,
+.paymentEditForm .formGroup {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 9px;
 }
 
-.formLabel {
+.paymentForm .formLabel,
+.paymentEditForm .formLabel {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: var(--text-muted);
-  font-size: 0.85rem;
-  font-weight: 500;
-}
-
-.required {
-  color: var(--danger-color);
-}
-
-.formInput,
-.formTextarea {
-  width: 100%;
-  padding: 14px 18px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border-color);
-  background: rgba(255, 255, 255, 0.75);
-  color: var(--text-main);
-  font-size: 1rem;
-  transition: var(--transition);
-  box-sizing: border-box;
-}
-
-.formTextarea {
-  resize: vertical;
-  font-family: inherit;
-}
-
-.formInput:focus,
-.formTextarea:focus {
-  outline: none;
-  border-color: var(--primary-accent);
-  box-shadow: 0 0 0 4px rgba(234, 237, 116, 0.18);
-}
-
-.formInputError {
-  border-color: rgba(227, 93, 93, 0.5);
-}
-
-.formInputError:focus {
-  box-shadow: 0 0 0 4px rgba(227, 93, 93, 0.12);
-}
-
-.formError {
-  color: var(--danger-color);
+  color: #66715c;
   font-size: 0.8rem;
+  font-weight: 900;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
 }
 
-.currencyPreview {
-  color: var(--text-muted);
-  font-size: 0.85rem;
+.paymentForm .required,
+.paymentEditForm .required {
+  color: #ff6b5f;
 }
 
-.submitError {
-  padding: 12px 16px;
-  border-radius: var(--radius-sm);
-  background: rgba(227, 93, 93, 0.1);
-  color: var(--danger-color);
-  font-size: 0.85rem;
-  text-align: center;
+.paymentForm .formInput,
+.paymentForm .formTextarea,
+.paymentEditForm .formInput,
+.paymentEditForm .formTextarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid rgba(24, 32, 22, 0.1);
+  border-radius: 18px;
+  color: #172014;
+  background: rgba(255, 255, 255, 0.74);
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 750;
+  transition: border-color 220ms ease, box-shadow 220ms ease, transform 220ms ease, background 220ms ease;
 }
 
-.formButtons {
+.paymentForm .formInput,
+.paymentEditForm .formInput {
+  min-height: 52px;
+  padding: 0 16px;
+}
+
+.paymentForm .formTextarea,
+.paymentEditForm .formTextarea {
+  min-height: 116px;
+  padding: 16px;
+  line-height: 1.55;
+  resize: vertical;
+}
+
+.paymentForm .formInput::placeholder,
+.paymentForm .formTextarea::placeholder,
+.paymentEditForm .formInput::placeholder,
+.paymentEditForm .formTextarea::placeholder {
+  color: rgba(102, 113, 92, 0.55);
+}
+
+.paymentForm .formInput:hover,
+.paymentForm .formTextarea:hover,
+.paymentEditForm .formInput:hover,
+.paymentEditForm .formTextarea:hover {
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.paymentForm .formInput:focus,
+.paymentForm .formTextarea:focus,
+.paymentEditForm .formInput:focus,
+.paymentEditForm .formTextarea:focus {
+  outline: none;
+  border-color: #e8f45d;
+  box-shadow: 0 0 0 4px rgba(232, 244, 93, 0.18);
+  transform: translateY(-1px);
+}
+
+.paymentForm .formInputError,
+.paymentEditForm .formInputError {
+  border-color: rgba(255, 107, 95, 0.65);
+}
+
+.paymentForm .formError,
+.paymentEditForm .formError {
+  color: #c84237;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.paymentForm .currencyPreview,
+.paymentEditForm .currencyPreview {
+  color: #66715c;
+  font-size: 0.88rem;
+  font-weight: 850;
+}
+
+.paymentForm .submitError,
+.paymentEditForm .submitError {
+  padding: 13px 16px;
+  border: 1px solid rgba(255, 107, 95, 0.22);
+  border-radius: 16px;
+  color: #c84237;
+  background: rgba(255, 107, 95, 0.1);
+  font-size: 0.9rem;
+  font-weight: 850;
+}
+
+.paymentForm .formButtons,
+.paymentEditForm .formButtons {
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
-  margin-top: 8px;
-  padding-top: 16px;
-  border-top: 1px solid var(--border-color);
+  gap: 10px;
+  margin-top: 6px;
 }
 
-.formButton {
+.paymentForm .formButton,
+.paymentEditForm .formButton {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 12px 24px;
-  border: none;
+  min-height: 46px;
+  padding: 0 18px;
+  border: 0;
   border-radius: 999px;
   cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 600;
-  transition: var(--transition);
+  font-weight: 900;
+  transition: transform 220ms ease, box-shadow 220ms ease, background 220ms ease, color 220ms ease;
 }
 
-.submitButton {
-  background: var(--primary-dark);
-  color: var(--primary-accent);
+.paymentForm .submitButton,
+.paymentEditForm .submitButton {
+  color: #172014;
+  background: #e8f45d;
+  box-shadow: 0 16px 34px rgba(73, 86, 49, 0.12);
 }
 
-.submitButton:hover:not(:disabled) {
+.paymentForm .cancelButton,
+.paymentEditForm .cancelButton {
+  color: #172014;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(24, 32, 22, 0.1);
+}
+
+.paymentForm .formButton:hover:not(:disabled),
+.paymentEditForm .formButton:hover:not(:disabled) {
   transform: translateY(-2px);
-  background: var(--primary-accent);
-  color: var(--primary-dark);
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 18px 36px rgba(44, 58, 35, 0.14);
 }
 
-.cancelButton {
-  background: rgba(73, 86, 49, 0.06);
-  color: var(--text-main);
-}
-
-.cancelButton:hover:not(:disabled) {
-  background: rgba(73, 86, 49, 0.12);
-}
-
-.formButton:disabled {
-  opacity: 0.5;
+.paymentForm .formButton:disabled,
+.paymentEditForm .formButton:disabled {
+  opacity: 0.55;
   cursor: not-allowed;
 }
 
-@media (max-width: 768px) {
-  .formButtons {
+@media (max-width: 620px) {
+  .paymentForm .formButtons,
+  .paymentEditForm .formButtons {
     flex-direction: column;
   }
 
-  .formButton {
+  .paymentForm .formButton,
+  .paymentEditForm .formButton {
     width: 100%;
   }
 }
