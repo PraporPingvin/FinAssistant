@@ -154,7 +154,7 @@ function CheckpointsForecast() {
   };
 
   return (
-    <div className="forecastPage">
+    <div className="checkpointsForecastPage">
       <div className="forecastSummary">
         <div className="summaryCardCheckpoint">
           <div className="summaryIcon">
@@ -204,11 +204,11 @@ function CheckpointsForecast() {
             <div className="chartCardCheckpointF">
               <h4>Распределение по прогрессу</h4>
               <div className="simpleChart">
-                <div>0-25%: {goalsWithForecast.filter(g => forecastsMap[g.goal_id]?.progress < 25).length}</div>
-                <div>26-50%: {goalsWithForecast.filter(g => forecastsMap[g.goal_id]?.progress >= 25 && forecastsMap[g.goal_id]?.progress < 50).length}</div>
-                <div>51-75%: {goalsWithForecast.filter(g => forecastsMap[g.goal_id]?.progress >= 50 && forecastsMap[g.goal_id]?.progress < 75).length}</div>
-                <div>76-99%: {goalsWithForecast.filter(g => forecastsMap[g.goal_id]?.progress >= 75 && forecastsMap[g.goal_id]?.progress < 100).length}</div>
-                <div>100%: {stats.achievedGoals}</div>
+                <div style={{ "--bar": `${goalsWithForecast.length ? (goalsWithForecast.filter(g => forecastsMap[g.goal_id]?.progress < 25).length / goalsWithForecast.length) * 100 : 0}%` }}><span>0-25%</span><strong>{goalsWithForecast.filter(g => forecastsMap[g.goal_id]?.progress < 25).length}</strong></div>
+                <div style={{ "--bar": `${goalsWithForecast.length ? (goalsWithForecast.filter(g => forecastsMap[g.goal_id]?.progress >= 25 && forecastsMap[g.goal_id]?.progress < 50).length / goalsWithForecast.length) * 100 : 0}%` }}><span>26-50%</span><strong>{goalsWithForecast.filter(g => forecastsMap[g.goal_id]?.progress >= 25 && forecastsMap[g.goal_id]?.progress < 50).length}</strong></div>
+                <div style={{ "--bar": `${goalsWithForecast.length ? (goalsWithForecast.filter(g => forecastsMap[g.goal_id]?.progress >= 50 && forecastsMap[g.goal_id]?.progress < 75).length / goalsWithForecast.length) * 100 : 0}%` }}><span>51-75%</span><strong>{goalsWithForecast.filter(g => forecastsMap[g.goal_id]?.progress >= 50 && forecastsMap[g.goal_id]?.progress < 75).length}</strong></div>
+                <div style={{ "--bar": `${goalsWithForecast.length ? (goalsWithForecast.filter(g => forecastsMap[g.goal_id]?.progress >= 75 && forecastsMap[g.goal_id]?.progress < 100).length / goalsWithForecast.length) * 100 : 0}%` }}><span>76-99%</span><strong>{goalsWithForecast.filter(g => forecastsMap[g.goal_id]?.progress >= 75 && forecastsMap[g.goal_id]?.progress < 100).length}</strong></div>
+                <div style={{ "--bar": `${goalsWithForecast.length ? (stats.achievedGoals / goalsWithForecast.length) * 100 : 0}%` }}><span>100%</span><strong>{stats.achievedGoals}</strong></div>
               </div>
             </div>
           </div>

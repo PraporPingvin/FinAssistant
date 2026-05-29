@@ -8,6 +8,7 @@ import {
   BarChart3,
   PieChart,
   Target,
+  Sparkles,
 } from "lucide-react";
 import Layout from "../../components/Layout";
 import CheckpointsOverview from "./CheckpointsOverview/CheckpointsOverview";
@@ -40,15 +41,26 @@ function CheckpointsPage() {
           <span className="current">Контроль и прогнозы</span>
         </div>
 
-        <div className="pageHeaderCheckpoint">
-          <h1>
-            <Target size={28} />
-            Контроль целей и прогнозы
-          </h1>
-          <p className="headerDescription">
-            Отслеживайте прогресс, управляйте контрольными точками и смотрите прогнозы достижения целей
-          </p>
-        </div>
+        <section className="checkpointHero">
+          <div className="pageHeaderCheckpoint">
+            <span className="checkpointEyebrow">
+              <Sparkles size={16} />
+              Панель контроля
+            </span>
+            <h1>
+              <Target size={34} />
+              Контроль целей и прогнозы
+            </h1>
+            <p className="headerDescription">
+              Отслеживайте контрольные точки, прогресс целей, сроки и сценарии в одном современном аналитическом центре.
+            </p>
+          </div>
+          <div className="checkpointHeroCard">
+            <span>Фокус недели</span>
+            <strong>Контрольные точки</strong>
+            <small>Следите за просрочками, темпом и ближайшими финансовыми milestones без лишнего шума.</small>
+          </div>
+        </section>
 
         <div className="tabsNavigation">
           {tabs.map(tab => (
@@ -63,7 +75,7 @@ function CheckpointsPage() {
           ))}
         </div>
 
-        <div className="tabContent">
+        <div className="checkpointTabContent">
           {activeTab === "overview" && <CheckpointsOverview />}
           {activeTab === "progress" && <CheckpointsProgress />}
           {activeTab === "forecast" && <CheckpointsForecast />}

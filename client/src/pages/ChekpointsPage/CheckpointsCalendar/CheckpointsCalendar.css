@@ -337,3 +337,108 @@
     align-items: flex-start;
   }
 }
+/* Modern calendar tab skin */
+.calendarPage {
+  --cp-ink: #172014;
+  --cp-muted: #68745b;
+  --cp-card: rgba(255, 255, 255, 0.82);
+  --cp-line: rgba(24, 32, 22, 0.1);
+  --cp-lime: #e8f45d;
+  --cp-moss: #495631;
+  --cp-green: #27a66a;
+  --cp-amber: #f0a13a;
+  padding: 4px 0 20px;
+}
+
+.calendarPage .calendarContainer,
+.calendarPage .selectedDateCheckpoints {
+  border: 1px solid var(--cp-line);
+  border-radius: 30px;
+  background: var(--cp-card);
+  box-shadow: 0 18px 45px rgba(44, 58, 35, 0.08);
+  backdrop-filter: blur(18px);
+}
+
+.calendarPage .currentMonth,
+.calendarPage .selectedDateCheckpoints h3 {
+  color: var(--cp-ink);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
+
+.calendarPage .selectedDateCheckpoints h3 {
+  border-bottom: 0;
+}
+
+.calendarPage .monthNav {
+  border: 1px solid var(--cp-line);
+  color: var(--cp-ink);
+  background: rgba(255, 255, 255, 0.66);
+}
+
+.calendarPage .monthNav:hover,
+.calendarPage .viewButton:hover {
+  color: var(--cp-ink);
+  background: var(--cp-lime);
+  border-color: transparent;
+}
+
+.calendarPage .weekday {
+  color: var(--cp-muted);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.calendarPage .calendarDay {
+  border: 1px solid transparent;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.58);
+}
+
+.calendarPage .calendarDay:hover {
+  background: rgba(232, 244, 93, 0.24);
+  transform: translateY(-2px);
+}
+
+.calendarPage .calendarDay.today {
+  border-color: var(--cp-lime);
+  background: rgba(232, 244, 93, 0.18);
+}
+
+.calendarPage .calendarDay.selected {
+  color: var(--cp-ink);
+  background: var(--cp-lime);
+}
+
+.calendarPage .calendarDay.selected .dayNumber {
+  color: var(--cp-ink);
+}
+
+.calendarPage .calendarDay.hasCheckpoints {
+  background: rgba(240, 161, 58, 0.14);
+}
+
+.calendarPage .checkpointsIndicator {
+  color: var(--cp-ink);
+  background: var(--cp-lime);
+  font-weight: 900;
+}
+
+.calendarPage .calendarCheckpointItem {
+  border: 1px solid var(--cp-line);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.64);
+}
+
+.calendarPage .checkpointMiniTitle,
+.calendarPage .checkpointAmount {
+  color: var(--cp-ink);
+  font-weight: 900;
+}
+
+.calendarPage .viewButton {
+  color: var(--cp-ink);
+  background: var(--cp-lime);
+  font-weight: 900;
+}

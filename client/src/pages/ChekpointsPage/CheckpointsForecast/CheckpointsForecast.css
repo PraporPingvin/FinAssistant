@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   --primary-dark: #495631;
   --primary-accent: #EAED74;
   --primary-light: #EFF2DD;
@@ -23,7 +23,7 @@
   --transition: all 0.28s ease;
 }
 
-.forecastPage {
+.checkpointsForecastPage {
   padding: 20px 0;
 }
 
@@ -409,5 +409,259 @@
 
   .tableAction {
     width: 100%;
+  }
+}
+/* Modern checkpoints forecast skin */
+.checkpointsForecastPage {
+  --cp-ink: #172014;
+  --cp-muted: #68745b;
+  --cp-card: rgba(255, 255, 255, 0.82);
+  --cp-line: rgba(24, 32, 22, 0.1);
+  --cp-lime: #e8f45d;
+  --cp-moss: #495631;
+  --cp-blue: #4f7cff;
+  --cp-green: #27a66a;
+  --cp-amber: #f0a13a;
+  --cp-red: #ff6b5f;
+  padding: 4px 0 20px;
+  color: var(--cp-ink);
+}
+
+.checkpointsForecastPage .forecastSummary {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+.checkpointsForecastPage .summaryCardCheckpoint,
+.checkpointsForecastPage .chartsSection,
+.checkpointsForecastPage .chartCardCheckpointF,
+.checkpointsForecastPage .forecastTableSection,
+.checkpointsForecastPage .tableContainer,
+.checkpointsForecastPage .forecastEmpty {
+  border: 1px solid var(--cp-line);
+  background: var(--cp-card);
+  box-shadow: 0 18px 45px rgba(44, 58, 35, 0.08);
+  backdrop-filter: blur(18px);
+}
+
+.checkpointsForecastPage .summaryCardCheckpoint {
+  position: relative;
+  overflow: hidden;
+  min-height: 128px;
+  padding: 22px;
+  border-radius: 26px;
+}
+
+.checkpointsForecastPage .summaryCardCheckpoint::after {
+  content: "";
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  right: -55px;
+  top: -55px;
+  border-radius: 999px;
+  background: rgba(232, 244, 93, 0.24);
+}
+
+.checkpointsForecastPage .summaryIcon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 54px;
+  width: 54px;
+  height: 54px;
+  border-radius: 18px;
+  color: var(--cp-ink);
+  background: var(--cp-lime);
+}
+
+.checkpointsForecastPage .summaryLabel {
+  color: var(--cp-muted);
+  font-size: 0.72rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+}
+
+.checkpointsForecastPage .summaryValue {
+  color: var(--cp-ink);
+  font-size: clamp(1.45rem, 2vw, 2rem);
+  font-weight: 900;
+  letter-spacing: -0.055em;
+}
+
+.checkpointsForecastPage .summaryValue.highlight {
+  color: var(--cp-moss);
+}
+
+.checkpointsForecastPage .chartsSection,
+.checkpointsForecastPage .forecastTableSection,
+.checkpointsForecastPage .forecastEmpty {
+  padding: 28px;
+  border-radius: 30px;
+}
+
+.checkpointsForecastPage .chartsHeader {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.checkpointsForecastPage .chartsHeader h3,
+.checkpointsForecastPage .forecastTableSection h3,
+.checkpointsForecastPage .chartCardCheckpointF h4 {
+  color: var(--cp-ink);
+  font-weight: 900;
+  letter-spacing: -0.035em;
+}
+
+.checkpointsForecastPage .toggleCharts,
+.checkpointsForecastPage .showChartsButton,
+.checkpointsForecastPage .createButton {
+  border: 1px solid var(--cp-line);
+  color: var(--cp-ink);
+  background: rgba(255, 255, 255, 0.64);
+  font-weight: 850;
+}
+
+.checkpointsForecastPage .toggleCharts:hover,
+.checkpointsForecastPage .showChartsButton:hover,
+.checkpointsForecastPage .createButton:hover {
+  color: var(--cp-ink);
+  background: var(--cp-lime);
+  border-color: transparent;
+}
+
+.checkpointsForecastPage .chartCardCheckpointF {
+  padding: 24px;
+  border-radius: 26px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(79, 124, 255, 0.1), transparent 16rem),
+    rgba(255, 255, 255, 0.66);
+}
+
+.checkpointsForecastPage .simpleChart {
+  display: grid;
+  gap: 12px;
+  padding: 4px;
+}
+
+.checkpointsForecastPage .simpleChart div {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 48px;
+  padding: 0 16px;
+  border: 1px solid var(--cp-line);
+  border-radius: 16px;
+  color: var(--cp-ink);
+  background: rgba(24, 32, 22, 0.045);
+}
+
+.checkpointsForecastPage .simpleChart div::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--bar, 0%);
+  border-radius: inherit;
+  background: linear-gradient(90deg, rgba(232, 244, 93, 0.75), rgba(79, 124, 255, 0.2));
+}
+
+.checkpointsForecastPage .simpleChart span,
+.checkpointsForecastPage .simpleChart strong {
+  position: relative;
+  z-index: 1;
+}
+
+.checkpointsForecastPage .simpleChart span {
+  color: var(--cp-muted);
+  font-weight: 850;
+}
+
+.checkpointsForecastPage .simpleChart strong {
+  font-size: 1.1rem;
+  font-weight: 950;
+}
+
+.checkpointsForecastPage .tableContainer {
+  padding: 10px;
+  border-radius: 26px;
+}
+
+.checkpointsForecastPage .forecastTable {
+  border-collapse: separate;
+  border-spacing: 0 8px;
+}
+
+.checkpointsForecastPage .forecastTable th {
+  padding: 0 14px 8px;
+  border: 0;
+  color: var(--cp-muted);
+  background: transparent;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.checkpointsForecastPage .forecastTable td {
+  padding: 14px;
+  border: 0;
+  background: rgba(255, 255, 255, 0.62);
+}
+
+.checkpointsForecastPage .forecastTable td:first-child {
+  border-radius: 16px 0 0 16px;
+}
+
+.checkpointsForecastPage .forecastTable td:last-child {
+  border-radius: 0 16px 16px 0;
+}
+
+.checkpointsForecastPage .tableProgressBar {
+  height: 12px;
+  background: rgba(24, 32, 22, 0.08);
+}
+
+.checkpointsForecastPage .tableProgressFill {
+  background: linear-gradient(90deg, var(--cp-lime), #98c43d, var(--cp-moss));
+}
+
+.checkpointsForecastPage .amountCell {
+  color: var(--cp-moss);
+  font-weight: 900;
+}
+
+.checkpointsForecastPage .scenariosCount {
+  color: var(--cp-ink);
+  background: rgba(232, 244, 93, 0.42);
+  font-weight: 900;
+}
+
+.checkpointsForecastPage .tableAction {
+  border: 1px solid var(--cp-line);
+  border-radius: 14px;
+}
+
+.checkpointsForecastPage .tableAction.view {
+  color: var(--cp-blue);
+  background: rgba(79, 124, 255, 0.12);
+}
+
+.checkpointsForecastPage .tableAction.scenarios {
+  color: var(--cp-moss);
+  background: rgba(232, 244, 93, 0.2);
+}
+
+@media (max-width: 1100px) {
+  .checkpointsForecastPage .forecastSummary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .checkpointsForecastPage .forecastSummary,
+  .checkpointsForecastPage .chartsGrid {
+    grid-template-columns: 1fr;
   }
 }

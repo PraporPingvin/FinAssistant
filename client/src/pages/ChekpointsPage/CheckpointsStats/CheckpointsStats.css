@@ -260,3 +260,172 @@
     font-size: 1rem;
   }
 }
+/* Modern checkpoint stats skin */
+.statsPage {
+  --cp-ink: #172014;
+  --cp-muted: #68745b;
+  --cp-card: rgba(255, 255, 255, 0.82);
+  --cp-line: rgba(24, 32, 22, 0.1);
+  --cp-lime: #e8f45d;
+  --cp-moss: #495631;
+  --cp-green: #27a66a;
+  --cp-amber: #f0a13a;
+  --cp-red: #ff6b5f;
+  padding: 4px 0 20px;
+  color: var(--cp-ink);
+}
+
+.statsPage .statsSection {
+  position: relative;
+  overflow: hidden;
+  padding: 28px;
+  margin-bottom: 24px;
+  border: 1px solid var(--cp-line);
+  border-radius: 30px;
+  background: var(--cp-card);
+  box-shadow: 0 18px 45px rgba(44, 58, 35, 0.08);
+  backdrop-filter: blur(18px);
+}
+
+.statsPage .statsSection::before {
+  content: "";
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  right: -110px;
+  top: -120px;
+  border-radius: 999px;
+  background: rgba(232, 244, 93, 0.18);
+}
+
+.statsPage .statsSection h3 {
+  position: relative;
+  z-index: 1;
+  border-bottom: 0;
+  padding-bottom: 0;
+  color: var(--cp-ink);
+  font-size: 1.2rem;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
+
+.statsPage .statsGrid {
+  position: relative;
+  z-index: 1;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.statsPage .statCard,
+.statsPage .priorityCard {
+  min-height: 112px;
+  padding: 18px;
+  border: 1px solid var(--cp-line);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.64);
+  box-shadow: none;
+}
+
+.statsPage .statCard:hover,
+.statsPage .priorityCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 38px rgba(44, 58, 35, 0.1);
+}
+
+.statsPage .statCard.warning {
+  border-left: 0;
+  background: rgba(255, 107, 95, 0.1);
+}
+
+.statsPage .statIcon,
+.statsPage .priorityIcon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 50px;
+  width: 50px;
+  height: 50px;
+  border-radius: 17px;
+  color: var(--cp-ink);
+  background: var(--cp-lime);
+  box-shadow: none;
+}
+
+.statsPage .priorityCard.high .priorityIcon {
+  background: rgba(255, 107, 95, 0.18);
+}
+
+.statsPage .priorityCard.medium .priorityIcon {
+  background: rgba(240, 161, 58, 0.18);
+}
+
+.statsPage .priorityCard.low .priorityIcon {
+  background: rgba(39, 166, 106, 0.16);
+}
+
+.statsPage .statValue,
+.statsPage .priorityValue {
+  color: var(--cp-ink);
+  font-size: clamp(1.35rem, 2vw, 1.9rem);
+  font-weight: 900;
+  letter-spacing: -0.055em;
+}
+
+.statsPage .statLabel,
+.statsPage .priorityLabel,
+.statsPage .progressLabel {
+  color: var(--cp-muted);
+  font-weight: 850;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.statsPage .priorityCard.high {
+  background: rgba(255, 107, 95, 0.1);
+}
+
+.statsPage .priorityCard.medium {
+  background: rgba(240, 161, 58, 0.12);
+}
+
+.statsPage .priorityCard.low {
+  background: rgba(39, 166, 106, 0.1);
+}
+
+.statsPage .progressBarContainer {
+  position: relative;
+  z-index: 1;
+  margin-top: 22px;
+  padding: 18px;
+  border: 1px solid var(--cp-line);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.56);
+}
+
+.statsPage .progressBar {
+  height: 14px;
+  background: rgba(24, 32, 22, 0.08);
+}
+
+.statsPage .progressFill {
+  background: linear-gradient(90deg, var(--cp-lime), #98c43d, var(--cp-moss));
+  box-shadow: 0 10px 24px rgba(73, 86, 49, 0.2);
+}
+
+.statsLoading {
+  display: grid;
+  place-items: center;
+  gap: 18px;
+  min-height: 360px;
+  color: var(--cp-muted, #68745b);
+}
+
+@media (max-width: 760px) {
+  .statsPage .statsSection {
+    padding: 22px;
+  }
+
+  .statsPage .statsGrid,
+  .statsPage .statsGrid.priorities {
+    grid-template-columns: 1fr;
+  }
+}

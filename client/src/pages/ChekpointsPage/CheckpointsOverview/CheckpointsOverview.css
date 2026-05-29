@@ -1379,3 +1379,399 @@
     padding: 10px;
   }
 }
+/* Modern checkpoint dashboard skin */
+.checkpointsOverview {
+  --cp-ink: #172014;
+  --cp-muted: #68745b;
+  --cp-card: rgba(255, 255, 255, 0.82);
+  --cp-line: rgba(24, 32, 22, 0.1);
+  --cp-lime: #e8f45d;
+  --cp-moss: #495631;
+  --cp-blue: #4f7cff;
+  --cp-green: #27a66a;
+  --cp-amber: #f0a13a;
+  --cp-red: #ff6b5f;
+  padding: 4px 0 20px;
+  color: var(--cp-ink);
+}
+
+.checkpointsOverview .statsCards {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+.checkpointsOverview .statCard,
+.checkpointsOverview .overallProgress,
+.checkpointsOverview .chartsSection,
+.checkpointsOverview .filtersBar,
+.checkpointsOverview .tableContainer,
+.checkpointsOverview .checkpointCard,
+.checkpointsOverview .emptyState,
+.checkpointsOverview .modalContent {
+  border: 1px solid var(--cp-line);
+  background: var(--cp-card);
+  box-shadow: 0 18px 45px rgba(44, 58, 35, 0.08);
+  backdrop-filter: blur(18px);
+}
+
+.checkpointsOverview .statCard {
+  position: relative;
+  overflow: hidden;
+  min-height: 128px;
+  padding: 22px;
+  border-radius: 26px;
+}
+
+.checkpointsOverview .statCard::after {
+  content: "";
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  right: -55px;
+  top: -55px;
+  border-radius: 999px;
+  background: rgba(232, 244, 93, 0.24);
+}
+
+.checkpointsOverview .statCard.warning {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(255, 107, 95, 0.12));
+  border-left: 0;
+}
+
+.checkpointsOverview .statIcon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 54px;
+  width: 54px;
+  height: 54px;
+  border-radius: 18px;
+  color: var(--cp-ink);
+  background: var(--cp-lime);
+}
+
+.checkpointsOverview .statValue {
+  color: var(--cp-ink);
+  font-size: clamp(1.55rem, 2vw, 2.1rem);
+  font-weight: 900;
+  letter-spacing: -0.055em;
+}
+
+.checkpointsOverview .statLabel,
+.checkpointsOverview .progressLabel,
+.checkpointsOverview .filterSelect,
+.checkpointsOverview .searchInput {
+  color: var(--cp-muted);
+}
+
+.checkpointsOverview .statLabel {
+  font-weight: 850;
+  letter-spacing: 0.08em;
+}
+
+.checkpointsOverview .overallProgress,
+.checkpointsOverview .chartsSection,
+.checkpointsOverview .filtersBar,
+.checkpointsOverview .tableContainer,
+.checkpointsOverview .emptyState {
+  border-radius: 30px;
+}
+
+.checkpointsOverview .overallProgress {
+  padding: 28px;
+}
+
+.checkpointsOverview .progressLabel {
+  align-items: center;
+  font-weight: 850;
+}
+
+.checkpointsOverview .progressPercent {
+  color: var(--cp-moss);
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  font-weight: 950;
+  letter-spacing: -0.07em;
+}
+
+.checkpointsOverview .progressBar {
+  height: 16px;
+  border-radius: 999px;
+  background: rgba(24, 32, 22, 0.08);
+}
+
+.checkpointsOverview .progressFill {
+  background: linear-gradient(90deg, var(--cp-lime), #98c43d, var(--cp-moss));
+  box-shadow: 0 10px 24px rgba(73, 86, 49, 0.2);
+}
+
+.checkpointsOverview .chartsSection {
+  padding: 28px;
+}
+
+.checkpointsOverview .chartsHeader {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.checkpointsOverview .chartsHeader h3,
+.checkpointsOverview .chartCard h4 {
+  color: var(--cp-ink);
+  font-weight: 900;
+  letter-spacing: -0.035em;
+}
+
+.checkpointsOverview .toggleCharts,
+.checkpointsOverview .showChartsButton,
+.checkpointsOverview .viewModeButton,
+.checkpointsOverview .sortOrderButton,
+.checkpointsOverview .modalCloseBtn,
+.checkpointsOverview .cancelBtn {
+  border: 1px solid var(--cp-line);
+  color: var(--cp-ink);
+  background: rgba(255, 255, 255, 0.64);
+  font-weight: 850;
+}
+
+.checkpointsOverview .toggleCharts:hover,
+.checkpointsOverview .showChartsButton:hover,
+.checkpointsOverview .viewModeButton:hover,
+.checkpointsOverview .viewModeButton.active,
+.checkpointsOverview .sortOrderButton:hover {
+  color: var(--cp-ink);
+  background: var(--cp-lime);
+  border-color: transparent;
+}
+
+.checkpointsOverview .chartsGrid {
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.checkpointsOverview .chartCard {
+  padding: 22px;
+  border: 1px solid var(--cp-line);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(79, 124, 255, 0.08), transparent 16rem),
+    rgba(255, 255, 255, 0.66);
+}
+
+.checkpointsOverview .chartContainer {
+  height: 330px;
+}
+
+.checkpointsOverview .filtersBar {
+  align-items: center;
+  padding: 18px;
+  gap: 12px;
+}
+
+.checkpointsOverview .filterSelect,
+.checkpointsOverview .searchInput {
+  min-height: 44px;
+  border: 1px solid var(--cp-line);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.72);
+  font-weight: 750;
+}
+
+.checkpointsOverview .createButton,
+.checkpointsOverview .createFirstButton,
+.checkpointsOverview .submitBtn {
+  color: var(--cp-ink);
+  background: var(--cp-lime);
+  border: 0;
+  font-weight: 900;
+  box-shadow: 0 16px 34px rgba(73, 86, 49, 0.12);
+}
+
+.checkpointsOverview .createButton:hover,
+.checkpointsOverview .createFirstButton:hover,
+.checkpointsOverview .submitBtn:hover:not(:disabled) {
+  color: var(--cp-ink);
+  background: var(--cp-lime);
+  transform: translateY(-2px);
+}
+
+.checkpointsOverview .tableContainer {
+  padding: 10px;
+}
+
+.checkpointsOverview .checkpointsTable {
+  border-collapse: separate;
+  border-spacing: 0 8px;
+}
+
+.checkpointsOverview .checkpointsTable th {
+  padding: 0 14px 8px;
+  border: 0;
+  color: var(--cp-muted);
+  background: transparent;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.checkpointsOverview .checkpointsTable td {
+  padding: 14px;
+  border: 0;
+  background: rgba(255, 255, 255, 0.62);
+}
+
+.checkpointsOverview .checkpointsTable td:first-child {
+  border-radius: 16px 0 0 16px;
+}
+
+.checkpointsOverview .checkpointsTable td:last-child {
+  border-radius: 0 16px 16px 0;
+}
+
+.checkpointsOverview .checkpointCard {
+  position: relative;
+  overflow: hidden;
+  padding: 24px;
+  border-radius: 28px;
+  transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+}
+
+.checkpointsOverview .checkpointCard::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 5px;
+  background: linear-gradient(90deg, var(--cp-lime), #98c43d, var(--cp-moss));
+}
+
+.checkpointsOverview .checkpointCard:hover {
+  transform: translateY(-7px);
+  border-color: rgba(73, 86, 49, 0.22);
+  box-shadow: 0 30px 70px rgba(44, 58, 35, 0.16);
+}
+
+.checkpointsOverview .overdueCard::before {
+  background: linear-gradient(90deg, var(--cp-red), var(--cp-amber));
+}
+
+.checkpointsOverview .checkpointTitle {
+  color: var(--cp-ink);
+  font-size: 1.2rem;
+  font-weight: 900;
+  letter-spacing: -0.045em;
+}
+
+.checkpointsOverview .statusBadge,
+.checkpointsOverview .priorityBadge,
+.checkpointsOverview .tableStatusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 11px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.checkpointsOverview .statusCompleted {
+  color: #11683d;
+  background: rgba(39, 166, 106, 0.15);
+}
+
+.checkpointsOverview .statusPending {
+  color: #9a5600;
+  background: rgba(240, 161, 58, 0.16);
+}
+
+.checkpointsOverview .statusOverdue {
+  color: #b43a31;
+  background: rgba(255, 107, 95, 0.14);
+}
+
+.checkpointsOverview .checkpointGoal,
+.checkpointsOverview .detailItem {
+  border-radius: 16px;
+  background: rgba(24, 32, 22, 0.045);
+}
+
+.checkpointsOverview .detailItem {
+  padding: 12px;
+}
+
+.checkpointsOverview .detailItem.description {
+  border-top: 0;
+}
+
+.checkpointsOverview .actionButton,
+.checkpointsOverview .tableAction {
+  border: 1px solid var(--cp-line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.64);
+  font-weight: 850;
+}
+
+.checkpointsOverview .actionButton.complete,
+.checkpointsOverview .tableAction.complete {
+  color: #11683d;
+  background: rgba(39, 166, 106, 0.13);
+}
+
+.checkpointsOverview .actionButton.edit,
+.checkpointsOverview .tableAction.edit {
+  color: #9a5600;
+  background: rgba(240, 161, 58, 0.14);
+}
+
+.checkpointsOverview .actionButton.view,
+.checkpointsOverview .tableAction.view {
+  color: var(--cp-blue);
+  background: rgba(79, 124, 255, 0.12);
+}
+
+.checkpointsOverview .actionButton.delete,
+.checkpointsOverview .tableAction.delete {
+  color: #b43a31;
+  background: rgba(255, 107, 95, 0.13);
+}
+
+.checkpointsOverview .modalOverlay {
+  background: rgba(23, 32, 20, 0.34);
+  backdrop-filter: blur(12px);
+}
+
+.checkpointsOverview .modalContent {
+  border-radius: 30px;
+}
+
+.checkpointsOverview .modalHeader h3 {
+  color: var(--cp-ink);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
+
+.checkpointsOverview .formGroup input,
+.checkpointsOverview .formGroup select,
+.checkpointsOverview .formGroup textarea {
+  border: 1px solid var(--cp-line);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+@media (max-width: 1100px) {
+  .checkpointsOverview .statsCards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .checkpointsOverview .statsCards,
+  .checkpointsOverview .chartsGrid,
+  .checkpointsOverview .checkpointsList {
+    grid-template-columns: 1fr;
+  }
+
+  .checkpointsOverview .chartContainer {
+    height: 280px;
+  }
+}

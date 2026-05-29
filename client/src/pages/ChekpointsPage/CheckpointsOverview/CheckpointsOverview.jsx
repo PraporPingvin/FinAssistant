@@ -439,8 +439,11 @@ function CheckpointsOverview() {
     labels: ['Выполнено', 'В процессе', 'Просрочено'],
     datasets: [{
       data: [stats.completed, stats.pending, stats.overdue],
-      backgroundColor: ['#2E7D32', '#F5A623', '#E35D5D'],
-      borderWidth: 0,
+      backgroundColor: ['#27a66a', '#f0a13a', '#ff6b5f'],
+      borderColor: '#ffffff',
+      borderWidth: 4,
+      hoverOffset: 12,
+      spacing: 4,
     }]
   };
 
@@ -448,20 +451,43 @@ function CheckpointsOverview() {
     labels: ['Высокий', 'Средний', 'Низкий'],
     datasets: [{
       data: [stats.highPriority, stats.mediumPriority, stats.lowPriority],
-      backgroundColor: ['#E35D5D', '#F5A623', '#2E7D32'],
-      borderWidth: 0,
+      backgroundColor: ['#ff6b5f', '#f0a13a', '#27a66a'],
+      borderColor: '#ffffff',
+      borderWidth: 4,
+      hoverOffset: 12,
+      spacing: 4,
     }]
   };
 
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
+    cutout: '68%',
     plugins: {
       legend: {
         position: 'bottom',
-        labels: { usePointStyle: true, boxWidth: 10, font: { size: 11 } }
+        labels: {
+          usePointStyle: true,
+          boxWidth: 8,
+          boxHeight: 8,
+          padding: 18,
+          color: '#68745b',
+          font: {
+            family: 'Manrope, Aptos Display, Segoe UI, sans-serif',
+            size: 12,
+            weight: '700'
+          }
+        }
       },
-      tooltip: { callbacks: { label: (ctx) => `${ctx.label}: ${ctx.raw}` } }
+      tooltip: {
+        padding: 14,
+        backgroundColor: 'rgba(24, 32, 22, 0.92)',
+        titleColor: '#ffffff',
+        bodyColor: 'rgba(255, 255, 255, 0.82)',
+        borderColor: 'rgba(232, 244, 93, 0.35)',
+        borderWidth: 1,
+        callbacks: { label: (ctx) => `${ctx.label}: ${ctx.raw}` }
+      }
     }
   };
 

@@ -223,6 +223,7 @@ function ForecastPage() {
     }
 
     const datasets = scenariosForecast.map((scenario, idx) => {
+      const color = getScenarioColor(idx);
       const data = [];
       let currentAmount = parseFloat(goal.current_amount || 0);
       const monthlyContribution = scenario.monthlyContribution || 0;
@@ -241,21 +242,25 @@ function ForecastPage() {
       return {
         label: scenario.name,
         data: data,
-        borderColor: getScenarioColor(idx),
-        backgroundColor: "transparent",
-        borderWidth: scenario.name === forecast?.optimalStrategy ? 3 : 1,
-        tension: 0.4,
-        pointRadius: 2,
-        pointHoverRadius: 4,
+        borderColor: color,
+        backgroundColor: `${color}18`,
+        borderWidth: scenario.name === forecast?.optimalStrategy ? 4 : 2.5,
+        tension: 0.42,
+        pointRadius: 0,
+        pointHoverRadius: 7,
+        pointHoverBorderWidth: 3,
+        pointHoverBackgroundColor: "#ffffff",
+        pointHoverBorderColor: color,
+        fill: idx === 0 ? "origin" : false,
       };
     });
 
     datasets.push({
       label: "Целевая сумма",
       data: Array(months.length).fill(parseFloat(goal.target_amount)),
-      borderColor: "#E35D5D",
+      borderColor: "#ff6b5f",
       borderWidth: 2,
-      borderDash: [5, 5],
+      borderDash: [8, 8],
       pointRadius: 0,
       fill: false,
     });
@@ -272,25 +277,27 @@ function ForecastPage() {
         {
           label: "Срок достижения (мес.)",
           data: scenariosForecast.map((s) => s.monthsToGoal || 0),
-          backgroundColor: "rgba(33, 150, 243, 0.7)",
-          borderColor: "#1976d2",
-          borderWidth: 1,
-          borderRadius: 8,
+          backgroundColor: "rgba(79, 124, 255, 0.88)",
+          borderColor: "#315fe8",
+          borderWidth: 0,
+          borderRadius: 14,
+          borderSkipped: false,
         },
         {
           label: "Уверенность (%)",
           data: scenariosForecast.map((s) => s.confidence || 80),
-          backgroundColor: "rgba(76, 175, 80, 0.7)",
-          borderColor: "#388e3c",
-          borderWidth: 1,
-          borderRadius: 8,
+          backgroundColor: "rgba(39, 166, 106, 0.84)",
+          borderColor: "#15935a",
+          borderWidth: 0,
+          borderRadius: 14,
+          borderSkipped: false,
         },
       ],
     });
   };
 
   const getScenarioColor = (index) => {
-    const colors = ["#2196f3", "#ff9800", "#f44336", "#4caf50", "#9c27b0"];
+    const colors = ["#4f7cff", "#f0a13a", "#27a66a", "#ff6b5f", "#8b5cf6"];
     return colors[index % colors.length];
   };
 
@@ -377,12 +384,38 @@ function ForecastPage() {
     );
   };
 
+  const chartFont = {
+    family: "Manrope, Aptos Display, Segoe UI, sans-serif",
+  };
+
   const lineOptions = {
     responsive: true,
     maintainAspectRatio: false,
+    interaction: {
+      intersect: false,
+      mode: "index",
+    },
     plugins: {
-      legend: { position: "bottom", labels: { usePointStyle: true, boxWidth: 10 } },
+      legend: {
+        position: "bottom",
+        labels: {
+          usePointStyle: true,
+          boxWidth: 8,
+          boxHeight: 8,
+          color: "#667159",
+          padding: 20,
+          font: { ...chartFont, size: 12, weight: "700" },
+        },
+      },
       tooltip: {
+        padding: 14,
+        backgroundColor: "rgba(24, 32, 22, 0.92)",
+        titleColor: "#ffffff",
+        bodyColor: "rgba(255, 255, 255, 0.82)",
+        borderColor: "rgba(232, 244, 93, 0.35)",
+        borderWidth: 1,
+        displayColors: true,
+        boxPadding: 5,
         callbacks: {
           label: (context) => `${context.dataset.label}: ${formatCurrency(context.parsed.y)}`,
         },
@@ -390,11 +423,22 @@ function ForecastPage() {
     },
     scales: {
       y: {
-        ticks: { callback: (value) => formatCurrency(value) },
-        grid: { color: "rgba(73, 86, 49, 0.08)" },
+        border: { display: false },
+        ticks: {
+          callback: (value) => formatCurrency(value),
+          color: "#7b8465",
+          font: { ...chartFont, size: 11, weight: "700" },
+        },
+        grid: { color: "rgba(24, 32, 22, 0.075)", drawTicks: false },
       },
       x: {
-        grid: { display: false },
+        border: { display: false },
+        ticks: {
+          color: "#7b8465",
+          maxRotation: 0,
+          font: { ...chartFont, size: 11, weight: "700" },
+        },
+        grid: { display: false, drawTicks: false },
       },
     },
   };
@@ -402,9 +446,27 @@ function ForecastPage() {
   const barOptions = {
     responsive: true,
     maintainAspectRatio: false,
+    interaction: {
+      intersect: false,
+      mode: "index",
+    },
     plugins: {
-      legend: { position: "bottom" },
+      legend: {
+        position: "bottom",
+        labels: {
+          usePointStyle: true,
+          color: "#667159",
+          padding: 20,
+          font: { ...chartFont, size: 12, weight: "700" },
+        },
+      },
       tooltip: {
+        padding: 14,
+        backgroundColor: "rgba(24, 32, 22, 0.92)",
+        titleColor: "#ffffff",
+        bodyColor: "rgba(255, 255, 255, 0.82)",
+        borderColor: "rgba(232, 244, 93, 0.35)",
+        borderWidth: 1,
         callbacks: {
           label: (context) => `${context.dataset.label}: ${context.parsed.y}`,
         },
@@ -412,7 +474,20 @@ function ForecastPage() {
     },
     scales: {
       y: {
-        grid: { color: "rgba(73, 86, 49, 0.08)" },
+        border: { display: false },
+        ticks: {
+          color: "#7b8465",
+          font: { ...chartFont, size: 11, weight: "700" },
+        },
+        grid: { color: "rgba(24, 32, 22, 0.075)", drawTicks: false },
+      },
+      x: {
+        border: { display: false },
+        ticks: {
+          color: "#7b8465",
+          font: { ...chartFont, size: 11, weight: "700" },
+        },
+        grid: { display: false },
       },
     },
   };
@@ -445,22 +520,28 @@ function ForecastPage() {
           <span className="current">Прогноз</span>
         </div>
 
-        <div className="pageHeaderForecast">
-          <h1>Финансовый прогноз</h1>
-          <p>Математический расчет достижения целей на основе ваших сценариев</p>
-        </div>
+        <section className="forecastHero">
+          <div className="pageHeaderForecast">
+            <span className="forecastEyebrow">
+              <Activity size={16} />
+              Аналитика сценариев
+            </span>
+            <h1>Финансовый прогноз</h1>
+            <p>Современная панель прогноза: сравниваем сценарии, темп накоплений и дату достижения цели.</p>
+          </div>
 
-        <div className="goalSelector">
-          <label htmlFor="goalSelect">Выберите цель для прогноза:</label>
-          <select id="goalSelect" value={selectedGoalId} onChange={handleGoalSelect}>
-            <option value="">-- Выберите цель --</option>
-            {allGoals.map((g) => (
-              <option key={g.goal_id} value={g.goal_id}>
-                {g.title} - {formatCurrency(g.target_amount)}
-              </option>
-            ))}
-          </select>
-        </div>
+          <div className="goalSelector">
+            <label htmlFor="goalSelect">Цель для прогноза</label>
+            <select id="goalSelect" value={selectedGoalId} onChange={handleGoalSelect}>
+              <option value="">-- Выберите цель --</option>
+              {allGoals.map((g) => (
+                <option key={g.goal_id} value={g.goal_id}>
+                  {g.title} - {formatCurrency(g.target_amount)}
+                </option>
+              ))}
+            </select>
+          </div>
+        </section>
 
         {error && (
           <div className="errorCard">
@@ -472,11 +553,11 @@ function ForecastPage() {
         {!selectedGoalId && allGoals.length > 0 && (
           <div className="goalsList">
             <h2>Ваши цели</h2>
-            <div className="goalsGrid">
+            <div className="forecastGoalsGrid">
               {allGoals.map((g) => (
                 <div
                   key={g.goal_id}
-                  className="goalCard"
+                  className="forecastGoalCard"
                   onClick={() => {
                     setSelectedGoalId(g.goal_id);
                     navigate(`/forecast/${g.goal_id}`);
@@ -488,19 +569,19 @@ function ForecastPage() {
                       {g.status === "active" ? "Активна" : "Завершена"}
                     </span>
                   </div>
-                  <div className="goalCardBody">
-                    <div className="goalCardRow">
+                  <div className="forecastGoalCardBody">
+                    <div className="forecastGoalCardRow">
                       <span>Цель:</span>
                       <strong>{formatCurrency(g.target_amount)}</strong>
                     </div>
-                    <div className="goalCardRow">
+                    <div className="forecastGoalCardRow">
                       <span>Прогресс:</span>
                       <strong>
                         {Math.round((parseFloat(g.current_amount || 0) / parseFloat(g.target_amount)) * 100)}%
                       </strong>
                     </div>
                   </div>
-                  <div className="goalCardFooter">
+                  <div className="forecastGoalCardFooter">
                     <button className="selectGoalButton">
                       Выбрать для прогноза <ChevronRight size={14} />
                     </button>
@@ -571,21 +652,21 @@ function ForecastPage() {
                 </div>
               </div>
 
-              <div className="progressBar">
-                <div className="progressFill" style={{ width: `${calculateProgress()}%` }} />
+              <div className="forecastProgressBar">
+                <div className="forecastProgressFill" style={{ width: `${calculateProgress()}%` }} />
               </div>
             </div>
 
-            <div className="tabs">
-              <button className={`tab ${activeTab === "overview" ? "active" : ""}`} onClick={() => setActiveTab("overview")}>
+            <div className="forecastTabs">
+              <button className={`forecastTab ${activeTab === "overview" ? "active" : ""}`} onClick={() => setActiveTab("overview")}>
                 <LineChart size={16} />
                 Обзор
               </button>
-              <button className={`tab ${activeTab === "scenarios" ? "active" : ""}`} onClick={() => setActiveTab("scenarios")}>
+              <button className={`forecastTab ${activeTab === "scenarios" ? "active" : ""}`} onClick={() => setActiveTab("scenarios")}>
                 <PieChart size={16} />
                 Сценарии
               </button>
-              <button className={`tab ${activeTab === "comparison" ? "active" : ""}`} onClick={() => setActiveTab("comparison")}>
+              <button className={`forecastTab ${activeTab === "comparison" ? "active" : ""}`} onClick={() => setActiveTab("comparison")}>
                 <BarChart3 size={16} />
                 Сравнение
               </button>
@@ -692,7 +773,7 @@ function ForecastPage() {
 
             {activeTab === "comparison" && comparisonData && (
               <div className="tabContent">
-                <div className="charchartCardForecasttCard">
+                <div className="chartCardForecast">
                   <h3>Сравнение сценариев</h3>
                   <div className="chartContainer">
                     <Bar data={comparisonData} options={barOptions} />

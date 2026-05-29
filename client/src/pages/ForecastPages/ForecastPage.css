@@ -1,662 +1,664 @@
-:root {
-  --primary-dark: #495631;
-  --primary-accent: #EAED74;
-  --primary-light: #EFF2DD;
-
-  --card-bg: rgba(255, 255, 255, 0.72);
-  --border-color: rgba(73, 86, 49, 0.08);
-
-  --text-main: #495631;
-  --text-muted: #7B8465;
-
-  --success-color: #2E7D32;
-  --danger-color: #E35D5D;
-  --warning-color: #F5A623;
-
-  --shadow-sm: 0 8px 24px rgba(73, 86, 49, 0.06);
-  --shadow-md: 0 10px 30px rgba(73, 86, 49, 0.08);
-  --shadow-lg: 0 18px 40px rgba(73, 86, 49, 0.12);
-
-  --radius-xl: 32px;
-  --radius-lg: 24px;
-  --radius-md: 18px;
-  --radius-sm: 12px;
-
-  --transition: all 0.28s ease;
+﻿:root {
+  --forecast-ink: #172014;
+  --forecast-muted: #69755d;
+  --forecast-card: rgba(255, 255, 255, 0.82);
+  --forecast-glass: rgba(255, 255, 255, 0.64);
+  --forecast-line: rgba(24, 32, 22, 0.1);
+  --forecast-lime: #e8f45d;
+  --forecast-moss: #495631;
+  --forecast-blue: #4f7cff;
+  --forecast-green: #27a66a;
+  --forecast-amber: #f0a13a;
+  --forecast-red: #ff6b5f;
+  --forecast-shadow: 0 24px 70px rgba(44, 58, 35, 0.14);
+  --forecast-radius-xl: 34px;
+  --forecast-radius-lg: 26px;
+  --forecast-radius-md: 18px;
+  --forecast-transition: 220ms ease;
 }
 
 .forecastPage {
-  max-width: 1400px;
+  max-width: 1440px;
   margin: 0 auto;
-  padding: 42px 24px 80px;
+  color: var(--forecast-ink);
 }
 
-/* Breadcrumb */
-.breadcrumb {
+.forecastPage .breadcrumb {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 12px;
-  margin-bottom: 36px;
-  color: var(--text-muted);
-  font-size: 0.92rem;
+  margin-bottom: 24px;
+  color: var(--forecast-muted);
+  font-size: 0.9rem;
 }
 
-.breadcrumb a {
-  display: flex;
+.forecastPage .breadcrumb a {
+  display: inline-flex;
   align-items: center;
-  gap: 6px;
-  color: var(--text-muted);
+  gap: 7px;
+  color: var(--forecast-muted);
   text-decoration: none;
-  transition: var(--transition);
+  transition: color var(--forecast-transition), transform var(--forecast-transition);
 }
 
-.breadcrumb a:hover {
-  color: var(--primary-dark);
+.forecastPage .breadcrumb a:hover {
+  color: var(--forecast-moss);
+  transform: translateY(-1px);
 }
 
-.breadcrumb .current {
-  color: var(--text-main);
-  font-weight: 600;
+.forecastPage .breadcrumb .current {
+  color: var(--forecast-ink);
+  font-weight: 800;
 }
 
-/* Header */
+.forecastHero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.75fr);
+  gap: 26px;
+  overflow: hidden;
+  padding: clamp(28px, 5vw, 54px);
+  margin-bottom: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 42px;
+  background:
+    radial-gradient(circle at 86% 12%, rgba(232, 244, 93, 0.34), transparent 24rem),
+    radial-gradient(circle at 15% 90%, rgba(79, 124, 255, 0.22), transparent 22rem),
+    linear-gradient(125deg, rgba(23, 32, 20, 0.96), rgba(73, 86, 49, 0.9));
+  box-shadow: var(--forecast-shadow);
+  isolation: isolate;
+}
+
+.forecastHero::before {
+  content: "";
+  position: absolute;
+  width: 360px;
+  height: 360px;
+  right: -120px;
+  top: -150px;
+  border-radius: 999px;
+  background: rgba(232, 244, 93, 0.22);
+  z-index: -1;
+}
+
 .pageHeaderForecast {
-  text-align: center;
-  margin-bottom: 42px;
+  align-self: center;
+}
+
+.forecastEyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.74);
+  font-size: 0.76rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 .pageHeaderForecast h1 {
-  margin: 0 0 8px;
-  color: var(--text-main);
-  font-size: clamp(2rem, 5vw, 2.8rem);
-  font-weight: 300;
-  letter-spacing: -1px;
+  max-width: 760px;
+  margin: 16px 0 16px;
+  color: #ffffff;
+  font-size: clamp(2.7rem, 6vw, 5.8rem);
+  font-weight: 900;
+  letter-spacing: -0.075em;
+  line-height: 0.94;
 }
 
 .pageHeaderForecast p {
+  max-width: 660px;
   margin: 0;
-  color: var(--text-muted);
+  color: rgba(255, 255, 255, 0.74);
+  font-size: clamp(1rem, 1.5vw, 1.16rem);
+  line-height: 1.7;
 }
 
-/* Goal Selector */
 .goalSelector {
+  align-self: center;
   padding: 24px;
-  margin-bottom: 32px;
-  border-radius: var(--radius-lg);
-  background: var(--card-bg);
-  backdrop-filter: blur(16px);
-  border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-sm);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(22px);
 }
 
 .goalSelector label {
   display: block;
   margin-bottom: 12px;
-  color: var(--text-muted);
-  font-size: 0.9rem;
-  font-weight: 500;
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
 .goalSelector select {
   width: 100%;
-  padding: 14px 18px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border-color);
-  background: rgba(255, 255, 255, 0.75);
-  color: var(--text-main);
-  font-size: 1rem;
+  min-height: 54px;
+  padding: 0 18px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 18px;
+  color: #ffffff;
+  background: rgba(24, 32, 22, 0.62);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
   cursor: pointer;
-  transition: var(--transition);
+  font-size: 1rem;
+  font-weight: 750;
+  transition: border-color var(--forecast-transition), box-shadow var(--forecast-transition);
 }
 
 .goalSelector select:focus {
   outline: none;
-  border-color: var(--primary-accent);
-  box-shadow: 0 0 0 4px rgba(234, 237, 116, 0.18);
+  border-color: var(--forecast-lime);
+  box-shadow: 0 0 0 4px rgba(232, 244, 93, 0.16);
 }
 
-/* Error Card */
 .errorCard {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 16px 24px;
-  margin-bottom: 28px;
-  border-radius: var(--radius-md);
-  background: rgba(227, 93, 93, 0.1);
-  color: var(--danger-color);
-  border-left: 4px solid var(--danger-color);
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(255, 107, 95, 0.24);
+  border-radius: var(--forecast-radius-md);
+  color: #c84237;
+  background: rgba(255, 107, 95, 0.1);
 }
 
-/* Goals List */
 .goalsList h2 {
-  margin: 0 0 24px;
-  color: var(--text-main);
-  font-size: 1.5rem;
-  font-weight: 300;
+  margin: 0 0 22px;
+  color: var(--forecast-ink);
+  font-size: clamp(1.5rem, 3vw, 2.1rem);
+  font-weight: 900;
+  letter-spacing: -0.05em;
 }
 
-.goalsGrid {
+.forecastGoalsGrid,
+.scenariosGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 24px;
+  gap: 22px;
 }
 
-.goalCard {
+.forecastGoalCard,
+.goalInfoCard,
+.summaryCard,
+.optimalStrategyCard,
+.chartCardForecast,
+.scenarioCard,
+.comparisonTable,
+.emptyState {
+  border: 1px solid var(--forecast-line);
+  background: var(--forecast-card);
+  box-shadow: 0 18px 45px rgba(44, 58, 35, 0.08);
+  backdrop-filter: blur(18px);
+}
+
+.forecastGoalCard {
   padding: 24px;
-  border-radius: var(--radius-lg);
-  background: var(--card-bg);
-  backdrop-filter: blur(16px);
-  border: 1px solid var(--border-color);
+  border-radius: var(--forecast-radius-lg);
   cursor: pointer;
-  transition: var(--transition);
+  transition: transform var(--forecast-transition), box-shadow var(--forecast-transition), border-color var(--forecast-transition);
 }
 
-.goalCard:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
-  border-color: var(--primary-accent);
+.forecastGoalCard:hover,
+.scenarioCard:hover {
+  transform: translateY(-6px);
+  border-color: rgba(73, 86, 49, 0.24);
+  box-shadow: 0 28px 62px rgba(44, 58, 35, 0.15);
 }
 
-.goalCardHeaderForecast {
+.goalCardHeaderForecast,
+.scenarioHeaderForecast,
+.goalInfoHeader {
   display: flex;
+  align-items: flex-start;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
+  gap: 14px;
+  margin-bottom: 18px;
 }
 
-.goalCardHeaderForecast h3 {
+.goalCardHeaderForecast h3,
+.scenarioHeaderForecast h3,
+.goalInfoHeader h2 {
   margin: 0;
-  color: var(--text-main);
-  font-size: 1.1rem;
-  font-weight: 600;
+  color: var(--forecast-ink);
+  font-size: 1.25rem;
+  font-weight: 900;
+  letter-spacing: -0.045em;
+  line-height: 1.18;
 }
 
-.goalStatus {
-  padding: 4px 12px;
+.goalStatus,
+.statusBadge,
+.optimalBadge,
+.riskBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 12px;
   border-radius: 999px;
-  font-size: 0.7rem;
-  font-weight: 600;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
-.goalStatus.active {
-  background: rgba(234, 237, 116, 0.2);
-  color: #6B7400;
+.goalStatus.active,
+.status-active,
+.optimalBadge {
+  color: #465000;
+  background: rgba(232, 244, 93, 0.42);
 }
 
-.goalStatus.completed {
-  background: rgba(46, 125, 50, 0.1);
-  color: var(--success-color);
+.goalStatus.completed,
+.status-completed {
+  color: #11683d;
+  background: rgba(39, 166, 106, 0.15);
 }
 
-.goalCardBody {
-  margin-bottom: 20px;
+.forecastGoalCardBody {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 18px;
 }
 
-.goalCardRow {
+.forecastGoalCardRow {
   display: flex;
   justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--border-color);
+  gap: 12px;
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(24, 32, 22, 0.045);
 }
 
-.goalCardRow span {
-  color: var(--text-muted);
+.forecastGoalCardRow span,
+.param span,
+.result span:first-child,
+.strategyDetails .detail span,
+.statItem span {
+  color: var(--forecast-muted);
+  font-size: 0.76rem;
+  font-weight: 850;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
 }
 
-.goalCardRow strong {
-  color: var(--text-main);
+.forecastGoalCardRow strong,
+.param strong,
+.result .value,
+.strategyDetails .detail strong,
+.statItem strong {
+  color: var(--forecast-ink);
+  font-weight: 900;
+}
+
+.selectGoalButton,
+.createButton,
+.recalculateButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 46px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 999px;
+  color: var(--forecast-ink);
+  background: var(--forecast-lime);
+  cursor: pointer;
+  font-weight: 900;
+  transition: transform var(--forecast-transition), box-shadow var(--forecast-transition), background var(--forecast-transition);
 }
 
 .selectGoalButton {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
   width: 100%;
-  padding: 10px;
-  background: rgba(73, 86, 49, 0.06);
-  border: none;
-  border-radius: 999px;
-  color: var(--text-main);
-  cursor: pointer;
-  transition: var(--transition);
 }
 
-.selectGoalButton:hover {
-  background: var(--primary-dark);
-  color: var(--primary-accent);
+.selectGoalButton:hover,
+.createButton:hover,
+.recalculateButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 38px rgba(73, 86, 49, 0.16);
 }
 
-/* Empty State */
-.emptyState {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.emptyState,
+.forecastLoading,
+.calculatingState {
+  display: grid;
+  place-items: center;
+  gap: 18px;
+  min-height: 340px;
+  padding: 54px 32px;
+  border-radius: var(--forecast-radius-xl);
   text-align: center;
-  gap: 20px;
-  padding: 64px 40px;
-  border-radius: var(--radius-xl);
-  background: var(--card-bg);
-  backdrop-filter: blur(16px);
-  border: 1px solid var(--border-color);
-  margin-top: 32px;
 }
 
 .emptyState h2 {
   margin: 0;
-  color: var(--text-main);
-  font-size: 1.5rem;
-  font-weight: 300;
+  color: var(--forecast-ink);
+  font-size: clamp(1.6rem, 4vw, 2.35rem);
+  font-weight: 900;
+  letter-spacing: -0.055em;
 }
 
-.emptyState p {
+.emptyState p,
+.forecastLoading p,
+.calculatingState p {
   margin: 0;
-  color: var(--text-muted);
-}
-
-.createButton {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 24px;
-  background: var(--primary-dark);
-  color: var(--primary-accent);
-  border: none;
-  border-radius: 999px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: var(--transition);
-}
-
-.createButton:hover {
-  transform: translateY(-2px);
-  background: var(--primary-accent);
-  color: var(--primary-dark);
-}
-
-/* Loading */
-.forecastLoading,
-.calculatingState {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
-  min-height: 400px;
+  color: var(--forecast-muted);
 }
 
 .loadingSpinner {
-  width: 56px;
-  height: 56px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
-  border: 3px solid rgba(73, 86, 49, 0.12);
-  border-top-color: var(--primary-dark);
-  animation: spin 0.9s linear infinite;
+  border: 4px solid rgba(73, 86, 49, 0.12);
+  border-top-color: var(--forecast-moss);
+  animation: spin 0.85s linear infinite;
 }
 
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+  to { transform: rotate(360deg); }
 }
 
-/* Goal Info Card */
 .goalInfoCard {
-  padding: 28px;
-  margin-bottom: 32px;
-  border-radius: var(--radius-xl);
-  background: var(--card-bg);
-  backdrop-filter: blur(16px);
-  border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-sm);
-}
-
-.goalInfoHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  position: relative;
+  overflow: hidden;
+  padding: clamp(24px, 3vw, 34px);
   margin-bottom: 24px;
+  border-radius: var(--forecast-radius-xl);
 }
 
-.goalInfoHeader h2 {
-  margin: 0;
-  color: var(--text-main);
-  font-size: 1.3rem;
-  font-weight: 500;
-}
-
-.statusBadge {
-  padding: 6px 14px;
+.goalInfoCard::before {
+  content: "";
+  position: absolute;
+  width: 280px;
+  height: 280px;
+  right: -95px;
+  top: -125px;
   border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 600;
+  background: rgba(232, 244, 93, 0.24);
 }
 
-.status-active {
-  background: rgba(234, 237, 116, 0.2);
-  color: #6B7400;
-}
-
-.status-completed {
-  background: rgba(46, 125, 50, 0.1);
-  color: var(--success-color);
+.goalInfoHeader,
+.goalInfoStatsForecast,
+.forecastProgressBar {
+  position: relative;
+  z-index: 1;
 }
 
 .goalInfoStatsForecast {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
   margin-bottom: 24px;
 }
 
 .statItem {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 13px;
+  min-width: 0;
+  padding: 16px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.64);
 }
 
 .statItem svg {
-  color: var(--primary-dark);
+  flex: 0 0 auto;
+  color: var(--forecast-moss);
 }
 
 .statItem div {
-  display: flex;
-  flex-direction: column;
+  display: grid;
   gap: 4px;
-}
-
-.statItem span {
-  font-size: 0.7rem;
-  color: var(--text-muted);
-  text-transform: uppercase;
+  min-width: 0;
 }
 
 .statItem strong {
-  font-size: 1rem;
-  color: var(--text-main);
-}
-
-.progressBar {
-  height: 8px;
-  background: rgba(73, 86, 49, 0.08);
-  border-radius: 999px;
   overflow: hidden;
+  font-size: 1.05rem;
+  letter-spacing: -0.03em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.progressFill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--primary-accent), var(--primary-dark));
+.forecastProgressBar {
+  height: 16px;
+  overflow: hidden;
   border-radius: 999px;
-  transition: width 1s ease;
+  background: rgba(24, 32, 22, 0.08);
 }
 
-/* Tabs */
-.tabs {
-  display: flex;
+.forecastProgressFill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--forecast-lime), #98c43d, var(--forecast-moss));
+  box-shadow: 0 10px 24px rgba(73, 86, 49, 0.2);
+  transition: width 900ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.forecastTabs {
+  display: inline-flex;
+  flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 28px;
-  border-bottom: 1px solid var(--border-color);
+  padding: 8px;
+  margin-bottom: 24px;
+  border: 1px solid var(--forecast-line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 16px 36px rgba(44, 58, 35, 0.08);
+  backdrop-filter: blur(18px);
 }
 
-.tab {
-  display: flex;
+.forecastTab {
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 12px 24px;
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: var(--transition);
-  border-bottom: 2px solid transparent;
-}
-
-.tab:hover {
-  color: var(--text-main);
-}
-
-.tab.active {
-  color: var(--primary-dark);
-  border-bottom-color: var(--primary-accent);
-}
-
-/* Summary Card */
-.summaryCard {
-  display: flex;
   justify-content: center;
+  gap: 9px;
+  min-height: 42px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 999px;
+  color: var(--forecast-muted);
+  background: transparent;
+  cursor: pointer;
+  font-weight: 900;
+  transition: color var(--forecast-transition), background var(--forecast-transition), transform var(--forecast-transition);
+}
+
+.forecastTab:hover {
+  color: var(--forecast-ink);
+}
+
+.forecastTab.active {
+  color: var(--forecast-ink);
+  background: var(--forecast-lime);
+  transform: translateY(-1px);
+}
+
+.tabContent {
+  animation: forecastReveal 280ms ease both;
+}
+
+@keyframes forecastReveal {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.summaryCard {
+  display: grid;
+  grid-template-columns: auto 1fr;
   align-items: center;
-  gap: 24px;
+  gap: 22px;
   padding: 28px;
-  margin-bottom: 28px;
-  border-radius: var(--radius-lg);
-  background: linear-gradient(135deg, rgba(234, 237, 116, 0.1), rgba(234, 237, 116, 0.05));
-  border: 1px solid rgba(234, 237, 116, 0.3);
+  margin-bottom: 22px;
+  border-radius: var(--forecast-radius-lg);
+  background:
+    linear-gradient(135deg, rgba(232, 244, 93, 0.2), rgba(255, 255, 255, 0.72)),
+    var(--forecast-card);
 }
 
-.summaryIcon svg {
-  color: var(--primary-dark);
+.summaryIcon {
+  display: grid;
+  place-items: center;
+  width: 68px;
+  height: 68px;
+  border-radius: 22px;
+  color: var(--forecast-ink);
+  background: var(--forecast-lime);
 }
 
-.summaryText h3 {
-  margin: 0 0 8px;
-  color: var(--text-main);
-  font-size: 1.1rem;
+.summaryText h3,
+.optimalStrategyCard h3,
+.chartCardForecast h3,
+.comparisonTable h3 {
+  margin: 0 0 12px;
+  color: var(--forecast-ink);
+  font-size: 1.15rem;
+  font-weight: 900;
+  letter-spacing: -0.035em;
 }
 
 .summaryText p {
   margin: 0;
-  color: var(--text-muted);
-  line-height: 1.5;
+  color: var(--forecast-muted);
+  line-height: 1.65;
 }
 
-/* Optimal Strategy */
+.optimalStrategyCard,
+.chartCardForecast,
+.comparisonTable,
+.scenarioCard {
+  padding: 26px;
+  border-radius: var(--forecast-radius-lg);
+}
+
 .optimalStrategyCard {
-  padding: 28px;
-  margin-bottom: 28px;
-  border-radius: var(--radius-lg);
-  background: var(--card-bg);
-  backdrop-filter: blur(16px);
-  border: 1px solid var(--border-color);
+  margin-bottom: 22px;
 }
 
 .optimalStrategyCard h3 {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin: 0 0 20px;
-  color: var(--text-main);
-  font-size: 1rem;
+  gap: 9px;
 }
 
 .strategyName {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: var(--primary-dark);
-  margin-bottom: 16px;
+  margin-bottom: 18px;
+  color: var(--forecast-moss);
+  font-size: clamp(1.35rem, 3vw, 2rem);
+  font-weight: 950;
+  letter-spacing: -0.06em;
 }
 
 .strategyDetails {
-  display: flex;
-  gap: 24px;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
 }
 
 .strategyDetails .detail {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  display: grid;
+  gap: 5px;
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(24, 32, 22, 0.045);
 }
 
-.strategyDetails .detail span {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-}
-
-.strategyDetails .detail strong {
-  font-size: 1.1rem;
-  color: var(--text-main);
-}
-
-/* Chart Card */
 .chartCardForecast {
-  padding: 24px;
-  border-radius: var(--radius-lg);
-  background: var(--card-bg);
-  backdrop-filter: blur(16px);
-  border: 1px solid var(--border-color);
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(79, 124, 255, 0.1), transparent 18rem),
+    var(--forecast-card);
 }
 
 .chartCardForecast h3 {
-  margin: 0 0 20px;
-  color: var(--text-main);
-  font-size: 1rem;
+  margin-bottom: 20px;
 }
 
 .chartContainer {
-  height: 400px;
+  height: 430px;
   width: 100%;
 }
 
-/* Scenarios Grid */
-.scenariosGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 24px;
-}
-
 .scenarioCard {
-  padding: 24px;
-  border-radius: var(--radius-lg);
-  background: var(--card-bg);
-  backdrop-filter: blur(16px);
-  border: 1px solid var(--border-color);
-  transition: var(--transition);
-}
-
-.scenarioCard:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
+  transition: transform var(--forecast-transition), box-shadow var(--forecast-transition), border-color var(--forecast-transition);
 }
 
 .scenarioHeaderForecast {
-  display: flex;
-  justify-content: center;
   align-items: center;
-  margin-bottom: 20px;
-}
-
-.scenarioHeaderForecast h3 {
-  margin: 0;
-  color: var(--text-main);
-  font-size: 1.1rem;
-}
-
-.optimalBadge {
-  padding: 4px 12px;
-  border-radius: 999px;
-  background: var(--primary-accent);
-  color: var(--primary-dark);
-  font-size: 0.7rem;
-  font-weight: 600;
 }
 
 .scenarioParams {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 20px;
-  margin-bottom: 20px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--border-color);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.param,
+.result {
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(24, 32, 22, 0.045);
 }
 
 .param {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.param span {
-  font-size: 0.7rem;
-  color: var(--text-muted);
-}
-
-.param strong {
-  font-size: 1rem;
-  color: var(--text-main);
+  display: grid;
+  gap: 5px;
 }
 
 .scenarioResults {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 20px;
+  display: grid;
+  gap: 10px;
+  margin-bottom: 16px;
 }
 
 .result {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
-.result span:first-child {
-  color: var(--text-muted);
-  font-size: 0.85rem;
-}
-
-.result .value {
-  color: var(--text-main);
-  font-weight: 500;
-}
-
-.result .value.highlight {
-  color: var(--success-color);
-  font-weight: 600;
+.result .value.highlight,
+.amount {
+  color: var(--forecast-green);
 }
 
 .scenarioRisk {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 12px;
-  border-radius: var(--radius-sm);
-  font-size: 0.85rem;
+  padding: 12px 14px;
+  border-radius: 16px;
+  font-size: 0.86rem;
+  font-weight: 850;
 }
 
 .riskLow {
-  background: rgba(46, 125, 50, 0.1);
-  color: var(--success-color);
+  color: #11683d;
+  background: rgba(39, 166, 106, 0.13);
 }
 
 .riskMedium {
-  background: rgba(245, 166, 35, 0.1);
-  color: var(--warning-color);
+  color: #9a5600;
+  background: rgba(240, 161, 58, 0.16);
 }
 
 .riskHigh {
-  background: rgba(227, 93, 93, 0.1);
-  color: var(--danger-color);
+  color: #b43a31;
+  background: rgba(255, 107, 95, 0.14);
 }
 
-/* Comparison Table */
 .comparisonTable {
-  padding: 24px;
-  border-radius: var(--radius-lg);
-  background: var(--card-bg);
-  backdrop-filter: blur(16px);
-  border: 1px solid var(--border-color);
-  margin-top: 28px;
-}
-
-.comparisonTable h3 {
-  margin: 0 0 20px;
-  color: var(--text-main);
-  font-size: 1rem;
+  margin-top: 22px;
 }
 
 .tableWrapper {
@@ -665,143 +667,132 @@
 
 .comparisonTable table {
   width: 100%;
-  border-collapse: collapse;
-  font-size: 0.85rem;
-}
-
-.comparisonTable th,
-.comparisonTable td {
-  padding: 12px;
-  text-align: left;
-  border-bottom: 1px solid var(--border-color);
+  border-collapse: separate;
+  border-spacing: 0 8px;
+  font-size: 0.88rem;
 }
 
 .comparisonTable th {
-  color: var(--text-muted);
-  font-weight: 600;
+  padding: 0 14px 8px;
+  color: var(--forecast-muted);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-align: left;
+  text-transform: uppercase;
 }
 
-.optimalRow {
-  background: rgba(234, 237, 116, 0.08);
+.comparisonTable td {
+  padding: 14px;
+  color: var(--forecast-ink);
+  background: rgba(255, 255, 255, 0.62);
 }
 
-.amount {
-  font-weight: 600;
-  color: var(--success-color);
+.comparisonTable td:first-child {
+  border-radius: 16px 0 0 16px;
+}
+
+.comparisonTable td:last-child {
+  border-radius: 0 16px 16px 0;
+}
+
+.optimalRow td {
+  background: rgba(232, 244, 93, 0.24);
 }
 
 .confidenceBar {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 8px;
-  background: rgba(73, 86, 49, 0.08);
-  border-radius: 999px;
+  min-width: 110px;
+  height: 28px;
   overflow: hidden;
+  border-radius: 999px;
+  background: rgba(24, 32, 22, 0.08);
 }
 
 .confidenceFill {
-  height: 6px;
-  background: var(--success-color);
-  border-radius: 999px;
-  transition: width 0.5s ease;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--forecast-green), var(--forecast-lime));
+  transition: width 500ms ease;
 }
 
 .confidenceBar span {
+  position: absolute;
+  right: 10px;
+  color: var(--forecast-ink);
   font-size: 0.75rem;
-  white-space: nowrap;
+  font-weight: 900;
 }
 
-.riskBadge {
-  padding: 4px 8px;
-  border-radius: 999px;
-  font-size: 0.7rem;
-}
-
-/* Recalculate */
 .recalculateSection {
   display: flex;
   justify-content: center;
-  margin-top: 48px;
-  padding-top: 32px;
-  border-top: 1px solid var(--border-color);
-}
-
-.recalculateButton {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 14px 32px;
-  background: transparent;
-  color: var(--text-main);
-  border: 1px solid var(--border-color);
-  border-radius: 999px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: var(--transition);
-}
-
-.recalculateButton:hover:not(:disabled) {
-  background: var(--primary-accent);
-  border-color: var(--primary-accent);
-  color: var(--primary-dark);
-  transform: translateY(-2px);
+  margin-top: 44px;
+  padding-top: 28px;
+  border-top: 1px solid var(--forecast-line);
 }
 
 .recalculateButton:disabled {
-  opacity: 0.5;
   cursor: not-allowed;
+  opacity: 0.55;
 }
 
 .spinning {
   animation: spin 1s linear infinite;
 }
 
-/* Mobile */
-@media (max-width: 900px) {
-  .goalsGrid,
-  .scenariosGrid {
+@media (max-width: 1100px) {
+  .forecastHero {
     grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 768px) {
-  .forecastPage {
-    padding: 28px 18px 60px;
   }
 
   .goalInfoStatsForecast {
-    flex-wrap: wrap;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .forecastHero {
+    padding: 26px;
+    border-radius: 30px;
+  }
+
+  .forecastGoalsGrid,
+  .scenariosGrid,
+  .goalInfoStatsForecast,
+  .strategyDetails,
+  .scenarioParams {
     grid-template-columns: 1fr;
-    gap: 16px;
+  }
+
+  .forecastTabs {
+    display: grid;
+    grid-template-columns: 1fr;
+    width: 100%;
+    border-radius: 24px;
+  }
+
+  .forecastTab,
+  .recalculateButton,
+  .createButton {
+    width: 100%;
   }
 
   .summaryCard {
-    flex-direction: column;
+    grid-template-columns: 1fr;
+    justify-items: center;
     text-align: center;
   }
 
-  .strategyDetails {
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .tabs {
-    flex-wrap: wrap;
-    justify-content: stretch;
-  }
-
-  .tab {
-    flex: 1;
-    justify-content: center;
-  }
-
   .chartContainer {
-    height: 300px;
+    height: 320px;
   }
 
   .comparisonTable th,
   .comparisonTable td {
-    padding: 8px;
-    font-size: 0.75rem;
+    padding: 10px;
+    font-size: 0.76rem;
   }
 }

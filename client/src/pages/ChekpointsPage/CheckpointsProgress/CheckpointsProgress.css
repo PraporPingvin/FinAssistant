@@ -359,3 +359,116 @@
     width: 100%;
   }
 }
+/* Modern progress tab skin */
+.progressPage {
+  --cp-ink: #172014;
+  --cp-muted: #68745b;
+  --cp-card: rgba(255, 255, 255, 0.82);
+  --cp-line: rgba(24, 32, 22, 0.1);
+  --cp-lime: #e8f45d;
+  --cp-moss: #495631;
+  --cp-green: #27a66a;
+  --cp-amber: #f0a13a;
+  --cp-red: #ff6b5f;
+  padding: 4px 0 20px;
+}
+
+.progressPage .goalsProgressGrid {
+  gap: 22px;
+}
+
+.progressPage .goalProgressCard {
+  position: relative;
+  overflow: hidden;
+  padding: 26px;
+  border: 1px solid var(--cp-line);
+  border-radius: 30px;
+  background: var(--cp-card);
+  box-shadow: 0 18px 45px rgba(44, 58, 35, 0.08);
+  backdrop-filter: blur(18px);
+}
+
+.progressPage .goalProgressCard::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 5px;
+  background: linear-gradient(90deg, var(--cp-lime), #98c43d, var(--cp-moss));
+}
+
+.progressPage .goalProgressCard:hover {
+  transform: translateY(-7px);
+  box-shadow: 0 30px 70px rgba(44, 58, 35, 0.16);
+}
+
+.progressPage .goalTitle {
+  color: var(--cp-ink);
+  font-size: 1.25rem;
+  font-weight: 900;
+  letter-spacing: -0.045em;
+}
+
+.progressPage .goalStatus,
+.progressPage .checkpointsBreakdown span {
+  font-weight: 900;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.progressPage .progressPercent {
+  color: var(--cp-moss);
+  font-size: 1.8rem;
+  font-weight: 950;
+  letter-spacing: -0.06em;
+}
+
+.progressPage .progressBarContainer {
+  height: 14px;
+  background: rgba(24, 32, 22, 0.08);
+}
+
+.progressPage .progressBarFill {
+  background: linear-gradient(90deg, var(--cp-lime), #98c43d, var(--cp-moss));
+  box-shadow: 0 10px 24px rgba(73, 86, 49, 0.2);
+}
+
+.progressPage .goalStatsChekpoint,
+.progressPage .forecastInfo,
+.progressPage .checkpointsStats,
+.progressPage .goalCheckpointsList,
+.progressPage .checkpointMiniItem {
+  border: 1px solid var(--cp-line);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.62);
+}
+
+.progressPage .statLabel,
+.progressPage .checkpointsCount,
+.progressPage .forecastDate,
+.progressPage .checkpointMiniDetails {
+  color: var(--cp-muted);
+  font-weight: 750;
+}
+
+.progressPage .statValue,
+.progressPage .forecastText strong {
+  color: var(--cp-ink);
+  font-weight: 900;
+}
+
+.progressPage .actionButton {
+  border: 1px solid var(--cp-line);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.64);
+  font-weight: 850;
+}
+
+.progressPage .actionButton.primary {
+  color: var(--cp-ink);
+  background: var(--cp-lime);
+}
+
+.progressPage .actionButton.primary:hover {
+  color: var(--cp-ink);
+  background: var(--cp-lime);
+}
