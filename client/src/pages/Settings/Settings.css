@@ -1,253 +1,49 @@
-:root {
-  --primary-dark: #495631;
-  --primary-accent: #EAED74;
-  --primary-light: #EFF2DD;
-
-  --card-bg: rgba(255, 255, 255, 0.72);
-  --border-color: rgba(73, 86, 49, 0.08);
-
-  --text-main: #495631;
-  --text-muted: #7B8465;
-
-  --success-color: #2E7D32;
-  --danger-color: #E35D5D;
-
-  --shadow-sm: 0 8px 24px rgba(73, 86, 49, 0.06);
-  --shadow-md: 0 10px 30px rgba(73, 86, 49, 0.08);
-
-  --radius-sm: 12px;
-  --radius-md: 18px;
-  --radius-lg: 24px;
-  --radius-full: 999px;
-
-  --transition: all 0.28s ease;
+﻿:root {
+  --settings-ink: #172014;
+  --settings-muted: #66715c;
+  --settings-card: rgba(255, 255, 255, 0.82);
+  --settings-line: rgba(24, 32, 22, 0.1);
+  --settings-lime: #e8f45d;
+  --settings-moss: #495631;
+  --settings-green: #27a66a;
+  --settings-red: #ff6b5f;
+  --settings-shadow: 0 24px 70px rgba(44, 58, 35, 0.14);
+  --settings-transition: 220ms ease;
 }
 
-.settingsPage {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 42px 24px 80px;
-}
-
-.pageHeaderSetting {
-  text-align: center;
-  margin-bottom: 42px;
-}
-
-.pageHeaderSetting h1 {
-  margin: 0 0 8px;
-  color: var(--text-main);
-  font-size: clamp(2rem, 4vw, 2.5rem);
-  font-weight: 300;
-  letter-spacing: -1px;
-}
-
-.pageHeaderSetting p {
-  margin: 0;
-  color: var(--text-muted);
-}
-
-.settingsGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 28px;
-}
-
-.settingsCard {
-  padding: 28px;
-  border-radius: var(--radius-lg);
-  background: var(--card-bg);
-  backdrop-filter: blur(16px);
-  border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-sm);
-}
-
-.cardHeader {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 24px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.cardHeader svg {
-  color: var(--primary-dark);
-}
-
-.cardHeader h2 {
-  margin: 0;
-  color: var(--text-main);
-  font-size: 1.2rem;
-  font-weight: 500;
-}
-
-.message {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 14px 18px;
-  margin-bottom: 24px;
-  border-radius: var(--radius-sm);
-  font-size: 0.85rem;
-}
-
-.message.success {
-  background: rgba(46, 125, 50, 0.1);
-  color: var(--success-color);
-  border-left: 3px solid var(--success-color);
-}
-
-.message.error {
-  background: rgba(227, 93, 93, 0.1);
-  color: var(--danger-color);
-  border-left: 3px solid var(--danger-color);
-}
-
-.settingsForm {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.formGroup {
-  margin-bottom: 20px;
-}
-
-.formLabel {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
-  color: var(--text-muted);
-  font-size: 0.85rem;
-  font-weight: 500;
-}
-
-.passwordWrapper {
-  position: relative;
-}
-
-.formInput {
-  width: 100%;
-  padding: 12px 16px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border-color);
-  background: rgba(255, 255, 255, 0.75);
-  color: var(--text-main);
-  font-size: 0.95rem;
-  transition: var(--transition);
-  box-sizing: border-box;
-}
-
-.formInput:focus {
-  outline: none;
-  border-color: var(--primary-accent);
-  box-shadow: 0 0 0 4px rgba(234, 237, 116, 0.18);
-}
-
-.showPasswordCheckbox {
-  margin: 16px 0 24px;
-}
-
-.showPasswordCheckbox label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  color: var(--text-muted);
-  font-size: 0.85rem;
-}
-
-.showPasswordCheckbox input {
-  cursor: pointer;
-}
-
-.submitButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px 24px;
-  background: var(--primary-dark);
-  color: var(--primary-accent);
-  border: none;
-  border-radius: var(--radius-full);
-  cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 600;
-  transition: var(--transition);
-}
-
-.submitButton:hover:not(:disabled) {
-  transform: translateY(-2px);
-  background: var(--primary-accent);
-  color: var(--primary-dark);
-  box-shadow: var(--shadow-md);
-}
-
-.submitButton:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.accountInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.infoRow {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.infoRow:last-child {
-  border-bottom: none;
-}
-
-.infoLabel {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 100px;
-  color: var(--text-muted);
-  font-size: 0.85rem;
-}
-
-.infoValue {
-  color: var(--text-main);
-  font-size: 0.95rem;
-  font-weight: 500;
-  word-break: break-all;
-}
-
-@media (max-width: 900px) {
-  .settingsGrid {
-    grid-template-columns: 1fr;
-    gap: 24px;
-  }
-}
-
-@media (max-width: 768px) {
-  .settingsPage {
-    padding: 28px 18px 60px;
-  }
-
-  .settingsCard {
-    padding: 20px;
-  }
-
-  .infoRow {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
-  }
-
-  .infoLabel {
-    min-width: auto;
-  }
-}
+.settingsPage { max-width: 1280px; margin: 0 auto; color: var(--settings-ink); }
+.settingsHero { position: relative; display: grid; grid-template-columns: minmax(0,1.2fr) minmax(260px,.5fr); gap: 26px; overflow: hidden; padding: clamp(28px,5vw,58px); margin-bottom: 22px; border: 1px solid rgba(255,255,255,.72); border-radius: 44px; background: radial-gradient(circle at 86% 12%, rgba(232,244,93,.35), transparent 24rem), radial-gradient(circle at 10% 92%, rgba(79,124,255,.22), transparent 22rem), linear-gradient(125deg, rgba(23,32,20,.96), rgba(73,86,49,.9)); box-shadow: var(--settings-shadow); }
+.settingsEyebrow, .settingsHeroPanel span, .settingsCardHeader span, .settingsField span, .accountInfoTile span { color: var(--settings-muted); font-size: .76rem; font-weight: 900; letter-spacing: .11em; text-transform: uppercase; }
+.settingsHero .settingsEyebrow { color: rgba(255,255,255,.68); }
+.settingsHero h1 { margin: 16px 0 12px; color: #fff; font-size: clamp(2.8rem,7vw,6rem); font-weight: 950; letter-spacing: -.08em; line-height: .92; }
+.settingsHero p { max-width: 720px; margin: 0; color: rgba(255,255,255,.74); font-size: clamp(1rem,1.5vw,1.18rem); line-height: 1.65; }
+.settingsHeroPanel { align-self: center; display: grid; gap: 10px; padding: 28px; border: 1px solid rgba(255,255,255,.22); border-radius: 32px; color: #fff; background: rgba(255,255,255,.12); backdrop-filter: blur(22px); }
+.settingsHeroPanel svg { color: var(--settings-lime); }
+.settingsHeroPanel span { color: rgba(255,255,255,.66); }
+.settingsHeroPanel strong { font-size: clamp(2.3rem,5vw,4rem); font-weight: 950; letter-spacing: -.08em; }
+.settingsGrid { display: grid; grid-template-columns: minmax(0,1fr) minmax(300px,.45fr); gap: 22px; align-items: start; }
+.settingsCard { border: 1px solid var(--settings-line); background: var(--settings-card); box-shadow: 0 18px 45px rgba(44,58,35,.08); backdrop-filter: blur(18px); border-radius: 36px; padding: clamp(22px,3vw,34px); }
+.settingsCardHeader { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 22px; }
+.settingsCardHeader h2 { margin: 4px 0 0; font-size: clamp(1.6rem,3vw,2.4rem); font-weight: 950; letter-spacing: -.07em; }
+.settingsCardHeader > svg { color: var(--settings-moss); }
+.settingsMessage { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; padding: 15px 18px; border-radius: 18px; font-weight: 850; }
+.settingsMessage.success { color: #11683d; background: rgba(39,166,106,.12); }
+.settingsMessage.error { color: #c84237; background: rgba(255,107,95,.1); }
+.settingsForm { display: grid; gap: 16px; }
+.settingsField { display: grid; gap: 8px; }
+.settingsField span, .accountInfoTile span { display: inline-flex; align-items: center; gap: 7px; }
+.settingsField input { min-height: 52px; box-sizing: border-box; padding: 0 16px; border: 1px solid var(--settings-line); border-radius: 18px; color: var(--settings-ink); background: rgba(255,255,255,.74); font: inherit; font-weight: 850; }
+.settingsField input:focus { outline: none; border-color: var(--settings-lime); box-shadow: 0 0 0 4px rgba(232,244,93,.18); }
+.showPasswordToggle { display: inline-flex; align-items: center; gap: 8px; width: fit-content; color: var(--settings-muted); font-weight: 850; cursor: pointer; }
+.showPasswordToggle input { accent-color: var(--settings-moss); }
+.settingsPrimaryButton { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 50px; padding: 0 22px; border: 0; border-radius: 999px; color: var(--settings-ink); background: var(--settings-lime); box-shadow: 0 16px 34px rgba(73,86,49,.12); cursor: pointer; font-weight: 900; transition: transform var(--settings-transition), box-shadow var(--settings-transition); }
+.settingsPrimaryButton:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 18px 38px rgba(44,58,35,.14); }
+.settingsPrimaryButton:disabled { opacity: .55; cursor: not-allowed; }
+.accountInfoGrid { display: grid; gap: 14px; }
+.accountInfoTile, .securityNote { display: grid; gap: 9px; padding: 18px; border-radius: 22px; background: rgba(255,255,255,.58); }
+.accountInfoTile strong { overflow: hidden; color: var(--settings-ink); font-size: 1.08rem; font-weight: 950; text-overflow: ellipsis; }
+.securityNote { color: var(--settings-muted); line-height: 1.6; background: rgba(232,244,93,.16); }
+.securityNote svg { color: var(--settings-moss); }
+.securityNote p { margin: 0; }
+@media (max-width: 980px) { .settingsHero, .settingsGrid { grid-template-columns: 1fr; } }
+@media (max-width: 640px) { .settingsHero { padding: 26px; border-radius: 32px; } .settingsPrimaryButton { width: 100%; } }

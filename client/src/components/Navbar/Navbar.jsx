@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, Target, LineChart, TrendingUp, Clock, Menu, X } from "lucide-react";
+import { BarChart3, Clock, LayoutDashboard, LineChart, Menu, Target, TrendingUp, X } from "lucide-react";
 import UserMenu from "../UserMenu/UserMenu";
 import "./Navbar.css";
 
@@ -12,66 +12,48 @@ function Navbar() {
     setIsMenuOpen(false);
   }, [location]);
 
-  const isActive = (path) => {
-    if (path === "/") {
-      return location.pathname === "/";
-    }
-    return location.pathname.startsWith(path);
-  };
+  const isActive = (path) => (path === "/" ? location.pathname === "/" : location.pathname.startsWith(path));
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
+  const navItems = [
+    { to: "/", label: "Обзор", icon: <LayoutDashboard size={18} /> },
+    { to: "/goals", label: "Цели", icon: <Target size={18} /> },
+    { to: "/scenarios", label: "Сценарии", icon: <LineChart size={18} /> },
+    { to: "/forecast", label: "Прогнозы", icon: <TrendingUp size={18} /> },
+    { to: "/checkpoints", label: "Контроль", icon: <Clock size={18} /> },
+  ];
 
   return (
     <header className="navbar">
       <div className="navbarContainer">
         <Link to="/" className="logo">
-          <Target size={24} />
-          <span>Финансовый ассистент</span>
+          <span className="logoMark"><BarChart3 size={22} /></span>
+          <span className="logoText">FinAssistant</span>
         </Link>
+
+        <nav className="desktopNav" aria-label="Основная навигация">
+          {navItems.map((item) => (
+            <Link key={item.to} to={item.to} className={`navLink ${isActive(item.to) ? "active" : ""}`}>
+              {item.icon}
+              <span>{item.label}</span>
+            </Link>
+          ))}
+        </nav>
 
         <div className="navbarRight">
           <UserMenu />
-          <button className="menuToggle" onClick={toggleMenu} aria-label="Меню">
+          <button className="menuToggle" onClick={() => setIsMenuOpen(!isMenuOpen)} aria-label="Меню">
             {isMenuOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
         </div>
       </div>
 
-      <nav className={`navMenu ${isMenuOpen ? "open" : ""}`}>
-        <ul className="navLinks">
-          <li className="navItem">
-            <Link to="/" className={`navLink ${isActive("/") ? "active" : ""}`}>
-              <LayoutDashboard size={18} />
-              <span>Обзор</span>
-            </Link>
-          </li>
-          <li className="navItem">
-            <Link to="/goals" className={`navLink ${isActive("/goals") ? "active" : ""}`}>
-              <Target size={18} />
-              <span>Цели</span>
-            </Link>
-          </li>
-          <li className="navItem">
-            <Link to="/scenarios" className={`navLink ${isActive("/scenarios") ? "active" : ""}`}>
-              <LineChart size={18} />
-              <span>Сценарии</span>
-            </Link>
-          </li>
-          <li className="navItem">
-            <Link to="/forecast" className={`navLink ${isActive("/forecast") ? "active" : ""}`}>
-              <TrendingUp size={18} />
-              <span>Прогнозы</span>
-            </Link>
-          </li>
-          <li className="navItem">
-            <Link to="/checkpoints" className={`navLink ${isActive("/checkpoints") ? "active" : ""}`}>
-              <Clock size={18} />
-              <span>Контроль</span>
-            </Link>
-          </li>
-        </ul>
+      <nav className={`mobileNav ${isMenuOpen ? "open" : ""}`} aria-label="Мобильная навигация">
+        {navItems.map((item) => (
+          <Link key={item.to} to={item.to} className={`navLink ${isActive(item.to) ? "active" : ""}`}>
+            {item.icon}
+            <span>{item.label}</span>
+          </Link>
+        ))}
       </nav>
     </header>
   );

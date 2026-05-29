@@ -1,260 +1,53 @@
-:root {
-  --primary-dark: #495631;
-  --primary-accent: #EAED74;
-  --primary-light: #EFF2DD;
-
-  --card-bg: rgba(255, 255, 255, 0.72);
-  --border-color: rgba(73, 86, 49, 0.08);
-
-  --text-main: #495631;
-  --text-muted: #7B8465;
-
-  --success-color: #2E7D32;
-  --danger-color: #E35D5D;
-
-  --shadow-sm: 0 8px 24px rgba(73, 86, 49, 0.06);
-  --shadow-md: 0 10px 30px rgba(73, 86, 49, 0.08);
-
-  --radius-sm: 12px;
-  --radius-md: 18px;
-  --radius-lg: 24px;
-  --radius-full: 999px;
-
-  --transition: all 0.28s ease;
+﻿:root {
+  --account-ink: #172014;
+  --account-muted: #66715c;
+  --account-card: rgba(255, 255, 255, 0.82);
+  --account-line: rgba(24, 32, 22, 0.1);
+  --account-lime: #e8f45d;
+  --account-moss: #495631;
+  --account-green: #27a66a;
+  --account-red: #ff6b5f;
+  --account-shadow: 0 24px 70px rgba(44, 58, 35, 0.14);
+  --account-transition: 220ms ease;
 }
 
-.profilePage {
-  max-width: 700px;
-  margin: 0 auto;
-  padding: 42px 24px 80px;
-}
-
-.pageHeaderProfile {
-  text-align: center;
-  margin-bottom: 42px;
-}
-
-.pageHeaderProfile h1 {
-  margin: 0 0 8px;
-  color: var(--text-main);
-  font-size: clamp(2rem, 4vw, 2.5rem);
-  font-weight: 300;
-  letter-spacing: -1px;
-}
-
-.pageHeaderProfile p {
-  margin: 0;
-  color: var(--text-muted);
-}
-
-.profileCard {
-  padding: 40px;
-  border-radius: var(--radius-xl);
-  background: var(--card-bg);
-  backdrop-filter: blur(16px);
-  border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-sm);
-  text-align: center;
-}
-
-.profileAvatar {
-  width: 100px;
-  height: 100px;
-  margin: 0 auto 28px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary-accent), var(--primary-dark));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2.5rem;
-  font-weight: 500;
-  color: white;
-  box-shadow: var(--shadow-md);
-}
-
-.message {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 14px 18px;
-  margin-bottom: 24px;
-  border-radius: var(--radius-sm);
-  font-size: 0.85rem;
-}
-
-.message.success {
-  background: rgba(46, 125, 50, 0.1);
-  color: var(--success-color);
-}
-
-.message.error {
-  background: rgba(227, 93, 93, 0.1);
-  color: var(--danger-color);
-}
-
-.profileInfo {
-  margin-bottom: 28px;
-}
-
-.infoRow {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px 0;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.infoRow:last-child {
-  border-bottom: none;
-}
-
-.infoLabel {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--text-muted);
-  font-size: 0.85rem;
-}
-
-.infoValue {
-  color: var(--text-main);
-  font-size: 0.95rem;
-  font-weight: 500;
-}
-
-.profileActions {
-  display: flex;
-  justify-content: center;
-}
-
-.editButton {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 28px;
-  background: var(--primary-dark);
-  color: var(--primary-accent);
-  border: none;
-  border-radius: var(--radius-full);
-  cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 600;
-  transition: var(--transition);
-}
-
-.editButton:hover {
-  transform: translateY(-2px);
-  background: var(--primary-accent);
-  color: var(--primary-dark);
-  box-shadow: var(--shadow-md);
-}
-
-.profileForm {
-  text-align: left;
-}
-
-.formGroup {
-  margin-bottom: 20px;
-}
-
-.formLabel {
-  display: block;
-  margin-bottom: 8px;
-  color: var(--text-muted);
-  font-size: 0.85rem;
-  font-weight: 500;
-}
-
-.formInput {
-  width: 100%;
-  padding: 12px 16px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border-color);
-  background: rgba(255, 255, 255, 0.75);
-  color: var(--text-main);
-  font-size: 0.95rem;
-  transition: var(--transition);
-  box-sizing: border-box;
-}
-
-.formInput:focus {
-  outline: none;
-  border-color: var(--primary-accent);
-  box-shadow: 0 0 0 4px rgba(234, 237, 116, 0.18);
-}
-
-.formActions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-top: 24px;
-  padding-top: 16px;
-  border-top: 1px solid var(--border-color);
-}
-
-.cancelButton,
-.saveButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 10px 24px;
-  border: none;
-  border-radius: var(--radius-full);
-  cursor: pointer;
-  font-size: 0.85rem;
-  font-weight: 600;
-  transition: var(--transition);
-}
-
-.cancelButton {
-  background: rgba(73, 86, 49, 0.06);
-  color: var(--text-main);
-}
-
-.cancelButton:hover:not(:disabled) {
-  background: rgba(73, 86, 49, 0.12);
-}
-
-.saveButton {
-  background: var(--primary-dark);
-  color: var(--primary-accent);
-}
-
-.saveButton:hover:not(:disabled) {
-  transform: translateY(-2px);
-  background: var(--primary-accent);
-  color: var(--primary-dark);
-  box-shadow: var(--shadow-md);
-}
-
-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-@media (max-width: 768px) {
-  .profilePage {
-    padding: 28px 18px 60px;
-  }
-
-  .profileCard {
-    padding: 28px 20px;
-  }
-
-  .infoRow {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
-  }
-
-  .formActions {
-    flex-direction: column;
-  }
-
-  .cancelButton,
-  .saveButton {
-    width: 100%;
-  }
-}
+.profilePage { max-width: 1280px; margin: 0 auto; color: var(--account-ink); }
+.profileHero { position: relative; display: grid; grid-template-columns: minmax(0,1.2fr) minmax(280px,.6fr); gap: 26px; overflow: hidden; padding: clamp(28px,5vw,58px); margin-bottom: 22px; border: 1px solid rgba(255,255,255,.72); border-radius: 44px; background: radial-gradient(circle at 86% 12%, rgba(232,244,93,.35), transparent 24rem), radial-gradient(circle at 10% 92%, rgba(79,124,255,.22), transparent 22rem), linear-gradient(125deg, rgba(23,32,20,.96), rgba(73,86,49,.9)); box-shadow: var(--account-shadow); }
+.profileEyebrow, .profileHeroBadge span, .profileSummaryCard span, .profileCardHeader span, .profileInfoTile span, .profileForm span { color: var(--account-muted); font-size: .76rem; font-weight: 900; letter-spacing: .11em; text-transform: uppercase; }
+.profileHero .profileEyebrow { color: rgba(255,255,255,.68); }
+.profileHero h1 { margin: 16px 0 12px; color: #fff; font-size: clamp(2.8rem,7vw,6rem); font-weight: 950; letter-spacing: -.08em; line-height: .92; }
+.profileHero p { max-width: 720px; margin: 0; color: rgba(255,255,255,.74); font-size: clamp(1rem,1.5vw,1.18rem); line-height: 1.65; }
+.profileHeroBadge { align-self: center; display: grid; gap: 10px; padding: 28px; border: 1px solid rgba(255,255,255,.22); border-radius: 32px; color: #fff; background: rgba(255,255,255,.12); backdrop-filter: blur(22px); }
+.profileHeroBadge span { color: rgba(255,255,255,.66); }
+.profileHeroBadge strong { font-size: clamp(3rem,7vw,5.3rem); font-weight: 950; letter-spacing: -.08em; line-height: .92; }
+.profileHeroBadge small { overflow: hidden; color: rgba(255,255,255,.72); font-weight: 800; text-overflow: ellipsis; }
+.profileShell { display: grid; grid-template-columns: minmax(280px,.38fr) minmax(0,1fr); gap: 22px; align-items: start; }
+.profileSummaryCard, .profileCard { border: 1px solid var(--account-line); background: var(--account-card); box-shadow: 0 18px 45px rgba(44,58,35,.08); backdrop-filter: blur(18px); border-radius: 36px; }
+.profileSummaryCard { display: grid; place-items: center; gap: 12px; padding: 34px; text-align: center; }
+.profileAvatar { display: grid; place-items: center; width: 112px; height: 112px; border-radius: 32px; color: var(--account-ink); background: linear-gradient(135deg, var(--account-lime), #fff); font-size: 3rem; font-weight: 950; letter-spacing: -.08em; box-shadow: 0 20px 42px rgba(73,86,49,.16); }
+.profileSummaryCard h2 { margin: 4px 0 0; font-size: clamp(1.6rem,3vw,2.4rem); font-weight: 950; letter-spacing: -.07em; }
+.profileSummaryCard p { margin: 0; color: var(--account-muted); word-break: break-all; }
+.profileGlowStat { display: inline-flex; align-items: center; gap: 8px; margin-top: 8px; padding: 12px 14px; border-radius: 999px; color: #11683d; background: rgba(39,166,106,.12); font-weight: 900; }
+.profileCard { padding: clamp(22px,3vw,34px); }
+.profileCardHeader { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 22px; }
+.profileCardHeader h2 { margin: 4px 0 0; font-size: clamp(1.6rem,3vw,2.4rem); font-weight: 950; letter-spacing: -.07em; }
+.profilePrimaryButton, .profileGhostButton { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 48px; padding: 0 20px; border-radius: 999px; cursor: pointer; font-weight: 900; border: 0; transition: transform var(--account-transition), box-shadow var(--account-transition); }
+.profilePrimaryButton { color: var(--account-ink); background: var(--account-lime); box-shadow: 0 16px 34px rgba(73,86,49,.12); }
+.profileGhostButton { color: var(--account-ink); background: rgba(255,255,255,.72); border: 1px solid var(--account-line); }
+.profilePrimaryButton:hover, .profileGhostButton:hover { transform: translateY(-2px); box-shadow: 0 18px 38px rgba(44,58,35,.14); }
+.profileMessage { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; padding: 15px 18px; border-radius: 18px; font-weight: 850; }
+.profileMessage.success { color: #11683d; background: rgba(39,166,106,.12); }
+.profileMessage.error { color: #c84237; background: rgba(255,107,95,.1); }
+.profileInfoGrid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px; }
+.profileInfoTile { display: grid; gap: 9px; min-width: 0; padding: 18px; border-radius: 22px; background: rgba(255,255,255,.58); }
+.profileInfoTile.wide { grid-column: 1 / -1; }
+.profileInfoTile span { display: inline-flex; align-items: center; gap: 7px; }
+.profileInfoTile strong { overflow: hidden; color: var(--account-ink); font-size: 1.15rem; font-weight: 950; text-overflow: ellipsis; }
+.profileForm { display: grid; gap: 16px; }
+.profileForm label { display: grid; gap: 8px; }
+.profileForm input { min-height: 52px; box-sizing: border-box; padding: 0 16px; border: 1px solid var(--account-line); border-radius: 18px; color: var(--account-ink); background: rgba(255,255,255,.74); font: inherit; font-weight: 850; }
+.profileForm input:focus { outline: none; border-color: var(--account-lime); box-shadow: 0 0 0 4px rgba(232,244,93,.18); }
+.profileFormActions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 8px; }
+button:disabled { opacity: .55; cursor: not-allowed; }
+@media (max-width: 980px) { .profileHero, .profileShell { grid-template-columns: 1fr; } }
+@media (max-width: 640px) { .profileHero { padding: 26px; border-radius: 32px; } .profileCardHeader, .profileFormActions { align-items: stretch; flex-direction: column; } .profileInfoGrid { grid-template-columns: 1fr; } .profilePrimaryButton, .profileGhostButton { width: 100%; } }
