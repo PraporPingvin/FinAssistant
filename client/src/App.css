@@ -1,8 +1,5 @@
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  min-height: 100vh;
 }
 
 
@@ -42,9 +39,27 @@
   background-color: var(--background-color);
 }
 
+.appShell {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 8% 0%, rgba(234, 237, 116, 0.32), transparent 30rem),
+    radial-gradient(circle at 92% 12%, rgba(36, 99, 235, 0.12), transparent 28rem),
+    linear-gradient(135deg, #f4f1e8 0%, #eef2df 42%, #e7ebd6 100%);
+}
+
+.appMain {
+  padding: 28px clamp(16px, 3vw, 40px) 72px;
+}
+
 .content-area {
   padding: 20px;
   min-height: calc(100vh - 100px);
+}
+
+@media (max-width: 768px) {
+  .appMain {
+    padding: 18px 14px 52px;
+  }
 }
 
 /* Анимации */
@@ -88,4 +103,3 @@
   color: #0c5460;
   border: 1px solid #bee5eb;
 }
-

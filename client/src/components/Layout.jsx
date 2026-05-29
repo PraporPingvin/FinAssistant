@@ -3,9 +3,9 @@ import Navbar from "./Navbar/Navbar";
 
 function Layout({ children }) {
   return (
-    <div>
+    <div className="appShell">
       <Navbar />
-      <main style={{ padding: "20px" }}>
+      <main className="appMain">
         {children}
       </main>
     </div>
