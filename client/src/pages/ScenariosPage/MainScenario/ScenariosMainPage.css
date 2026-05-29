@@ -1,693 +1,89 @@
-:root {
-  --primary-dark: #495631;
-  --primary-accent: #EAED74;
-  --primary-light: #EFF2DD;
-
-  --card-bg: rgba(255, 255, 255, 0.72);
-  --border-color: rgba(73, 86, 49, 0.08);
-
-  --text-main: #495631;
-  --text-muted: #7B8465;
-
-  --success-color: #2E7D32;
-  --danger-color: #E35D5D;
-  --warning-color: #F5A623;
-
-  --shadow-sm: 0 8px 24px rgba(73, 86, 49, 0.06);
-  --shadow-md: 0 10px 30px rgba(73, 86, 49, 0.08);
-  --shadow-lg: 0 18px 40px rgba(73, 86, 49, 0.12);
-
-  --radius-sm: 12px;
-  --radius-md: 18px;
-  --radius-lg: 24px;
-  --radius-xl: 32px;
-  --radius-full: 999px;
-
-  --transition: all 0.28s ease;
-}
-
-.scenariosMainPage {
-  max-width: 1400px;
-  margin: 0 auto;
-  /* padding: 42px 24px 80px; */
-}
-
-.breadcrumb {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 36px;
-  color: var(--text-muted);
-  font-size: 0.92rem;
-}
-
-.breadcrumb a {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--text-muted);
-  text-decoration: none;
-  transition: var(--transition);
-}
-
-.breadcrumb a:hover {
-  color: var(--primary-dark);
-}
-
-.breadcrumb .current {
-  color: var(--text-main);
-  font-weight: 600;
-}
-
-.pageHeaderScenarioMain {
-  text-align: center;
-  margin-bottom: 42px;
-}
-
-.pageHeaderScenarioMain h1 {
-  margin: 0 0 8px;
-  color: var(--text-main);
-  font-size: clamp(2rem, 5vw, 2.8rem);
-  font-weight: 300;
-  letter-spacing: -1px;
-}
-
-.pageHeaderScenarioMain p {
-  max-width: 700px;
-  margin: 0 auto;
-  color: var(--text-muted);
-  line-height: 1.6;
-}
-
-.errorMessage {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 16px 24px;
-  margin-bottom: 28px;
-  border-radius: var(--radius-md);
-  background: rgba(227, 93, 93, 0.1);
-  color: var(--danger-color);
-  border-left: 4px solid var(--danger-color);
-}
-
-.filtersSection {
-  padding: 24px;
-  margin-bottom: 32px;
-  border-radius: var(--radius-lg);
-  background: var(--card-bg);
-  backdrop-filter: blur(16px);
-  border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-sm);
-}
-
-.filtersTitle {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 0 0 20px;
-  color: var(--text-main);
-  font-size: 1rem;
-  font-weight: 500;
-}
-
-.filterGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
-  align-items: flex-end;
-}
-
-.filterGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.filterLabel {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--text-muted);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-}
-
-.filterSelect,
-.filterInput {
-  padding: 12px 16px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border-color);
-  background: rgba(255, 255, 255, 0.75);
-  color: var(--text-main);
-  font-size: 0.9rem;
-  transition: var(--transition);
-}
-
-.filterSelect:focus,
-.filterInput:focus {
-  outline: none;
-  border-color: var(--primary-accent);
-  box-shadow: 0 0 0 4px rgba(234, 237, 116, 0.18);
-}
-
-.filterActions {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.clearFiltersButton {
-  padding: 12px 20px;
-  border-radius: var(--radius-full);
-  background: rgba(73, 86, 49, 0.06);
-  color: var(--text-main);
-  border: none;
-  cursor: pointer;
-  transition: var(--transition);
-}
-
-.clearFiltersButton:hover {
-  background: rgba(73, 86, 49, 0.12);
-}
-
-.goalsSection {
-  margin-bottom: 48px;
-}
-
-.sectionTitle {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 0 0 24px;
-  color: var(--text-main);
-  font-size: 1.3rem;
-  font-weight: 500;
-}
-
-.sectionSubtitle {
-  color: var(--text-muted);
-  font-size: 0.9rem;
-  font-weight: normal;
-}
-
-.goalsGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-  gap: 24px;
-}
-
-.goalCard {
-  border-radius: var(--radius-lg);
-  background: var(--card-bg);
-  backdrop-filter: blur(16px);
-  border: 1px solid var(--border-color);
-  overflow: hidden;
-  transition: var(--transition);
-}
-
-.goalCard:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
-}
-
-.goalCardHeaderScenario {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px 20px 12px;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.goalTitle {
-  margin: 0 0 10px;
-  color: var(--text-main);
-  font-size: 1.2rem;
-  font-weight: 600;
-}
-
-.goalMeta {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.goalStatus {
-  padding: 4px 12px;
-  border-radius: var(--radius-full);
-  font-size: 0.7rem;
-  font-weight: 600;
-}
-
-.statusActive {
-  background: rgba(234, 237, 116, 0.2);
-  color: #6B7400;
-}
-
-.statusCompleted {
-  background: rgba(46, 125, 50, 0.1);
-  color: var(--success-color);
-}
-
-.statusPaused {
-  background: rgba(227, 93, 93, 0.1);
-  color: var(--danger-color);
-}
-
-.scenariosCountBadge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  border-radius: var(--radius-full);
-  background: var(--primary-light);
-  color: var(--primary-dark);
-  font-size: 0.7rem;
-  font-weight: 600;
-}
-
-.goalStats {
-  padding: 16px 20px;
-}
-
-.goalStatRow {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 0;
-  border-bottom: 1px dashed var(--border-color);
-}
-
-.goalStatRow:last-child {
-  border-bottom: none;
-}
-
-.goalStatLabel {
-  color: var(--text-muted);
-  font-size: 0.8rem;
-}
-
-.goalStatValue {
-  color: var(--text-main);
-  font-size: 0.9rem;
-  font-weight: 600;
-}
-
-.progressContainer {
-  margin-top: 16px;
-}
-
-.progressLabel {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 8px;
-  font-size: 0.75rem;
-  color: var(--text-muted);
-}
-
-.progressBar {
-  height: 6px;
-  background: rgba(73, 86, 49, 0.08);
-  border-radius: var(--radius-full);
-  overflow: hidden;
-}
-
-.progressFill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--primary-accent), var(--primary-dark));
-  border-radius: var(--radius-full);
-  transition: width 0.5s ease;
-}
-
-.scenariosInfo {
-  padding: 16px 20px 20px;
-  border-top: 1px solid var(--border-color);
-}
-
-.scenariosButton {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  width: 100%;
-  padding: 12px;
-  border-radius: var(--radius-full);
-  background: var(--primary-dark);
-  color: var(--primary-accent);
-  border: none;
-  cursor: pointer;
-  font-size: 0.85rem;
-  font-weight: 600;
-  transition: var(--transition);
-}
-
-.scenariosButton:hover {
-  transform: translateY(-2px);
-  background: var(--primary-accent);
-  color: var(--primary-dark);
-  box-shadow: var(--shadow-md);
-}
-
-.allScenariosSection {
-  margin-top: 48px;
-  padding-top: 32px;
-  border-top: 1px solid var(--border-color);
-}
-
-.allScenariosHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 20px;
-  border-radius: var(--radius-lg);
-  background: var(--card-bg);
-  backdrop-filter: blur(16px);
-  border: 1px solid var(--border-color);
-  cursor: pointer;
-  transition: var(--transition);
-}
-
-.allScenariosHeader:hover {
-  background: var(--primary-light);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-sm);
-}
-
-.allScenariosTitle {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 0;
-  color: var(--text-main);
-  font-size: 1.2rem;
-  font-weight: 500;
-}
-
-.allScenariosCount {
-  padding: 4px 12px;
-  border-radius: var(--radius-full);
-  background: rgba(234, 237, 116, 0.2);
-  color: var(--primary-dark);
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-
-.expandIcon {
-  color: var(--text-muted);
-}
-
-.scenariosCollapse {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.scenariosCollapse.expanded {
-  max-height: 2000px;
-  margin-top: 20px;
-}
-
-.scenariosListMain {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-  gap: 20px;
-  padding: 10px 0;
-}
-
-.scenarioItem {
-  padding: 20px;
-  border-radius: var(--radius-lg);
-  background: var(--card-bg);
-  backdrop-filter: blur(16px);
-  border: 1px solid var(--border-color);
-  cursor: pointer;
-  transition: var(--transition);
-}
-
-.scenarioItem:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
-}
-
-.scenarioHeader {
-  margin-bottom: 16px;
-}
-
-.scenarioGoal {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 8px;
-  font-size: 0.75rem;
-  color: var(--text-muted);
-}
-
-.scenarioName {
-  margin: 0 0 8px;
-  color: var(--text-main);
-  font-size: 1rem;
-  font-weight: 600;
-}
-
-.scenarioMeta {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.scenarioDate {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.7rem;
-  color: var(--text-muted);
-}
-
-.scenarioRisk {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 2px 8px;
-  border-radius: var(--radius-full);
-  font-size: 0.7rem;
-  font-weight: 600;
-}
-
-.riskLow {
-  background: rgba(46, 125, 50, 0.15);
-  color: var(--success-color);
-}
-
-.riskMedium {
-  background: rgba(245, 166, 35, 0.15);
-  color: var(--warning-color);
-}
-
-.riskHigh {
-  background: rgba(227, 93, 93, 0.15);
-  color: var(--danger-color);
-}
-
-.scenarioContent {
-  margin-bottom: 16px;
-}
-
-.scenarioRow {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 0;
-  border-bottom: 1px dashed var(--border-color);
-}
-
-.scenarioRow:last-child {
-  border-bottom: none;
-}
-
-.scenarioLabel {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.8rem;
-  color: var(--text-muted);
-}
-
-.scenarioValue {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--text-main);
-}
-
-.scenarioActions {
-  display: flex;
-  gap: 12px;
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid var(--border-color);
-}
-
-.scenarioActionButton {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 10px;
-  border-radius: var(--radius-full);
-  background: rgba(73, 86, 49, 0.06);
-  border: none;
-  color: var(--text-main);
-  cursor: pointer;
-  font-size: 0.8rem;
-  transition: var(--transition);
-}
-
-.scenarioActionButton:hover {
-  background: var(--primary-dark);
-  color: var(--primary-accent);
-}
-
-.emptyState {
-  text-align: center;
-  padding: 60px 40px;
-  border-radius: var(--radius-lg);
-  background: var(--card-bg);
-  backdrop-filter: blur(16px);
-  border: 1px solid var(--border-color);
-}
-
-.emptyState.small {
-  padding: 40px 20px;
-  margin: 20px 0;
-}
-
-.emptyState h3 {
-  margin: 16px 0 8px;
-  color: var(--text-main);
-  font-size: 1.2rem;
-  font-weight: 500;
-}
-
-.emptyState p {
-  margin: 0 0 24px;
-  color: var(--text-muted);
-}
-
-.emptyStateButton {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 24px;
-  border-radius: var(--radius-full);
-  background: var(--primary-dark);
-  color: var(--primary-accent);
-  border: none;
-  cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 600;
-  transition: var(--transition);
-}
-
-.emptyStateButton:hover {
-  transform: translateY(-2px);
-  background: var(--primary-accent);
-  color: var(--primary-dark);
-  box-shadow: var(--shadow-md);
-}
-
-.refreshSection {
-  text-align: center;
-  margin-top: 48px;
-  padding-top: 32px;
-  border-top: 1px solid var(--border-color);
-}
-
-.refreshButton {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 28px;
-  border-radius: var(--radius-full);
-  background: transparent;
-  color: var(--text-main);
-  border: 1px solid var(--border-color);
-  cursor: pointer;
-  transition: var(--transition);
-}
-
-.refreshButton:hover {
-  background: var(--primary-accent);
-  border-color: var(--primary-accent);
-  color: var(--primary-dark);
-  transform: translateY(-2px);
-}
-
-.loadingContainer {
-  min-height: 60vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
-}
-
-.loadingSpinner {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  border: 3px solid rgba(73, 86, 49, 0.12);
-  border-top-color: var(--primary-dark);
-  animation: spin 0.9s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (max-width: 900px) {
-
-  .goalsGrid,
-  .scenariosList {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 768px) {
-  .scenariosMainPage {
-    padding: 28px 18px 60px;
-  }
-
-  .filterGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .filterActions {
-    justify-content: stretch;
-  }
-
-  .clearFiltersButton {
-    width: 100%;
-  }
-
-  .goalCard {
-    margin-bottom: 0;
-  }
-
-  .allScenariosHeader {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
-
-  .scenarioActions {
-    flex-direction: column;
-  }
-
-  .emptyState {
-    padding: 40px 24px;
-  }
-}
+﻿:root {
+  --main-ink: #172014;
+  --main-muted: #66715c;
+  --main-card: rgba(255, 255, 255, 0.82);
+  --main-line: rgba(24, 32, 22, 0.1);
+  --main-lime: #e8f45d;
+  --main-moss: #495631;
+  --main-green: #27a66a;
+  --main-amber: #f5a623;
+  --main-red: #ff6b5f;
+  --main-shadow: 0 24px 70px rgba(44, 58, 35, 0.14);
+  --main-transition: 220ms ease;
+}
+
+.scenariosMainPage { max-width: 1440px; margin: 0 auto; color: var(--main-ink); }
+.scenarioMainBreadcrumb { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 22px; color: var(--main-muted); font-size: .88rem; font-weight: 750; }
+.scenarioMainBreadcrumb a { display: inline-flex; align-items: center; gap: 6px; color: var(--main-muted); text-decoration: none; transition: color var(--main-transition), transform var(--main-transition); }
+.scenarioMainBreadcrumb a:hover { color: var(--main-ink); transform: translateY(-1px); }
+
+.scenarioMainHero { position: relative; display: grid; grid-template-columns: minmax(0,1.25fr) minmax(280px,.75fr); gap: 26px; overflow: hidden; padding: clamp(28px,5vw,58px); margin-bottom: 22px; border: 1px solid rgba(255,255,255,.72); border-radius: 44px; background: radial-gradient(circle at 86% 12%, rgba(232,244,93,.35), transparent 24rem), radial-gradient(circle at 10% 92%, rgba(79,124,255,.22), transparent 22rem), linear-gradient(125deg, rgba(23,32,20,.96), rgba(73,86,49,.9)); box-shadow: var(--main-shadow); isolation: isolate; }
+.scenarioMainHero::before { content: ""; position: absolute; width: 420px; height: 420px; right: -140px; bottom: -180px; border-radius: 999px; background: rgba(232,244,93,.18); z-index: -1; }
+.scenarioMainEyebrow, .mainStatCard span, .filterTitle span, .filterGridModern label > span, .mainSectionHeader span, .goalMoneyGrid span, .scenarioPreviewCard .scenarioGoalName, .previewMetrics span { color: var(--main-muted); font-size: .76rem; font-weight: 900; letter-spacing: .11em; text-transform: uppercase; }
+.scenarioMainHero .scenarioMainEyebrow { color: rgba(255,255,255,.68); }
+.scenarioMainHero h1 { margin: 16px 0 12px; color: #fff; font-size: clamp(2.8rem,7vw,6rem); font-weight: 950; letter-spacing: -.08em; line-height: .92; }
+.scenarioMainHero p { max-width: 720px; margin: 0; color: rgba(255,255,255,.74); font-size: clamp(1rem,1.5vw,1.18rem); line-height: 1.65; }
+.scenarioMainActions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+.scenarioMainPrimary, .scenarioMainGhost, .resetFiltersButton, .openScenarioButton, .scenarioPreviewFooter button { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 48px; padding: 0 22px; border-radius: 999px; cursor: pointer; font-weight: 900; border: 0; transition: transform var(--main-transition), box-shadow var(--main-transition), background var(--main-transition); }
+.scenarioMainPrimary, .openScenarioButton { color: var(--main-ink); background: var(--main-lime); box-shadow: 0 18px 38px rgba(0,0,0,.14); }
+.scenarioMainGhost { color: #fff; background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.24); }
+.scenarioMainPrimary:hover, .scenarioMainGhost:hover, .resetFiltersButton:hover, .openScenarioButton:hover, .scenarioPreviewFooter button:hover { transform: translateY(-2px); box-shadow: 0 20px 44px rgba(44,58,35,.15); }
+.scenarioMainHeroPanel { align-self: center; display: grid; gap: 10px; padding: 28px; border: 1px solid rgba(255,255,255,.22); border-radius: 32px; color: #fff; background: rgba(255,255,255,.12); backdrop-filter: blur(22px); }
+.scenarioMainHeroPanel span { color: rgba(255,255,255,.66); font-size: .78rem; font-weight: 900; letter-spacing: .11em; text-transform: uppercase; }
+.scenarioMainHeroPanel strong { font-size: clamp(3rem,7vw,5.3rem); font-weight: 950; letter-spacing: -.08em; line-height: .92; }
+.scenarioMainHeroPanel small { color: rgba(255,255,255,.7); font-weight: 800; }
+
+.scenarioMainStats { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 16px; margin-bottom: 18px; }
+.mainStatCard, .scenarioMainFilters, .goalScenarioCard, .scenarioPreviewCard, .scenarioMainEmpty { border: 1px solid var(--main-line); background: var(--main-card); box-shadow: 0 18px 45px rgba(44,58,35,.08); backdrop-filter: blur(18px); }
+.mainStatCard { display: grid; gap: 10px; min-height: 132px; padding: 22px; border-radius: 28px; }
+.mainStatCard.accent { background: linear-gradient(140deg, rgba(232,244,93,.62), rgba(255,255,255,.82)); }
+.mainStatCard svg { color: var(--main-moss); }
+.mainStatCard strong { align-self: end; color: var(--main-ink); font-size: clamp(1.35rem,2.4vw,2.1rem); font-weight: 950; letter-spacing: -.06em; }
+
+.scenarioMainFilters { padding: 22px; margin-bottom: 24px; border-radius: 32px; }
+.filterTitle { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 18px; }
+.filterGridModern { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 14px; align-items: end; }
+.filterGridModern label { display: grid; gap: 8px; }
+.filterGridModern select, .filterGridModern input { width: 100%; min-height: 48px; box-sizing: border-box; padding: 0 15px; border: 1px solid var(--main-line); border-radius: 17px; color: var(--main-ink); background: rgba(255,255,255,.74); font: inherit; font-weight: 800; }
+.filterGridModern select:focus, .filterGridModern input:focus { outline: none; border-color: var(--main-lime); box-shadow: 0 0 0 4px rgba(232,244,93,.18); }
+.resetFiltersButton { color: var(--main-ink); background: rgba(255,255,255,.72); border: 1px solid var(--main-line); }
+
+.mainSectionHeader { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin: 28px 0 16px; }
+.mainSectionHeader h2 { margin: 4px 0 0; color: var(--main-ink); font-size: clamp(1.7rem,3vw,2.5rem); font-weight: 950; letter-spacing: -.07em; }
+.mainSectionHeader > strong { display: grid; place-items: center; min-width: 52px; height: 52px; border-radius: 18px; background: var(--main-lime); font-size: 1.3rem; font-weight: 950; }
+.goalsGridModern, .allScenariosGridModern { display: grid; grid-template-columns: repeat(auto-fit,minmax(320px,1fr)); gap: 20px; }
+.goalScenarioCard, .scenarioPreviewCard { display: grid; gap: 18px; padding: 22px; border-radius: 32px; transition: transform var(--main-transition), box-shadow var(--main-transition), border-color var(--main-transition); }
+.goalScenarioCard:hover, .scenarioPreviewCard:hover { transform: translateY(-4px); border-color: rgba(232,244,93,.7); box-shadow: 0 26px 60px rgba(44,58,35,.13); }
+.goalScenarioTop, .scenarioPreviewFooter { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.statusPill, .scenarioCountPill, .riskPill { display: inline-flex; align-items: center; gap: 6px; width: fit-content; padding: 6px 11px; border-radius: 999px; font-size: .78rem; font-weight: 900; }
+.statusPill.active, .statusPill.undefined { color: #11683d; background: rgba(39,166,106,.14); }
+.statusPill.completed { color: #435000; background: rgba(232,244,93,.24); }
+.statusPill.paused { color: #c84237; background: rgba(255,107,95,.14); }
+.scenarioCountPill { color: var(--main-ink); background: rgba(232,244,93,.22); }
+.goalScenarioCard h3, .scenarioPreviewCard h3 { margin: 0; color: var(--main-ink); font-size: clamp(1.35rem,2.6vw,2rem); font-weight: 950; letter-spacing: -.06em; }
+.goalMoneyGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.goalMoneyGrid div, .previewMetrics div { display: grid; gap: 6px; padding: 14px; border-radius: 18px; background: rgba(255,255,255,.58); }
+.goalMoneyGrid strong { color: var(--main-ink); font-weight: 950; }
+.mainProgressTrack { height: 14px; overflow: hidden; border-radius: 999px; background: rgba(24,32,22,.08); }
+.mainProgressTrack div { height: 100%; border-radius: inherit; background: linear-gradient(90deg,var(--main-lime),#98c43d,var(--main-moss)); }
+.progressLine { display: flex; justify-content: space-between; color: var(--main-muted); font-weight: 850; }
+.openScenarioButton { width: 100%; }
+.scenariosHeader { margin-top: 40px; }
+.scenarioPreviewCard { cursor: pointer; }
+.scenarioGoalName { display: inline-flex; align-items: center; gap: 7px; }
+.previewMetrics { display: grid; gap: 10px; }
+.previewMetrics div { display: flex; align-items: center; gap: 8px; color: var(--main-muted); font-weight: 850; }
+.riskPill.low { color: #11683d; background: rgba(39,166,106,.14); }
+.riskPill.medium { color: #93610d; background: rgba(245,166,35,.16); }
+.riskPill.high { color: #c84237; background: rgba(255,107,95,.14); }
+.scenarioPreviewFooter button { min-height: 40px; padding: 0 14px; color: var(--main-ink); background: var(--main-lime); }
+.scenarioMainEmpty, .scenarioMainLoading { display: grid; place-items: center; gap: 16px; text-align: center; }
+.scenarioMainEmpty { min-height: 360px; padding: 40px; border-radius: 36px; }
+.scenarioMainEmpty h2 { margin: 0; font-size: 1.8rem; font-weight: 950; letter-spacing: -.05em; }
+.scenarioMainEmpty p { margin: 0; color: var(--main-muted); line-height: 1.65; }
+.scenarioMainError { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; padding: 16px 20px; border-radius: 18px; color: #c84237; background: rgba(255,107,95,.1); font-weight: 850; }
+.scenarioMainLoading { min-height: 70vh; color: var(--main-muted); font-weight: 850; }
+.scenarioMainSpinner { width: 60px; height: 60px; border-radius: 50%; border: 4px solid rgba(73,86,49,.12); border-top-color: var(--main-moss); animation: mainSpin .85s linear infinite; }
+@keyframes mainSpin { to { transform: rotate(360deg); } }
+@media (max-width: 1160px) { .scenarioMainHero, .scenarioMainStats, .filterGridModern { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 720px) { .scenarioMainHero, .scenarioMainStats, .filterGridModern, .goalMoneyGrid { grid-template-columns: 1fr; } .scenarioMainHero { padding: 26px; border-radius: 32px; } .scenarioMainActions, .goalScenarioTop, .scenarioPreviewFooter { align-items: stretch; flex-direction: column; } .scenarioMainPrimary, .scenarioMainGhost, .resetFiltersButton { width: 100%; } }
