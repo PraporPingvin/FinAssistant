@@ -27,7 +27,7 @@ function Navbar() {
       <div className="navbarContainer">
         <Link to="/" className="logo">
           <span className="logoMark"><BarChart3 size={22} /></span>
-          <span className="logoText">FinAssistant</span>
+          <span className="logoText">Финансовый ассистент</span>
         </Link>
 
         <nav className="desktopNav" aria-label="Основная навигация">

@@ -15,6 +15,7 @@ import {
   Trash2,
 } from "lucide-react";
 import Layout from "../../../components/Layout";
+import ModernDialog from "../../../components/ModernDialog/ModernDialog";
 import { getScenario, updateScenario, getGoal } from "../../../api/api";
 import "./EditScenarioPage.css";
 
@@ -28,6 +29,8 @@ function EditScenarioPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [useMockData, setUseMockData] = useState(false);
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const [showDemoNotice, setShowDemoNotice] = useState(false);
   
   const [formData, setFormData] = useState({
     name: "",
@@ -170,8 +173,7 @@ function EditScenarioPage() {
       
       if (useMockData) {
         console.log("Обновляем mock-данные:", updates);
-        alert("В демо-режиме данные не сохраняются на сервере");
-        navigate(`/scenarios/detail/${scenarioId}`);
+        setShowDemoNotice(true);
       } else {
         await updateScenario(scenarioId, updates);
         navigate(`/scenarios/detail/${scenarioId}`);
@@ -191,9 +193,7 @@ function EditScenarioPage() {
   };
 
   const handleCancel = () => {
-    if (window.confirm("Отменить изменения? Все несохраненные данные будут потеряны.")) {
-      navigate(-1);
-    }
+    setShowCancelConfirm(true);
   };
 
   const formatCurrency = (value) => {
@@ -495,6 +495,29 @@ function EditScenarioPage() {
             </div>
           </form>
         </div>
+
+        <ModernDialog
+          open={showCancelConfirm}
+          variant="danger"
+          eyebrow="Несохраненные изменения"
+          title="Отменить изменения?"
+          description="Все несохраненные данные будут потеряны, если выйти со страницы сейчас."
+          cancelText="Остаться"
+          confirmText="Выйти"
+          onCancel={() => setShowCancelConfirm(false)}
+          onConfirm={() => navigate(-1)}
+        />
+
+        <ModernDialog
+          open={showDemoNotice}
+          variant="info"
+          eyebrow="Демо-режим"
+          title="Данные не сохранятся"
+          description="В демо-режиме изменения не отправляются на сервер, но можно продолжить просмотр сценария."
+          confirmText="Продолжить"
+          onClose={() => navigate(`/scenarios/detail/${scenarioId}`)}
+          onConfirm={() => navigate(`/scenarios/detail/${scenarioId}`)}
+        />
       </div>
     </Layout>
   );

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Layout from "../components/Layout";
 import { useNavigate } from "react-router-dom";
+import ModernDialog from "../components/ModernDialog/ModernDialog";
 
 function NewGoalPage() {
   const [formData, setFormData] = useState({
@@ -9,6 +10,7 @@ function NewGoalPage() {
     monthly_contribution: "",
   });
   const [loading, setLoading] = useState(false);
+  const [createdGoalTitle, setCreatedGoalTitle] = useState("");
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -25,8 +27,7 @@ function NewGoalPage() {
     
     // Имитация создания цели
     setTimeout(() => {
-      alert(`Цель "${formData.title}" создана успешно!`);
-      navigate("/goals");
+      setCreatedGoalTitle(formData.title);
       setLoading(false);
     }, 1000);
   };
@@ -143,6 +144,17 @@ function NewGoalPage() {
             ← Назад к списку целей
           </a>
         </div>
+
+        <ModernDialog
+          open={Boolean(createdGoalTitle)}
+          variant="success"
+          eyebrow="Цель создана"
+          title="Готово"
+          description={`Цель "${createdGoalTitle}" создана успешно.`}
+          confirmText="К списку целей"
+          onClose={() => navigate("/goals")}
+          onConfirm={() => navigate("/goals")}
+        />
       </div>
     </Layout>
   );

@@ -1,0 +1,127 @@
+﻿.paymentReminder {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  max-width: 1440px;
+  margin: 14px auto 22px;
+  padding: 16px 18px;
+  border: 1px solid rgba(24, 32, 22, 0.1);
+  border-radius: 26px;
+  color: #172014;
+  background:
+    radial-gradient(circle at 8% 20%, rgba(232, 244, 93, 0.28), transparent 16rem),
+    rgba(255, 255, 255, 0.82);
+  box-shadow: 0 18px 44px rgba(44, 58, 35, 0.1);
+  backdrop-filter: blur(18px);
+}
+
+.paymentReminder.overdue {
+  background:
+    radial-gradient(circle at 8% 20%, rgba(255, 107, 95, 0.18), transparent 16rem),
+    rgba(255, 255, 255, 0.86);
+}
+
+.paymentReminderIcon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 18px;
+  color: #172014;
+  background: #e8f45d;
+}
+
+.paymentReminder.overdue .paymentReminderIcon {
+  color: #ffffff;
+  background: #ff6b5f;
+}
+
+.paymentReminderContent {
+  min-width: 0;
+}
+
+.paymentReminderContent span {
+  display: block;
+  color: #66715c;
+  font-size: 0.74rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.paymentReminderContent strong {
+  display: block;
+  margin-top: 3px;
+  overflow: hidden;
+  color: #172014;
+  font-size: clamp(1.1rem, 2vw, 1.45rem);
+  font-weight: 950;
+  letter-spacing: -0.05em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.paymentReminderContent p {
+  margin: 5px 0 0;
+  color: #66715c;
+  line-height: 1.45;
+}
+
+.paymentReminderActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.paymentReminderButton,
+.paymentReminderClose {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 900;
+  text-decoration: none;
+  transition: transform 220ms ease, box-shadow 220ms ease, background 220ms ease;
+}
+
+.paymentReminderButton {
+  padding: 0 16px;
+  color: #172014;
+  background: #e8f45d;
+  box-shadow: 0 14px 30px rgba(73, 86, 49, 0.12);
+}
+
+.paymentReminderButton:hover,
+.paymentReminderClose:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 34px rgba(44, 58, 35, 0.14);
+}
+
+.paymentReminderClose {
+  width: 42px;
+  color: #66715c;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(24, 32, 22, 0.1);
+}
+
+@media (max-width: 760px) {
+  .paymentReminder {
+    grid-template-columns: 1fr;
+    margin: 12px 10px 18px;
+  }
+
+  .paymentReminderIcon {
+    width: 42px;
+    height: 42px;
+  }
+
+  .paymentReminderActions,
+  .paymentReminderButton {
+    width: 100%;
+  }
+}

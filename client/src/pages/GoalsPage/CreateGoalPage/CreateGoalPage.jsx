@@ -1,4 +1,4 @@
-﻿import React, { useMemo, useState } from "react";
+﻿import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Calendar,
@@ -15,6 +15,35 @@ import Layout from "../../../components/Layout";
 import { createGoal } from "../../../api/api";
 import "./CreateGoalPage.css";
 
+function getYearWord(value) {
+  const abs = Math.abs(value);
+  if (abs % 10 === 1 && abs % 100 !== 11) return "год";
+  if (abs % 10 >= 2 && abs % 10 <= 4 && (abs % 100 < 10 || abs % 100 >= 20)) return "года";
+  return "лет";
+}
+
+function getMonthWord(value) {
+  const abs = Math.abs(value);
+  if (abs % 10 === 1 && abs % 100 !== 11) return "месяц";
+  if (abs % 10 >= 2 && abs % 10 <= 4 && (abs % 100 < 10 || abs % 100 >= 20)) return "месяца";
+  return "месяцев";
+}
+
+function getDayWord(value) {
+  const abs = Math.abs(value);
+  if (abs % 10 === 1 && abs % 100 !== 11) return "день";
+  if (abs % 10 >= 2 && abs % 10 <= 4 && (abs % 100 < 10 || abs % 100 >= 20)) return "дня";
+  return "дней";
+}
+
+function toDateInputValue(date) {
+  if (!date) return "";
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 function CreateGoalPage() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -30,6 +59,7 @@ function CreateGoalPage() {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [autoDeadline, setAutoDeadline] = useState(true);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -38,6 +68,10 @@ function CreateGoalPage() {
       : value;
 
     setFormData((prev) => ({ ...prev, [name]: nextValue }));
+
+    if (name === "deadline_date") {
+      setAutoDeadline(false);
+    }
 
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
@@ -55,8 +89,8 @@ function CreateGoalPage() {
       newErrors.monthly_contribution = "Введите корректный ежемесячный взнос";
     }
     if (!formData.start_date) newErrors.start_date = "Выберите дату начала";
-    if (formData.deadline_date && new Date(formData.deadline_date) <= new Date(formData.start_date)) {
-      newErrors.deadline_date = "Дата завершения должна быть позже даты начала";
+    if (formData.deadline_date && new Date(formData.deadline_date) < new Date(formData.start_date)) {
+      newErrors.deadline_date = "Дата завершения не может быть раньше даты начала";
     }
 
     return newErrors;
@@ -67,15 +101,74 @@ function CreateGoalPage() {
     return new Intl.NumberFormat("ru-RU").format(parseFloat(value));
   };
 
+  const formatDuration = ({ years, months, days }) => {
+    const parts = [];
+    if (years > 0) parts.push(`${years} ${getYearWord(years)}`);
+    if (months > 0) parts.push(`${months} ${getMonthWord(months)}`);
+    if (days > 0 || parts.length === 0) parts.push(`${days} ${getDayWord(days)}`);
+    return parts.join(" ");
+  };
+
+  const formatDate = (date) => {
+    if (!date) return "—";
+    return new Intl.DateTimeFormat("ru-RU", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    }).format(date);
+  };
+
   const preview = useMemo(() => {
     const target = parseFloat(formData.target_amount) || 0;
     const initial = parseFloat(formData.initial_amount) || 0;
     const monthly = parseFloat(formData.monthly_contribution) || 0;
     const remaining = Math.max(target - initial, 0);
-    const months = monthly > 0 ? Math.ceil(remaining / monthly) : null;
+    const exactMonths = monthly > 0 && remaining > 0 ? remaining / monthly : 0;
+    const months = monthly > 0 ? Math.ceil(exactMonths) : null;
+    const totalDays = monthly > 0 ? Math.ceil(exactMonths * 30.44) : null;
+    const yearsPart = totalDays !== null ? Math.floor(totalDays / 365) : 0;
+    const monthsPart = totalDays !== null ? Math.floor((totalDays % 365) / 30.44) : 0;
+    const daysPart = totalDays !== null ? Math.max(0, Math.round((totalDays % 365) % 30.44)) : 0;
+    const startDate = formData.start_date ? new Date(formData.start_date) : new Date();
+    const finishDate = totalDays !== null ? new Date(startDate) : null;
+
+    if (finishDate) {
+      finishDate.setDate(finishDate.getDate() + totalDays);
+    }
+
     const progress = target > 0 ? Math.min(100, Math.round((initial / target) * 100)) : 0;
-    return { months, progress, remaining };
-  }, [formData]);
+    return {
+      months,
+      progress,
+      remaining,
+      totalDays,
+      yearsPart,
+      monthsPart,
+      daysPart,
+      finishDate,
+      deadlineValue: toDateInputValue(finishDate),
+      hasForecast: target > 0 && monthly > 0,
+      isReached: target > 0 && remaining === 0,
+    };
+  }, [formData.target_amount, formData.initial_amount, formData.monthly_contribution, formData.start_date]);
+
+  useEffect(() => {
+    if (!autoDeadline) return;
+
+    const nextDeadline = preview.isReached
+      ? formData.start_date
+      : preview.hasForecast
+        ? preview.deadlineValue
+        : "";
+
+    setFormData((prev) => (
+      prev.deadline_date === nextDeadline ? prev : { ...prev, deadline_date: nextDeadline }
+    ));
+  }, [autoDeadline, formData.start_date, preview.deadlineValue, preview.hasForecast, preview.isReached]);
+
+  const handleAutoDeadline = () => {
+    setAutoDeadline(true);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -134,7 +227,13 @@ function CreateGoalPage() {
           <div className="goalFormPreviewCard">
             <span>Предпросмотр</span>
             <strong>{preview.progress}%</strong>
-            <small>{preview.months ? `Около ${preview.months} мес. до цели` : "Добавьте взнос для прогноза"}</small>
+            <small>
+              {preview.isReached
+                ? "Цель уже покрыта стартовой суммой"
+                : preview.hasForecast
+                  ? `Около ${formatDuration({ years: preview.yearsPart, months: preview.monthsPart, days: preview.daysPart })}`
+                  : "Добавьте сумму и взнос для прогноза"}
+            </small>
           </div>
         </section>
 
@@ -191,11 +290,59 @@ function CreateGoalPage() {
             </div>
 
             <div className="formGroup fullWidth">
-              <label htmlFor="deadline_date" className="formLabel"><Clock size={14} /> Желаемая дата завершения</label>
+              <div className="deadlineLabelRow">
+                <label htmlFor="deadline_date" className="formLabel"><Clock size={14} /> Желаемая дата завершения</label>
+                {!autoDeadline && preview.hasForecast && (
+                  <button type="button" className="autoDeadlineButton" onClick={handleAutoDeadline} disabled={loading}>
+                    Пересчитать автоматически
+                  </button>
+                )}
+              </div>
               <input id="deadline_date" name="deadline_date" type="date" value={formData.deadline_date} onChange={handleChange} className={`formInput ${errors.deadline_date ? "formInputError" : ""}`} min={formData.start_date} disabled={loading} />
+              {autoDeadline && preview.hasForecast && <div className="currencyPreview">Дата рассчитана автоматически по ежемесячному взносу.</div>}
+              {!autoDeadline && <div className="currencyPreview">Дата изменена вручную.</div>}
               {errors.deadline_date && <div className="validationError">{errors.deadline_date}</div>}
             </div>
 
+            <section className="goalTrajectoryPanel">
+              <div className="goalTrajectorySummary">
+                <div>
+                  <span>Финансовая траектория</span>
+                  <strong>{formatCurrency(preview.remaining)} ₽</strong>
+                  <p>Осталось до цели с учётом стартовой суммы.</p>
+                </div>
+                <div className="goalTrajectoryProgress">
+                  <strong>{preview.progress}%</strong>
+                  <span>стартовый прогресс</span>
+                </div>
+              </div>
+
+              <div className="miniProgressTrack">
+                <div style={{ width: `${preview.progress}%` }} />
+              </div>
+
+              <div className="goalTimeEstimate">
+                <div className="goalTimeEstimateHeader">
+                  <Clock size={16} />
+                  <span>Примерный срок</span>
+                </div>
+
+                {preview.isReached ? (
+                  <strong>Цель уже достигнута</strong>
+                ) : preview.hasForecast ? (
+                  <>
+                    <strong>{formatDuration({ years: preview.yearsPart, months: preview.monthsPart, days: preview.daysPart })}</strong>
+                    <div className="goalTimeChips">
+                      <span>{preview.months} {getMonthWord(preview.months)}</span>
+                      <span>{preview.totalDays} {getDayWord(preview.totalDays)}</span>
+                    </div>
+                    <p>Желаемая дата завершения: {formatDate(preview.finishDate)}</p>
+                  </>
+                ) : (
+                  <p>Введите целевую сумму и ежемесячный взнос, чтобы увидеть расчет срока.</p>
+                )}
+              </div>
+            </section>
             <div className="formGroup fullWidth">
               <label htmlFor="description" className="formLabel"><FileText size={14} /> Описание цели</label>
               <textarea id="description" name="description" placeholder="Опишите детали вашей цели..." value={formData.description} onChange={handleChange} className="formTextarea" disabled={loading} rows="4" />
@@ -209,15 +356,6 @@ function CreateGoalPage() {
               </button>
             </div>
           </form>
-
-          <aside className="goalFormSideCard">
-            <span>Финансовая траектория</span>
-            <strong>{formatCurrency(preview.remaining)} ₽</strong>
-            <p>Осталось до цели с учётом стартовой суммы.</p>
-            <div className="miniProgressTrack">
-              <div style={{ width: `${preview.progress}%` }} />
-            </div>
-          </aside>
         </section>
       </div>
     </Layout>

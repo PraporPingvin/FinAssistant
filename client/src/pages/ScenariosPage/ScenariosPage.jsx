@@ -21,6 +21,7 @@ import {
   Zap,
 } from "lucide-react";
 import Layout from "../../components/Layout";
+import ModernDialog from "../../components/ModernDialog/ModernDialog";
 import { getGoal, getScenarios, deleteScenario } from "../../api/api";
 import "./ScenariosPage.css";
 
@@ -33,6 +34,7 @@ function ScenariosPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [sortBy, setSortBy] = useState("created_at");
+  const [scenarioToDelete, setScenarioToDelete] = useState(null);
 
   useEffect(() => {
     if (goalId) loadData();
@@ -117,16 +119,16 @@ function ScenariosPage() {
     };
   }, [scenarios, goal]);
 
-  const handleDeleteScenario = async (scenarioId, scenarioName, e) => {
-    e.stopPropagation();
-    if (!window.confirm(`Удалить сценарий "${scenarioName}"?`)) return;
+  const handleDeleteScenario = async () => {
+    if (!scenarioToDelete) return;
     try {
       setLoading(true);
-      await deleteScenario(scenarioId);
+      await deleteScenario(scenarioToDelete.id);
+      setScenarioToDelete(null);
       await loadData();
     } catch (error) {
       console.error("Ошибка удаления сценария:", error);
-      alert(`Не удалось удалить сценарий: ${error.message}`);
+      setError(`Не удалось удалить сценарий: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -202,7 +204,16 @@ function ScenariosPage() {
                     <div className="scenarioActions">
                       <button onClick={(e) => { e.stopPropagation(); navigate(`/scenarios/edit/${scenario.scenario_id}`); }} title="Редактировать"><Edit2 size={15} /></button>
                       <button onClick={(e) => { e.stopPropagation(); navigate(`/scenarios/detail/${scenario.scenario_id}`); }} title="Открыть"><Eye size={15} /></button>
-                      <button className="danger" onClick={(e) => handleDeleteScenario(scenario.scenario_id, scenario.name, e)} title="Удалить"><Trash2 size={15} /></button>
+                      <button
+                        className="danger"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setScenarioToDelete({ id: scenario.scenario_id, name: scenario.name });
+                        }}
+                        title="Удалить"
+                      >
+                        <Trash2 size={15} />
+                      </button>
                     </div>
                   </div>
 
@@ -230,6 +241,17 @@ function ScenariosPage() {
             <button onClick={() => navigate(`/scenarios/new/${goalId}`)} className="scenarioPrimaryButton"><Plus size={18} /> Создать сценарий</button>
           </section>
         )}
+        <ModernDialog
+          open={Boolean(scenarioToDelete)}
+          variant="danger"
+          eyebrow="Сценарии"
+          title="Удалить сценарий?"
+          description={`Сценарий "${scenarioToDelete?.name || "Без названия"}" исчезнет из сравнения и расчетов.`}
+          cancelText="Отмена"
+          confirmText="Удалить"
+          onCancel={() => setScenarioToDelete(null)}
+          onConfirm={handleDeleteScenario}
+        />
       </div>
     </Layout>
   );

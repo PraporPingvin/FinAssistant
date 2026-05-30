@@ -18,6 +18,7 @@ import {
   Zap,
 } from "lucide-react";
 import Layout from "../../../components/Layout";
+import ModernDialog from "../../../components/ModernDialog/ModernDialog";
 import { getScenario, updateScenario, deleteScenario, getGoal, getForecast } from "../../../api/api";
 import "./ScenarioDetailPage.css";
 
@@ -34,6 +35,7 @@ function ScenarioDetailPage() {
   const [editData, setEditData] = useState({});
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
     if (scenarioId) loadData();
@@ -96,7 +98,6 @@ function ScenarioDetailPage() {
   };
 
   const handleDelete = async () => {
-    if (!window.confirm(`Удалить сценарий "${scenario?.name}"? Это действие нельзя отменить.`)) return;
     try {
       setDeleting(true);
       await deleteScenario(scenarioId);
@@ -176,7 +177,7 @@ function ScenarioDetailPage() {
                 <>
                   <button onClick={() => setEditMode(true)} className="detailPrimaryButton" disabled={deleting}><Edit2 size={17} /> Редактировать</button>
                   <button onClick={() => navigate(`/forecast/${scenario.goal_id}?scenario=${scenarioId}`)} className="detailGhostButton"><BarChart3 size={17} /> Прогноз</button>
-                  <button onClick={handleDelete} className="detailDangerButton" disabled={deleting}><Trash2 size={17} /> {deleting ? "Удаление..." : "Удалить"}</button>
+                  <button onClick={() => setShowDeleteConfirm(true)} className="detailDangerButton" disabled={deleting}><Trash2 size={17} /> {deleting ? "Удаление..." : "Удалить"}</button>
                 </>
               ) : (
                 <>
@@ -234,6 +235,18 @@ function ScenarioDetailPage() {
             </div>
           </section>
         )}
+        <ModernDialog
+          open={showDeleteConfirm}
+          variant="danger"
+          eyebrow="Сценарий"
+          title="Удалить сценарий?"
+          description={`Сценарий "${scenario?.name || "Без названия"}" будет удален без возможности отмены.`}
+          cancelText="Отмена"
+          confirmText="Удалить"
+          loading={deleting}
+          onCancel={() => setShowDeleteConfirm(false)}
+          onConfirm={handleDelete}
+        />
       </div>
     </Layout>
   );

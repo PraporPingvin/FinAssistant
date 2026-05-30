@@ -38,6 +38,7 @@ import {
 } from 'chart.js';
 import { Pie, Doughnut, Bar } from 'react-chartjs-2';
 import { getCheckpoints, getGoals, updateCheckpoint, deleteCheckpoint, createCheckpoint } from "../../../api/api";
+import ModernDialog from "../../../components/ModernDialog/ModernDialog";
 import "./CheckpointsOverview.css";
 
 ChartJS.register(
@@ -234,6 +235,8 @@ function CheckpointsOverview() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedGoal, setSelectedGoal] = useState(null);
   const [editingCheckpoint, setEditingCheckpoint] = useState(null);
+  const [checkpointToDelete, setCheckpointToDelete] = useState(null);
+  const [notice, setNotice] = useState(null);
 
   useEffect(() => {
     loadData();
@@ -286,17 +289,18 @@ function CheckpointsOverview() {
       await updateCheckpoint(checkpointId, { status: "completed" });
       await loadData();
     } catch (error) {
-      alert("Ошибка обновления статуса");
+      setNotice({ title: "Не удалось обновить статус", description: "Попробуйте повторить действие чуть позже." });
     }
   };
 
-  const handleDelete = async (checkpointId, title) => {
-    if (!window.confirm(`Удалить "${title}"?`)) return;
+  const handleDelete = async () => {
+    if (!checkpointToDelete) return;
     try {
-      await deleteCheckpoint(checkpointId);
+      await deleteCheckpoint(checkpointToDelete.id);
+      setCheckpointToDelete(null);
       await loadData();
     } catch (error) {
-      alert("Ошибка удаления");
+      setNotice({ title: "Не удалось удалить точку", description: "Данные остались без изменений." });
     }
   };
 
@@ -307,7 +311,7 @@ function CheckpointsOverview() {
       setShowCreateModal(false);
       setSelectedGoal(null);
     } catch (error) {
-      alert("Ошибка: " + error.message);
+      setNotice({ title: "Не удалось создать точку", description: error.message });
     }
   };
 
@@ -324,7 +328,7 @@ function CheckpointsOverview() {
       setShowEditModal(false);
       setEditingCheckpoint(null);
     } catch (error) {
-      alert("Ошибка: " + error.message);
+      setNotice({ title: "Не удалось сохранить точку", description: error.message });
     }
   };
 
@@ -625,7 +629,7 @@ function CheckpointsOverview() {
                       {cp.status === "pending" && !isOverdue && <button className="tableAction complete" onClick={() => handleMarkComplete(cp.checkpoint_id)} title="Выполнено"><CheckCircle size={14} /></button>}
                       <button className="tableAction edit" onClick={() => handleEditClick(cp)} title="Редактировать"><Edit2 size={14} /></button>
                       <button className="tableAction view" onClick={() => navigate(`/goals/${cp.goal_id}`)} title="К цели"><Eye size={14} /></button>
-                      <button className="tableAction delete" onClick={() => handleDelete(cp.checkpoint_id, cp.title)} title="Удалить"><Trash2 size={14} /></button>
+                      <button className="tableAction delete" onClick={() => setCheckpointToDelete({ id: cp.checkpoint_id, title: cp.title })} title="Удалить"><Trash2 size={14} /></button>
                     </td>
                   </tr>
                 );
@@ -663,7 +667,7 @@ function CheckpointsOverview() {
                   {cp.status === "pending" && !isOverdue && <button className="actionButton complete" onClick={() => handleMarkComplete(cp.checkpoint_id)}><CheckCircle size={14} /> Выполнено</button>}
                   <button className="actionButton edit" onClick={() => handleEditClick(cp)}><Edit2 size={14} /> Редактировать</button>
                   <button className="actionButton view" onClick={() => navigate(`/goals/${cp.goal_id}`)}><Eye size={14} /> Цель</button>
-                  <button className="actionButton delete" onClick={() => handleDelete(cp.checkpoint_id, cp.title)}><Trash2 size={14} /> Удалить</button>
+                  <button className="actionButton delete" onClick={() => setCheckpointToDelete({ id: cp.checkpoint_id, title: cp.title })}><Trash2 size={14} /> Удалить</button>
                 </div>
               </div>
             );
@@ -680,6 +684,29 @@ function CheckpointsOverview() {
           <button className="createFirstButton" onClick={() => setShowGoalSelector(true)}><Plus size={14} /> Создать первую точку</button>
         </div>
       )}
+
+      <ModernDialog
+        open={Boolean(checkpointToDelete)}
+        variant="danger"
+        eyebrow="Контрольная точка"
+        title="Удалить точку?"
+        description={`Контрольная точка "${checkpointToDelete?.title || "Без названия"}" будет удалена из плана цели.`}
+        cancelText="Отмена"
+        confirmText="Удалить"
+        onCancel={() => setCheckpointToDelete(null)}
+        onConfirm={handleDelete}
+      />
+
+      <ModernDialog
+        open={Boolean(notice)}
+        variant="info"
+        eyebrow="Уведомление"
+        title={notice?.title || ""}
+        description={notice?.description || ""}
+        confirmText="Понятно"
+        onClose={() => setNotice(null)}
+        onConfirm={() => setNotice(null)}
+      />
     </div>
   );
 }

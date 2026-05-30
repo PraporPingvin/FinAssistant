@@ -1,8 +1,11 @@
-﻿import React from "react";
+﻿import React, { useState } from "react";
 import { Calendar, Edit2, FileText, Trash2 } from "lucide-react";
+import ModernDialog from "../../ModernDialog/ModernDialog";
 import "./PaymentList.css";
 
 function PaymentList({ payments, onEdit, onDelete }) {
+  const [paymentToDelete, setPaymentToDelete] = useState(null);
+
   const formatCurrency = (amount) => {
     const num = parseFloat(amount) || 0;
     return new Intl.NumberFormat("ru-RU").format(num);
@@ -36,10 +39,10 @@ function PaymentList({ payments, onEdit, onDelete }) {
     }
   };
 
-  const handleDelete = (payment) => {
-    if (window.confirm(`Удалить платеж на сумму ${formatCurrency(payment.amount)} ₽? Это действие нельзя отменить.`)) {
-      onDelete(payment.payment_id);
-    }
+  const handleConfirmDelete = () => {
+    if (!paymentToDelete) return;
+    onDelete(paymentToDelete.payment_id);
+    setPaymentToDelete(null);
   };
 
   if (!payments || payments.length === 0) {
@@ -99,7 +102,7 @@ function PaymentList({ payments, onEdit, onDelete }) {
                     <Edit2 size={15} />
                   </button>
                   <button
-                    onClick={() => handleDelete(payment)}
+                    onClick={() => setPaymentToDelete(payment)}
                     className="paymentActionButton deleteButton"
                     title="Удалить платеж"
                   >
@@ -114,6 +117,22 @@ function PaymentList({ payments, onEdit, onDelete }) {
           </article>
         ))}
       </div>
+
+      <ModernDialog
+        open={Boolean(paymentToDelete)}
+        variant="danger"
+        eyebrow="Платежи"
+        title="Удалить платеж?"
+        description={
+          paymentToDelete
+            ? `Платеж на сумму ${formatCurrency(paymentToDelete.amount)} ₽ будет удален без возможности отмены.`
+            : ""
+        }
+        cancelText="Отмена"
+        confirmText="Удалить"
+        onCancel={() => setPaymentToDelete(null)}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   );
 }

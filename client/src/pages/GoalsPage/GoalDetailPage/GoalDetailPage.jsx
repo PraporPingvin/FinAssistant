@@ -13,6 +13,7 @@ import {
   Wallet,
 } from "lucide-react";
 import Layout from "../../../components/Layout";
+import ModernDialog from "../../../components/ModernDialog/ModernDialog";
 import { deleteGoal, getGoal } from "../../../api/api";
 import "./GoalDetailPage.css";
 
@@ -324,22 +325,18 @@ function GoalDetailPage() {
           </Link>
         </section>
 
-        {showDeleteConfirm && (
-          <div className="modalOverlay">
-            <div className="modalCard">
-              <h3>Удалить цель?</h3>
-              <p>Это действие нельзя отменить. Связанные данные цели могут стать недоступны.</p>
-              <div className="modalActions">
-                <button onClick={() => setShowDeleteConfirm(false)} className="modalButton cancelModalButton">
-                  Отмена
-                </button>
-                <button onClick={handleDeleteGoal} disabled={deleting} className="modalButton deleteModalButton">
-                  {deleting ? "Удаление..." : "Удалить"}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        <ModernDialog
+          open={showDeleteConfirm}
+          variant="danger"
+          eyebrow="Важное действие"
+          title="Удалить цель?"
+          description="Это действие нельзя отменить. Связанные данные цели могут стать недоступны."
+          cancelText="Отмена"
+          confirmText="Удалить"
+          loading={deleting}
+          onCancel={() => setShowDeleteConfirm(false)}
+          onConfirm={handleDeleteGoal}
+        />
       </div>
     </Layout>
   );
