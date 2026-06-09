@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import {
   Home,
   LayoutDashboard,
@@ -20,6 +20,13 @@ import "./CheckpointsPage.css";
 
 function CheckpointsPage() {
   const [activeTab, setActiveTab] = useState("overview");
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get("create") === "1") {
+      setActiveTab("overview");
+    }
+  }, [searchParams]);
 
   const tabs = [
     { id: "overview", label: "Обзор", icon: <LayoutDashboard size={16} /> },

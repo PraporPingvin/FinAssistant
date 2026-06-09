@@ -207,3 +207,11 @@ th {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);
 }
+
+@media (max-width: 768px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}

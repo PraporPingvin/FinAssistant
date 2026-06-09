@@ -610,18 +610,27 @@
 }
 
 .actionCard {
+  position: relative;
   display: flex;
   align-items: flex-start;
   gap: 16px;
   padding: 26px;
+  border: 2px solid rgba(73, 86, 49, 0.16);
   border-radius: var(--detail-radius-lg);
   color: inherit;
   text-decoration: none;
-  transition: transform var(--detail-transition), box-shadow var(--detail-transition), border-color var(--detail-transition);
+  cursor: pointer;
+  transition: transform var(--detail-transition), box-shadow var(--detail-transition), border-color var(--detail-transition), background var(--detail-transition);
+}
+
+.actionCard > div {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
 }
 
 .actionCard h3 {
-  margin: 0 0 8px;
+  margin: 0;
   color: var(--detail-ink);
   font-size: 1.18rem;
   font-weight: 950;
@@ -632,6 +641,40 @@
   margin: 0;
   color: var(--detail-muted);
   line-height: 1.6;
+}
+
+.actionCardLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 5px;
+  min-width: 170px;
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  color: var(--detail-moss);
+  background: var(--detail-lime);
+  font-weight: 900;
+}
+
+.actionCardLink svg {
+  transition: transform var(--detail-transition);
+}
+
+.actionCard:hover,
+.actionCard:focus-visible {
+  border-color: var(--detail-moss);
+  background: rgba(232, 244, 93, 0.16);
+  outline: none;
+}
+
+.actionCard:hover .actionCardLink svg,
+.actionCard:focus-visible .actionCardLink svg {
+  transform: translateX(4px);
+}
+
+.actionCard:active {
+  transform: translateY(-1px) scale(0.99);
 }
 
 .modalOverlay {
@@ -763,6 +806,15 @@
 
   .goalNextPaymentCard {
     grid-template-columns: 1fr;
+  }
+
+  .actionCard {
+    padding: 22px;
+    border-color: rgba(73, 86, 49, 0.28);
+  }
+
+  .actionCardLink {
+    width: 100%;
   }
 
   .heroButton,

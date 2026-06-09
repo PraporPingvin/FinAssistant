@@ -629,20 +629,20 @@ function ForecastPage() {
                       <tbody>
                         {forecast.scenarios.map((scenario) => (
                           <tr key={scenario.id} className={scenario.name === forecast.optimalStrategy ? "optimalRow" : ""}>
-                            <td>
+                            <td data-label="Вариант">
                               <strong>{scenario.name}</strong>
                             </td>
-                            <td>{formatCurrency(scenario.monthlyContribution)}</td>
-                            <td>{formatMonths(scenario.monthsToGoal)}</td>
-                            <td>{formatDate(scenario.predictedDate)}</td>
-                            <td>{formatPercent(scenario.effectiveReturn)}%</td>
-                            <td>
+                            <td data-label="Взнос">{formatCurrency(scenario.monthlyContribution)}</td>
+                            <td data-label="Срок">{formatMonths(scenario.monthsToGoal)}</td>
+                            <td data-label="Дата">{formatDate(scenario.predictedDate)}</td>
+                            <td data-label="Рост после инфляции">{formatPercent(scenario.effectiveReturn)}%</td>
+                            <td data-label="Вероятность">
                               <div className="confidenceBar">
                                 <div className="confidenceFill" style={{ width: `${scenario.confidence}%` }} />
                                 <span>{scenario.confidence}%</span>
                               </div>
                             </td>
-                            <td>
+                            <td data-label="Риск">
                               <span className={`riskBadge ${getRiskColor(scenario.risk)}`}>{scenario.risk}</span>
                             </td>
                           </tr>

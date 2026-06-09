@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   Calendar,
   CalendarClock,
+  ChevronRight,
   Flag,
   CreditCard,
   Home,
@@ -429,6 +430,7 @@ function GoalDetailPage() {
             <div>
               <h3>Платежи</h3>
               <p>Просмотр и добавление платежей по этой цели.</p>
+              <span className="actionCardLink">Открыть платежи <ChevronRight size={17} /></span>
             </div>
           </Link>
           <Link to={`/scenarios/${goalId}`} className="actionCard">
@@ -436,6 +438,7 @@ function GoalDetailPage() {
             <div>
               <h3>Сценарии</h3>
               <p>Сравните варианты накоплений и темпы достижения.</p>
+              <span className="actionCardLink">Открыть сценарии <ChevronRight size={17} /></span>
             </div>
           </Link>
           <Link to={`/forecast/${goalId}`} className="actionCard">
@@ -443,6 +446,7 @@ function GoalDetailPage() {
             <div>
               <h3>Прогноз</h3>
               <p>Оцените дату достижения цели и финансовую траекторию.</p>
+              <span className="actionCardLink">Открыть прогноз <ChevronRight size={17} /></span>
             </div>
           </Link>
         </section>

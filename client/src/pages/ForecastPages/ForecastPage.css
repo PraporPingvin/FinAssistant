@@ -489,6 +489,8 @@
 }
 
 .tabContent {
+  width: 100%;
+  min-width: 0;
   animation: forecastReveal 280ms ease both;
 }
 
@@ -619,6 +621,8 @@
 
 .chartCardForecast {
   position: relative;
+  width: 100%;
+  min-width: 0;
   overflow: hidden;
   background:
     radial-gradient(circle at 100% 0%, rgba(79, 124, 255, 0.1), transparent 18rem),
@@ -639,6 +643,7 @@
 .chartContainer {
   height: 430px;
   width: 100%;
+  min-width: 0;
 }
 
 .scenarioCard {
@@ -719,11 +724,16 @@
 }
 
 .comparisonTable {
+  width: 100%;
+  min-width: 0;
   margin-top: 22px;
 }
 
 .tableWrapper {
+  width: 100%;
+  max-width: 100%;
   overflow-x: auto;
+  overscroll-behavior-inline: contain;
 }
 
 .comparisonTable table {
@@ -817,6 +827,16 @@
 }
 
 @media (max-width: 760px) {
+  .forecastPage,
+  .tabContent,
+  .chartCardForecast,
+  .comparisonTable,
+  .tableWrapper {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
   .forecastHero {
     padding: 26px;
     border-radius: 30px;
@@ -851,12 +871,69 @@
   }
 
   .chartContainer {
-    height: 320px;
+    height: 360px;
   }
 
-  .comparisonTable th,
+  .chartCardForecast,
+  .comparisonTable {
+    padding: 18px;
+  }
+
+  .comparisonTable table,
+  .comparisonTable tbody,
+  .comparisonTable tr,
   .comparisonTable td {
-    padding: 10px;
-    font-size: 0.76rem;
+    display: block;
+    width: 100%;
+  }
+
+  .comparisonTable thead {
+    display: none;
+  }
+
+  .comparisonTable table {
+    border-spacing: 0;
+  }
+
+  .comparisonTable tr {
+    overflow: hidden;
+    margin-bottom: 14px;
+    border: 1px solid var(--forecast-line);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.68);
+  }
+
+  .comparisonTable td {
+    display: grid;
+    grid-template-columns: minmax(120px, 0.9fr) minmax(0, 1.1fr);
+    align-items: center;
+    gap: 12px;
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--forecast-line);
+    border-radius: 0 !important;
+    font-size: 0.88rem;
+    overflow-wrap: anywhere;
+    background: transparent;
+  }
+
+  .comparisonTable td:last-child {
+    border-bottom: 0;
+  }
+
+  .comparisonTable td::before {
+    content: attr(data-label);
+    color: var(--forecast-muted);
+    font-size: 0.72rem;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  .comparisonTable .confidenceBar {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .optimalRow {
+    background: rgba(232, 244, 93, 0.24) !important;
   }
 }

@@ -208,7 +208,7 @@ function CheckpointFormModal({ goal, goals = [], onGoalChange, initialData, onSu
         <form onSubmit={handleSubmit}>
           <div className="formGroup">
             <label>Название <span className="required">*</span></label>
-            <input type="text" name="title" value={formData.title} onChange={handleChange} placeholder="Например: Накопить 50%" disabled={submitting} />
+            <input autoFocus={!isEdit} type="text" name="title" value={formData.title} onChange={handleChange} placeholder="Например: Накопить 50%" disabled={submitting} />
             {errors.title && <div className="formError">{errors.title}</div>}
           </div>
 
