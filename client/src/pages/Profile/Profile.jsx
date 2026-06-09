@@ -71,7 +71,7 @@ function Profile() {
       <div className="profilePage">
         <section className="profileHero">
           <div>
-            <span className="profileEyebrow">Account identity</span>
+        <span className="profileEyebrow">Учетная запись</span>
             <h1>Профиль пользователя</h1>
             <p>Личные данные, контактная информация и быстрый доступ к редактированию аккаунта.</p>
           </div>

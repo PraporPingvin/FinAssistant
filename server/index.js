@@ -15,6 +15,7 @@ const scenariosRoutes = require('./routes/scenarios.routes');
 const checkpointsRoutes = require('./routes/checkpoints.routes');
 const forecastsRoutes = require('./routes/forecasts.routes');
 const statsRoutes = require('./routes/stats.routes');
+const economicRoutes = require('./routes/economic.routes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -62,6 +63,7 @@ app.use('/api/scenarios', scenariosRoutes);
 app.use('/api/checkpoints', checkpointsRoutes);
 app.use('/api/forecast', forecastsRoutes);
 app.use('/api/user/stats', statsRoutes);
+app.use('/api/economic', economicRoutes);
 
 // Обработка ошибок
 app.use((err, req, res, next) => {

@@ -87,20 +87,6 @@ export function AuthProvider({ children }) {
   );
 
   // Добавьте эту функцию в AuthContext
-  const checkAuth = async () => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        const userData = await verifyToken(token);
-        setUser(userData);
-      } catch (err) {
-        console.error('Token verification failed:', err);
-        localStorage.removeItem('token');
-        setUser(null);
-      }
-    }
-  };
-
   // Используйте ее после регистрации и логина
   // После успешного login/register вызывайте checkAuth()
 }

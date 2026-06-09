@@ -1,41 +1,50 @@
-// server/routes/stats.routes.js
 const express = require('express');
 const pool = require('../config/database');
 const { authenticateToken } = require('../middleware/auth');
 
 const router = express.Router();
 
-// Получить статистику пользователя
 router.get('/', authenticateToken, async (req, res) => {
   try {
-    const userId = req.user.userId;
-
-    const stats = await pool.query(
-      `SELECT 
-         COUNT(DISTINCT g.goal_id) as total_goals,
-         COUNT(DISTINCT s.scenario_id) as total_scenarios,
-         COUNT(DISTINCT p.payment_id) as total_payments,
-         COALESCE(SUM(p.amount), 0) as total_saved,
-         COUNT(DISTINCT cp.checkpoint_id) as total_checkpoints,
-         SUM(CASE WHEN cp.status = 'completed' THEN 1 ELSE 0 END) as completed_checkpoints
-       FROM users u
-       LEFT JOIN goals g ON u.user_id = g.user_id
-       LEFT JOIN scenarios s ON g.goal_id = s.goal_id
-       LEFT JOIN payments p ON g.goal_id = p.goal_id
-       LEFT JOIN checkpoints cp ON g.goal_id = cp.goal_id
-       WHERE u.user_id = $1
-       GROUP BY u.user_id`,
-      [userId]
+    const result = await pool.query(
+      `WITH user_goals AS (
+         SELECT goal_id, COALESCE(initial_amount, 0) AS initial_amount
+         FROM goals
+         WHERE user_id = $1
+       ),
+       goal_stats AS (
+         SELECT COUNT(*) AS total_goals, COALESCE(SUM(initial_amount), 0) AS initial_saved
+         FROM user_goals
+       ),
+       scenario_stats AS (
+         SELECT COUNT(*) AS total_scenarios
+         FROM scenarios s
+         JOIN user_goals g ON g.goal_id = s.goal_id
+       ),
+       payment_stats AS (
+         SELECT COUNT(*) AS total_payments, COALESCE(SUM(p.amount), 0) AS payment_saved
+         FROM payments p
+         JOIN user_goals g ON g.goal_id = p.goal_id
+       ),
+       checkpoint_stats AS (
+         SELECT
+           COUNT(*) AS total_checkpoints,
+           COUNT(*) FILTER (WHERE cp.status = 'completed') AS completed_checkpoints
+         FROM checkpoints cp
+         JOIN user_goals g ON g.goal_id = cp.goal_id
+       )
+       SELECT
+         goal_stats.total_goals,
+         scenario_stats.total_scenarios,
+         payment_stats.total_payments,
+         goal_stats.initial_saved + payment_stats.payment_saved AS total_saved,
+         checkpoint_stats.total_checkpoints,
+         checkpoint_stats.completed_checkpoints
+       FROM goal_stats, scenario_stats, payment_stats, checkpoint_stats`,
+      [req.user.userId]
     );
 
-    res.json(stats.rows[0] || {
-      total_goals: 0,
-      total_scenarios: 0,
-      total_payments: 0,
-      total_saved: 0,
-      total_checkpoints: 0,
-      completed_checkpoints: 0
-    });
+    res.json(result.rows[0]);
   } catch (error) {
     console.error('Ошибка получения статистики:', error);
     res.status(500).json({ error: 'Ошибка сервера' });

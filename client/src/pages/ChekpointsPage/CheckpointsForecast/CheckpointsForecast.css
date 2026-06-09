@@ -664,4 +664,14 @@
   .checkpointsForecastPage .chartsGrid {
     grid-template-columns: 1fr;
   }
+
+  .checkpointsForecastPage .tableContainer {
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .checkpointsForecastPage .forecastTable {
+    min-width: 760px;
+  }
 }

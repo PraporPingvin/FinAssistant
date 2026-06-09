@@ -26,6 +26,7 @@ import {
   createScenario,
   getForecast 
 } from "../../../api/api";
+import { calculateScenarioMetrics } from "../../../utils/scenarioCalculations";
 import "./ScenarioAnalysisPage.css";
 
 function ScenarioAnalysisPage() {
@@ -92,33 +93,24 @@ function ScenarioAnalysisPage() {
     const remainingAmount = targetAmount - currentAmount;
     
     const analyzedScenarios = scenariosList.map(scenario => {
-      const monthlyContribution = parseFloat(scenario.monthly_contribution) || 0;
-      const expectedReturn = parseFloat(scenario.expected_return) || 0;
-      const inflationRate = parseFloat(scenario.inflation_rate) || 0;
-      
-      const monthsToGoal = monthlyContribution > 0 && remainingAmount > 0
-        ? Math.ceil(remainingAmount / monthlyContribution)
-        : Infinity;
-      
-      const effectiveReturn = expectedReturn - inflationRate;
-      
-      let riskLevel = "Низкий";
+      const metrics = calculateScenarioMetrics({ goal: goalData, scenario });
+      const monthlyContribution = metrics.monthly;
+      const monthsToGoal = metrics.monthsToGoal;
+      const effectiveReturn = metrics.effectiveReturn;
+      const expectedReturn = metrics.expectedReturn;
+
+      let riskLevel = metrics.risk.label;
       let riskColor = "#2E7D32";
       let riskIcon = <Shield size={14} />;
-      if (expectedReturn > 15) {
-        riskLevel = "Высокий";
+      if (metrics.risk.className === "high") {
         riskColor = "#E35D5D";
         riskIcon = <Zap size={14} />;
-      } else if (expectedReturn > 8) {
-        riskLevel = "Средний";
+      } else if (metrics.risk.className === "medium") {
         riskColor = "#F5A623";
         riskIcon = <Activity size={14} />;
       }
-      
-      let probability = 100;
-      if (monthsToGoal > 120) probability = 30;
-      else if (monthsToGoal > 60) probability = 60;
-      else if (monthsToGoal > 36) probability = 80;
+
+      const probability = metrics.probability;
       
       let feasibility = "Высокая";
       if (expectedReturn > 20) feasibility = "Низкая";
@@ -126,7 +118,7 @@ function ScenarioAnalysisPage() {
       
       return {
         ...scenario,
-        monthsToGoal: isFinite(monthsToGoal) ? monthsToGoal : 0,
+        monthsToGoal: Number.isFinite(monthsToGoal) ? monthsToGoal : 0,
         effectiveReturn,
         riskLevel,
         riskColor,

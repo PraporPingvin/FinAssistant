@@ -21,6 +21,7 @@ import {
 import Layout from "../../../components/Layout";
 import { getGoals, getScenarios } from "../../../api/api";
 import "./ScenariosMainPage.css";
+import { formatPercent } from "../../../utils/scenarioCalculations";
 
 function ScenariosMainPage() {
   const navigate = useNavigate();
@@ -143,7 +144,7 @@ function ScenariosMainPage() {
 
         <section className="scenarioMainHero">
           <div>
-            <span className="scenarioMainEyebrow">Strategy cockpit</span>
+            <span className="scenarioMainEyebrow">Панель стратегий</span>
             <h1>Сценарии финансовых целей</h1>
             <p>Единое пространство для всех целей и стратегий: смотрите прогресс, находите сценарии и быстро переходите к анализу.</p>
             <div className="scenarioMainActions">
@@ -222,8 +223,8 @@ function ScenariosMainPage() {
                     <h3>{scenario.name || "Без названия"}</h3>
                     <div className="previewMetrics">
                       <div><DollarSign size={14} /><span>{formatCurrency(scenario.monthly_contribution)} ₽/мес</span></div>
-                      <div><TrendingUp size={14} /><span>{scenario.expected_return}%</span></div>
-                      <div><Activity size={14} /><span>{scenario.inflation_rate}% инфл.</span></div>
+                      <div><TrendingUp size={14} /><span>{formatPercent(scenario.expected_return)}%</span></div>
+                      <div><Activity size={14} /><span>{formatPercent(scenario.inflation_rate)}% инфляция</span></div>
                     </div>
                     <div className="scenarioPreviewFooter">
                       <span className={`riskPill ${risk.className}`}>{risk.icon}{risk.text} риск</span>

@@ -129,6 +129,16 @@
   font-weight: 850;
 }
 
+.paymentForm .formHint {
+  padding: 10px 12px;
+  border-radius: 14px;
+  color: #566047;
+  background: rgba(232, 244, 93, 0.18);
+  font-size: 0.86rem;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
 .paymentForm .submitError,
 .paymentEditForm .submitError {
   padding: 13px 16px;

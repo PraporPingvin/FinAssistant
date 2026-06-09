@@ -346,6 +346,58 @@
   color: var(--auth-muted);
 }
 
+.authConsent {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: flex-start;
+  gap: 11px;
+  margin: 18px 0 20px;
+  padding: 14px;
+  border: 1px solid var(--auth-line);
+  border-radius: 16px;
+  color: var(--auth-muted);
+  background: rgba(255, 255, 255, 0.56);
+  cursor: pointer;
+  font-size: 0.84rem;
+  line-height: 1.55;
+  transition: border-color var(--auth-transition), background var(--auth-transition);
+}
+
+.authConsent.checked {
+  border-color: rgba(39, 166, 106, 0.32);
+  background: rgba(39, 166, 106, 0.08);
+}
+
+.authConsent input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.authConsentBox {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid rgba(73, 86, 49, 0.22);
+  border-radius: 8px;
+  color: transparent;
+  background: #ffffff;
+  transition: color var(--auth-transition), background var(--auth-transition), border-color var(--auth-transition);
+}
+
+.authConsent.checked .authConsentBox {
+  border-color: var(--auth-green);
+  color: #ffffff;
+  background: var(--auth-green);
+}
+
+.authConsent:focus-within {
+  outline: 3px solid rgba(232, 244, 93, 0.32);
+  outline-offset: 2px;
+}
+
 .successMessage {
   padding: 24px 0;
   text-align: center;

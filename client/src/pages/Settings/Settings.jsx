@@ -58,14 +58,14 @@ function Settings() {
       <div className="settingsPage">
         <section className="settingsHero">
           <div>
-            <span className="settingsEyebrow">Security center</span>
+          <span className="settingsEyebrow">Центр безопасности</span>
             <h1>Настройки аккаунта</h1>
             <p>Управляйте безопасностью, паролем и основной информацией аккаунта в одном аккуратном пространстве.</p>
           </div>
           <div className="settingsHeroPanel">
             <Shield size={28} />
             <span>Защита</span>
-            <strong>Active</strong>
+              <strong>Активна</strong>
           </div>
         </section>
 
@@ -113,7 +113,7 @@ function Settings() {
             </div>
             <div className="accountInfoGrid">
               <div className="accountInfoTile">
-                <span><Mail size={15} /> Email</span>
+              <span><Mail size={15} /> Электронная почта</span>
                 <strong>{user?.email || "Не указан"}</strong>
               </div>
               <div className="accountInfoTile">

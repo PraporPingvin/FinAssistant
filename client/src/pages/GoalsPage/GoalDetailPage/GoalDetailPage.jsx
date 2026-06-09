@@ -2,6 +2,8 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   Calendar,
+  CalendarClock,
+  Flag,
   CreditCard,
   Home,
   LineChart,
@@ -14,7 +16,9 @@ import {
 } from "lucide-react";
 import Layout from "../../../components/Layout";
 import ModernDialog from "../../../components/ModernDialog/ModernDialog";
-import { deleteGoal, getGoal } from "../../../api/api";
+import { deleteGoal, getCheckpointsByGoal, getGoal, getPayments } from "../../../api/api";
+import { buildPaymentSchedule, getPaymentStatusLabel } from "../../../utils/paymentSchedule";
+import { calculateScenarioMetrics } from "../../../utils/scenarioCalculations";
 import "./GoalDetailPage.css";
 
 function getDayWord(days) {
@@ -29,11 +33,36 @@ function getMonthWord(months) {
   return "месяцев";
 }
 
+function addCalendarMonths(date, monthsToAdd) {
+  const next = new Date(date);
+  const day = next.getDate();
+  next.setDate(1);
+  next.setMonth(next.getMonth() + monthsToAdd);
+  const lastDay = new Date(next.getFullYear(), next.getMonth() + 1, 0).getDate();
+  next.setDate(Math.min(day, lastDay));
+  return next;
+}
+
+function formatRemainingTerm(monthsNeeded) {
+  if (monthsNeeded <= 0) return "Цель достигнута";
+
+  const years = Math.floor(monthsNeeded / 12);
+  const months = monthsNeeded % 12;
+  const parts = [];
+
+  if (years > 0) parts.push(`${years} ${years % 10 === 1 && years % 100 !== 11 ? "год" : years % 10 >= 2 && years % 10 <= 4 && (years % 100 < 10 || years % 100 >= 20) ? "года" : "лет"}`);
+  if (months > 0) parts.push(`${months} ${getMonthWord(months)}`);
+
+  return parts.join(" ") || "Меньше месяца";
+}
+
 function GoalDetailPage() {
   const { goalId } = useParams();
   const navigate = useNavigate();
 
   const [goal, setGoal] = useState(null);
+  const [payments, setPayments] = useState([]);
+  const [checkpoints, setCheckpoints] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -47,8 +76,14 @@ function GoalDetailPage() {
     try {
       setLoading(true);
       setError("");
-      const data = await getGoal(goalId);
+      const [data, paymentsData, checkpointsData] = await Promise.all([
+        getGoal(goalId),
+        getPayments(goalId).catch(() => []),
+        getCheckpointsByGoal(goalId).catch(() => []),
+      ]);
       setGoal(data);
+      setPayments(paymentsData || []);
+      setCheckpoints(checkpointsData || []);
     } catch (error) {
       console.error("Ошибка загрузки цели:", error);
       setError("Не удалось загрузить данные цели");
@@ -105,50 +140,34 @@ function GoalDetailPage() {
       };
     }
 
-    const currentAmount = Number(goal.current_amount || 0);
-    const targetAmount = Number(goal.target_amount || 0);
-    const monthlyContribution = Number(goal.monthly_contribution || 0);
-    const remainingAmount = Math.max(0, targetAmount - currentAmount);
+    const plan = calculateScenarioMetrics({
+      goal,
+      payments,
+      scenario: {
+        monthly_contribution: goal.monthly_contribution,
+        expected_return: 0,
+        inflation_rate: 0,
+      },
+    });
+    const currentAmount = plan.current;
+    const targetAmount = plan.target;
+    const remainingAmount = plan.remaining;
     const progress = targetAmount ? Math.min(100, Math.round((currentAmount / targetAmount) * 100)) : 0;
 
     let estimatedTime = "—";
 
-    if (goal.deadline_date) {
-      const deadline = new Date(goal.deadline_date);
+    if (remainingAmount <= 0) {
+      estimatedTime = "Цель достигнута";
+    } else if (Number.isFinite(plan.monthsToGoal)) {
+      const monthsNeeded = plan.monthsToGoal;
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      deadline.setHours(0, 0, 0, 0);
+      const finishDate = addCalendarMonths(today, monthsNeeded);
+      const diffDays = Math.round((finishDate - today) / (1000 * 60 * 60 * 24));
 
-      const diffDays = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
-
-      if (diffDays > 0) {
-        if (diffDays < 30) {
-          estimatedTime = `${diffDays} ${getDayWord(diffDays)}`;
-        } else {
-          const months = Math.floor(diffDays / 30);
-          const days = diffDays % 30;
-          estimatedTime = days === 0
-            ? `${months} ${getMonthWord(months)}`
-            : `${months} ${getMonthWord(months)} ${days} ${getDayWord(days)}`;
-        }
-      } else if (diffDays === 0) {
-        estimatedTime = "Сегодня";
-      } else {
-        estimatedTime = "Просрочена";
-      }
-    } else if (monthlyContribution > 0 && remainingAmount > 0) {
-      const monthsNeeded = remainingAmount / monthlyContribution;
-
-      if (monthsNeeded < 1) {
-        const daysNeeded = Math.ceil(monthsNeeded * 30);
-        estimatedTime = `${daysNeeded} ${getDayWord(daysNeeded)}`;
-      } else {
-        const fullMonths = Math.floor(monthsNeeded);
-        const remainingDays = Math.ceil((monthsNeeded - fullMonths) * 30);
-        estimatedTime = remainingDays === 0
-          ? `${fullMonths} ${getMonthWord(fullMonths)}`
-          : `${fullMonths} ${getMonthWord(fullMonths)} ${remainingDays} ${getDayWord(remainingDays)}`;
-      }
+      estimatedTime = monthsNeeded < 1
+        ? `${diffDays} ${getDayWord(diffDays)}`
+        : formatRemainingTerm(monthsNeeded);
     }
 
     return {
@@ -158,7 +177,31 @@ function GoalDetailPage() {
       progress,
       estimatedTime,
     };
-  }, [goal]);
+  }, [goal, payments]);
+
+  const paymentSchedule = useMemo(
+    () => buildPaymentSchedule(goal, payments),
+    [goal, payments]
+  );
+
+  const checkpointTimeline = useMemo(() => {
+    if (!goal) return [];
+    const target = Number(goal.target_amount || 0);
+    const current = calculations.currentAmount;
+    return [...checkpoints]
+      .sort((a, b) => Number(a.target_amount || 0) - Number(b.target_amount || 0))
+      .map((checkpoint) => {
+        const amount = Number(checkpoint.target_amount || 0);
+        const achieved = checkpoint.status === "completed" || current >= amount;
+        return {
+          ...checkpoint,
+          amount,
+          achieved,
+          remaining: Math.max(0, amount - current),
+          position: target > 0 ? Math.min(100, Math.max(2, (amount / target) * 100)) : 0,
+        };
+      });
+  }, [goal, checkpoints, calculations.currentAmount]);
 
   if (loading) {
     return (
@@ -211,7 +254,6 @@ function GoalDetailPage() {
             <div className="goalHeroCopy">
               <span className={`statusBadge status-${goal.status}`}>{statusLabel}</span>
               <h1 className="goalTitle">{goal.title}</h1>
-              {goal.description && <p className="goalDescription">{goal.description}</p>}
             </div>
 
             <div className="heroActions">
@@ -269,6 +311,86 @@ function GoalDetailPage() {
             </div>
           </div>
         </section>
+
+        <section className="goalCheckpointTimeline">
+          <div className="goalCheckpointHeader">
+            <div>
+              <span className="sectionKicker">Этапы маршрута</span>
+              <h2>Контрольные точки цели</h2>
+              <p>Шкала показывает, какие промежуточные суммы нужно накопить и к каким датам.</p>
+            </div>
+            <Link to={`/checkpoints?create=1&goalId=${goalId}`} className="goalCheckpointCreate">
+              <Flag size={16} /> Добавить точку
+            </Link>
+          </div>
+
+          {checkpointTimeline.length > 0 ? (
+            <>
+              <div className="goalCheckpointScale">
+                <div className="goalCheckpointScaleFill" style={{ width: `${calculations.progress}%` }} />
+                {checkpointTimeline.map((checkpoint) => (
+                  <div
+                    key={checkpoint.checkpoint_id}
+                    className={`goalCheckpointMarker ${checkpoint.achieved ? "achieved" : ""}`}
+                    style={{ left: `${checkpoint.position}%` }}
+                  >
+                    <span />
+                    <div>
+                      <strong>{checkpoint.title}</strong>
+                      <small>{formatCurrency(checkpoint.amount)}</small>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="goalCheckpointList">
+                {checkpointTimeline.map((checkpoint) => (
+                  <article key={checkpoint.checkpoint_id} className={checkpoint.achieved ? "achieved" : ""}>
+                    <Flag size={18} />
+                    <div>
+                      <strong>{checkpoint.title}</strong>
+                      <span>{checkpoint.target_date ? `Срок: ${formatDate(checkpoint.target_date)}` : "Срок не указан"}</span>
+                    </div>
+                    <div>
+                      <b>{checkpoint.achieved ? "Достигнуто" : `Осталось ${formatCurrency(checkpoint.remaining)}`}</b>
+                      <small>{formatCurrency(checkpoint.amount)}</small>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </>
+          ) : (
+            <div className="goalCheckpointEmpty">
+              <Flag size={30} />
+              <div>
+                <strong>Контрольных точек пока нет</strong>
+                <span>Например: накопить первые 50% суммы к выбранной дате.</span>
+              </div>
+              <Link to={`/checkpoints?create=1&goalId=${goalId}`}>Создать контрольную точку</Link>
+            </div>
+          )}
+        </section>
+
+        {paymentSchedule && (
+          <section className={`goalNextPaymentCard ${paymentSchedule.status}`}>
+            <div className="goalNextPaymentIcon">
+              <CalendarClock size={24} />
+            </div>
+            <div className="goalNextPaymentContent">
+              <span>{getPaymentStatusLabel(paymentSchedule.status)}</span>
+              <h2>Следующий платеж: {paymentSchedule.dueDateLabel}</h2>
+              <p>
+                {paymentSchedule.isCurrentPeriodCovered
+                  ? `Текущий период уже закрыт. Следующий плановый взнос: ${formatCurrency(paymentSchedule.amountDue)}.`
+                  : `${paymentSchedule.message}. Осталось внести за текущий период: ${formatCurrency(paymentSchedule.amountDue)}.`}
+              </p>
+            </div>
+            <Link to={`/goals/${goalId}/payments/new`} className="goalNextPaymentButton">
+              <CreditCard size={16} />
+              Внести платеж
+            </Link>
+          </section>
+        )}
 
         <section className="infoGridGoalDetail">
           <div className="infoCardGoalDetail">

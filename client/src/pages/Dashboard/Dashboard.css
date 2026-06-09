@@ -398,6 +398,76 @@
   background: rgba(232, 244, 93, 0.22);
 }
 
+.baselineForecastCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 14px;
+  padding: 18px;
+  border: 1px solid rgba(73, 86, 49, 0.14);
+  border-radius: 22px;
+  color: var(--dash-ink);
+  background: rgba(255, 255, 255, 0.72);
+  text-decoration: none;
+  transition: transform var(--dash-transition), box-shadow var(--dash-transition), border-color var(--dash-transition);
+}
+
+.baselineForecastCard:hover {
+  transform: translateY(-2px);
+  border-color: rgba(73, 86, 49, 0.28);
+  box-shadow: 0 18px 38px rgba(44, 58, 35, 0.1);
+}
+
+.baselineForecastCard div:first-child {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.baselineLabel {
+  color: var(--dash-muted);
+  font-size: 0.72rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.baselineForecastCard strong {
+  overflow: hidden;
+  font-size: 1.05rem;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.baselineForecastCard small {
+  color: var(--dash-muted);
+  font-weight: 750;
+}
+
+.baselineForecastMeta {
+  display: grid;
+  justify-items: end;
+  gap: 4px;
+  flex: 0 0 auto;
+}
+
+.baselineForecastMeta b {
+  color: var(--dash-moss);
+  font-size: 1.2rem;
+  font-weight: 900;
+}
+
+.baselineForecastMeta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--dash-muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
 .priorityList {
   display: grid;
   gap: 12px;
@@ -440,6 +510,120 @@
   border-radius: 18px;
   color: var(--dash-ink);
   background: #ffffff;
+}
+
+.dashboardCheckpoint,
+.dashboardCheckpointExample {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 24px;
+  padding: 22px;
+  border: 1px solid var(--dash-line);
+  border-left: 5px solid #6f9b32;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 18px 42px rgba(44, 58, 35, 0.08);
+}
+
+.dashboardCheckpoint.checkpoint-risk {
+  border-left-color: #f0a13a;
+}
+
+.dashboardCheckpoint.checkpoint-overdue {
+  border-left-color: #ff6b5f;
+}
+
+.dashboardCheckpointIcon,
+.dashboardCheckpointExample > div:first-child {
+  display: grid;
+  place-items: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 15px;
+  color: var(--dash-ink);
+  background: var(--dash-lime);
+}
+
+.dashboardCheckpointMain span,
+.dashboardCheckpointAmount span,
+.dashboardCheckpointAmount small,
+.dashboardCheckpointExample span {
+  color: var(--dash-muted);
+  font-size: 0.8rem;
+  font-weight: 750;
+}
+
+.dashboardCheckpointMain h2,
+.dashboardCheckpointExample h2 {
+  margin: 3px 0;
+  color: var(--dash-ink);
+  font-size: 1.25rem;
+}
+
+.dashboardCheckpointMain p,
+.dashboardCheckpointExample p {
+  margin: 0;
+  color: var(--dash-muted);
+  line-height: 1.55;
+}
+
+.dashboardCheckpointTrack {
+  overflow: hidden;
+  height: 8px;
+  margin-top: 10px;
+  border-radius: 999px;
+  background: rgba(24, 32, 22, 0.1);
+}
+
+.dashboardCheckpointTrack div {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--dash-lime), var(--dash-moss));
+}
+
+.dashboardCheckpointAmount {
+  display: grid;
+  gap: 3px;
+  min-width: 150px;
+}
+
+.dashboardCheckpointAmount strong {
+  color: var(--dash-ink);
+  font-size: 1.25rem;
+}
+
+.dashboardCheckpointActions {
+  display: grid;
+  gap: 8px;
+}
+
+.dashboardCheckpointActions a,
+.dashboardCheckpointExample > a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 42px;
+  padding: 0 15px;
+  border: 1px solid var(--dash-line);
+  border-radius: 12px;
+  color: var(--dash-ink);
+  background: rgba(255, 255, 255, 0.76);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.dashboardCheckpointActions a:first-child,
+.dashboardCheckpointExample > a {
+  border-color: transparent;
+  background: var(--dash-lime);
+}
+
+.dashboardCheckpointExample {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  border-left-color: var(--dash-lime);
 }
 
 .goalsSection {
@@ -560,9 +744,14 @@
 
   .heroActions,
   .progressDetails,
+  .baselineForecastCard,
   .sectionHeader {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .baselineForecastMeta {
+    justify-items: start;
   }
 
   .primaryAction,
@@ -578,5 +767,17 @@
 
   .dashboardStatCard {
     min-height: 112px;
+  }
+
+  .dashboardCheckpoint,
+  .dashboardCheckpointExample {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .dashboardCheckpointAmount,
+  .dashboardCheckpointActions,
+  .dashboardCheckpointExample > a {
+    grid-column: 1 / -1;
+    width: 100%;
   }
 }

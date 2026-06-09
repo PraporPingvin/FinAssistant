@@ -1,5 +1,6 @@
 ﻿import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
+import { useRef } from "react";
 import {
   Activity,
   AlertCircle,
@@ -9,6 +10,8 @@ import {
   Clock,
   DollarSign,
   Edit2,
+  HelpCircle,
+  RefreshCw,
   Save,
   Shield,
   Target,
@@ -19,15 +22,19 @@ import {
 } from "lucide-react";
 import Layout from "../../../components/Layout";
 import ModernDialog from "../../../components/ModernDialog/ModernDialog";
-import { getScenario, updateScenario, deleteScenario, getGoal, getForecast } from "../../../api/api";
+import { getScenario, updateScenario, deleteScenario, getGoal, getForecast, getPayments, getRussiaInflation } from "../../../api/api";
+import { calculateScenarioMetrics, formatPercent } from "../../../utils/scenarioCalculations";
 import "./ScenarioDetailPage.css";
 
 function ScenarioDetailPage() {
   const { scenarioId } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const editPanelRef = useRef(null);
 
   const [scenario, setScenario] = useState(null);
   const [goal, setGoal] = useState(null);
+  const [payments, setPayments] = useState([]);
   const [forecast, setForecast] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -35,6 +42,8 @@ function ScenarioDetailPage() {
   const [editData, setEditData] = useState({});
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [inflationLoading, setInflationLoading] = useState(false);
+  const [inflationInfo, setInflationInfo] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
@@ -49,8 +58,12 @@ function ScenarioDetailPage() {
       setScenario(scenarioData);
       setEditData(scenarioData);
 
-      const goalData = await getGoal(scenarioData.goal_id);
+      const [goalData, paymentsData] = await Promise.all([
+        getGoal(scenarioData.goal_id),
+        getPayments(scenarioData.goal_id).catch(() => []),
+      ]);
       setGoal(goalData);
+      setPayments(paymentsData || []);
 
       try {
         const forecastData = await getForecast(scenarioData.goal_id);
@@ -78,14 +91,15 @@ function ScenarioDetailPage() {
   const handleSave = async () => {
     try {
       setSaving(true);
-      const updates = {
-        name: editData.name?.trim(),
-        monthly_contribution: parseFloat(editData.monthly_contribution),
-        expected_return: parseFloat(editData.expected_return),
-        inflation_rate: parseFloat(editData.inflation_rate),
-        target_amount: parseFloat(editData.target_amount),
-      };
-      Object.keys(updates).forEach((key) => updates[key] === undefined && delete updates[key]);
+      const updates = {};
+      const name = editData.name?.trim();
+      if (name) updates.name = name;
+
+      ["monthly_contribution", "expected_return", "inflation_rate", "target_amount"].forEach((field) => {
+        const value = parseFloat(editData[field]);
+        if (Number.isFinite(value)) updates[field] = value;
+      });
+
       await updateScenario(scenarioId, updates);
       setScenario({ ...scenario, ...updates });
       setEditMode(false);
@@ -94,6 +108,43 @@ function ScenarioDetailPage() {
       setError(`Ошибка сохранения: ${error.message}`);
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleStartEdit = () => {
+    setEditMode(true);
+    window.setTimeout(() => {
+      editPanelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      editPanelRef.current?.querySelector("input")?.focus();
+    }, 80);
+  };
+
+  useEffect(() => {
+    if (scenario && searchParams.get("edit") === "1" && !editMode) {
+      handleStartEdit();
+    }
+  }, [scenario, searchParams, editMode]);
+
+  const handleCancelEdit = () => {
+    setEditData(scenario);
+    setEditMode(false);
+    setInflationInfo("");
+  };
+
+  const applyCurrentInflation = async () => {
+    try {
+      setInflationLoading(true);
+      setInflationInfo("");
+      const data = await getRussiaInflation();
+      if (!Number.isFinite(Number(data.inflation_rate)) || Number(data.inflation_rate) > 25) {
+        throw new Error("Некорректное значение инфляции");
+      }
+      setEditData((prev) => ({ ...prev, inflation_rate: String(data.inflation_rate) }));
+      setInflationInfo(`Подставлено ${data.inflation_rate}%: ${data.source}. Сохраните сценарий, если хотите применить значение.`);
+    } catch (error) {
+      setInflationInfo("Не удалось загрузить инфляцию автоматически. Можно ввести процент вручную.");
+    } finally {
+      setInflationLoading(false);
     }
   };
 
@@ -123,11 +174,7 @@ function ScenarioDetailPage() {
 
   const calculateMonthsToGoal = () => {
     if (!goal || !scenario) return 0;
-    const target = parseFloat(scenario.target_amount || goal.target_amount) || 0;
-    const current = parseFloat(goal.current_amount) || 0;
-    const monthly = parseFloat(scenario.monthly_contribution) || 0;
-    if (monthly <= 0) return Infinity;
-    return Math.max(0, Math.ceil((target - current) / monthly));
+    return calculateScenarioMetrics({ goal, scenario, payments }).monthsToGoal;
   };
 
   const calculateRiskLevel = (expectedReturn) => {
@@ -155,8 +202,9 @@ function ScenarioDetailPage() {
 
   const monthsToGoal = calculateMonthsToGoal();
   const risk = calculateRiskLevel(scenario.expected_return);
-  const effectiveReturn = ((parseFloat(scenario.expected_return) || 0) - (parseFloat(scenario.inflation_rate) || 0)).toFixed(1);
-  const goalProgress = goal?.target_amount > 0 ? Math.min(100, Math.round(((parseFloat(goal.current_amount) || 0) / parseFloat(goal.target_amount)) * 100)) : 0;
+  const metrics = calculateScenarioMetrics({ goal, scenario, payments });
+  const effectiveReturn = metrics.effectiveReturn.toFixed(1);
+  const goalProgress = goal?.target_amount > 0 ? Math.min(100, Math.round((metrics.current / parseFloat(goal.target_amount)) * 100)) : 0;
 
   return (
     <Layout>
@@ -165,26 +213,16 @@ function ScenarioDetailPage() {
 
         <section className="scenarioDetailHero">
           <div>
-            <span className="detailEyebrow">Scenario profile</span>
+          <span className="detailEyebrow">Параметры сценария</span>
             {editMode ? (
               <input type="text" name="name" value={editData.name || ""} onChange={handleEditChange} className="detailTitleInput" placeholder="Название сценария" />
             ) : (
               <h1>{scenario.name}</h1>
             )}
-            <p>Создан: {formatDate(scenario.created_at)}. Детальная карта параметров, риска и связи с финансовой целью.</p>
+            <p>Эта страница показывает, как взнос, дополнительный рост и инфляция меняют срок достижения цели. Создан: {formatDate(scenario.created_at)}.</p>
             <div className="detailHeroActions">
-              {!editMode ? (
-                <>
-                  <button onClick={() => setEditMode(true)} className="detailPrimaryButton" disabled={deleting}><Edit2 size={17} /> Редактировать</button>
-                  <button onClick={() => navigate(`/forecast/${scenario.goal_id}?scenario=${scenarioId}`)} className="detailGhostButton"><BarChart3 size={17} /> Прогноз</button>
-                  <button onClick={() => setShowDeleteConfirm(true)} className="detailDangerButton" disabled={deleting}><Trash2 size={17} /> {deleting ? "Удаление..." : "Удалить"}</button>
-                </>
-              ) : (
-                <>
-                  <button onClick={() => { setEditData(scenario); setEditMode(false); }} className="detailGhostButton" disabled={saving}><X size={17} /> Отмена</button>
-                  <button onClick={handleSave} className="detailPrimaryButton" disabled={saving}><Save size={17} /> {saving ? "Сохраняем..." : "Сохранить"}</button>
-                </>
-              )}
+              <button onClick={() => navigate(`/forecast/${scenario.goal_id}?scenario=${scenarioId}`)} className="detailGhostButton"><BarChart3 size={17} /> Прогноз</button>
+              <button onClick={() => setShowDeleteConfirm(true)} className="detailDangerButton" disabled={deleting}><Trash2 size={17} /> {deleting ? "Удаление..." : "Удалить"}</button>
             </div>
           </div>
           <div className="detailHeroPanel">
@@ -194,27 +232,65 @@ function ScenarioDetailPage() {
 
         <section className="detailStatsGrid">
           <article className="detailStatCard accent"><DollarSign size={24} /><span>Ежемесячный взнос</span><strong>{formatCurrency(scenario.monthly_contribution)} ₽</strong></article>
-          <article className="detailStatCard"><TrendingUp size={24} /><span>Доходность</span><strong>{scenario.expected_return}%</strong></article>
-          <article className="detailStatCard"><Activity size={24} /><span>Инфляция</span><strong>{scenario.inflation_rate}%</strong></article>
+          <article className="detailStatCard"><TrendingUp size={24} /><span>Доп. рост</span><strong>{formatPercent(scenario.expected_return)}%</strong></article>
+          <article className="detailStatCard"><Activity size={24} /><span>Инфляция</span><strong>{formatPercent(scenario.inflation_rate)}%</strong></article>
           <article className="detailStatCard"><Shield size={24} /><span>Риск</span><strong className={`riskBadge ${risk.className}`}>{risk.icon}{risk.level}</strong></article>
         </section>
 
+        <section className="scenarioPurposeCard">
+          <div className="scenarioPurposeHeader">
+            <span><HelpCircle size={15} /> Зачем нужен сценарий</span>
+            <h2>Проверить план до того, как менять цель</h2>
+            <p>Сценарий помогает проверить план: сколько вносить каждый месяц, учитывать ли дополнительный рост накоплений и как инфляция влияет на примерный срок.</p>
+          </div>
+          <div className="scenarioPurposeGrid">
+            <article>
+              <strong>Срок</strong>
+              <p>Пересчитывается по накопленной сумме, платежам, ежемесячному взносу, дополнительному росту и инфляции.</p>
+            </article>
+            <article>
+              <strong>Дополнительный рост</strong>
+              <p>Это необязательное поле. Если цель пополняется только вашими платежами, поставьте 0. Если хотите заложить рост суммы на 8% в год, укажите 8.</p>
+            </article>
+            <article>
+              <strong>Риск</strong>
+              <p>Чем выше дополнительный рост, тем менее осторожным считается сценарий.</p>
+            </article>
+          </div>
+          <div className="scenarioExampleBox">
+            <strong>Пример</strong>
+            <p>Цель 100 000 ₽, уже накоплено 20 000 ₽, ежемесячный взнос 5 000 ₽. Если дополнительный рост 0%, система считает срок только по вашим платежам. Если указать рост 8% и инфляцию 6%, в расчёте останется около 2% реального роста, поэтому срок может немного сократиться.</p>
+          </div>
+        </section>
+
         <section className="detailWorkspace">
-          <main className="detailCard">
-            <div className="detailCardHeader"><span>Параметры</span><h2>Настройки сценария</h2></div>
-            <div className="detailFormGrid">
-              <EditableMetric label="Ежемесячный взнос" icon={<DollarSign size={15} />} editMode={editMode} name="monthly_contribution" value={editData.monthly_contribution} onChange={handleEditChange} display={`${formatCurrency(scenario.monthly_contribution)} ₽`} />
-              <EditableMetric label="Ожидаемая доходность" icon={<TrendingUp size={15} />} editMode={editMode} name="expected_return" value={editData.expected_return} onChange={handleEditChange} display={`${scenario.expected_return}%`} />
-              <EditableMetric label="Ожидаемая инфляция" icon={<Activity size={15} />} editMode={editMode} name="inflation_rate" value={editData.inflation_rate} onChange={handleEditChange} display={`${scenario.inflation_rate}%`} />
-              <EditableMetric label="Целевая сумма" icon={<Target size={15} />} editMode={editMode} name="target_amount" value={editData.target_amount} onChange={handleEditChange} display={`${formatCurrency(scenario.target_amount || goal?.target_amount)} ₽`} />
+          <main className="detailCard" ref={editPanelRef}>
+            <div className="detailCardHeader editableHeader">
+              <div><span>Параметры</span><h2>Настройки сценария</h2></div>
+              {!editMode && <button onClick={handleStartEdit} className="detailPrimaryButton" disabled={deleting}><Edit2 size={17} /> Редактировать</button>}
             </div>
+            <div className="detailFormGrid">
+              <EditableMetric label="Ежемесячный взнос" hint="Сколько вы планируете добавлять к цели каждый месяц. Например: 5 000 означает, что расчёт будет считать по 5 000 ₽ каждый месяц." icon={<DollarSign size={15} />} editMode={editMode} name="monthly_contribution" value={editData.monthly_contribution} onChange={handleEditChange} display={`${formatCurrency(scenario.monthly_contribution)} ₽`} />
+              <EditableMetric label="Дополнительный рост, % в год" hint="Необязательное поле. Если вы просто копите деньги платежами, поставьте 0. Если хотите проверить вариант, где сумма дополнительно растёт, укажите процент за год: например, 8." icon={<TrendingUp size={15} />} editMode={editMode} name="expected_return" value={editData.expected_return} onChange={handleEditChange} display={`${formatPercent(scenario.expected_return)}%`} />
+              <EditableMetric label="Ожидаемая инфляция" hint="На сколько процентов за год могут вырасти цены. Например: 6 означает, что покупательная способность денег снизится примерно на 6% за год. Система вычитает инфляцию из годового прироста." icon={<Activity size={15} />} editMode={editMode} name="inflation_rate" value={editData.inflation_rate} onChange={handleEditChange} display={`${formatPercent(scenario.inflation_rate)}%`} action={applyCurrentInflation} actionText={inflationLoading ? "Загружаем..." : "Подставить актуальную"} actionDisabled={inflationLoading} actionIcon={<RefreshCw size={14} />} note={inflationInfo} />
+              <EditableMetric label="Целевая сумма" hint="Сумма, которую нужно накопить в этом сценарии. Можно указать другую сумму для проверки, не меняя саму цель." icon={<Target size={15} />} editMode={editMode} name="target_amount" value={editData.target_amount} onChange={handleEditChange} display={`${formatCurrency(scenario.target_amount || goal?.target_amount)} ₽`} />
+            </div>
+            {editMode && (
+              <div className="detailEditActions">
+                <button onClick={handleCancelEdit} className="detailGhostLight" disabled={saving}><X size={17} /> Отмена</button>
+                <button onClick={handleSave} className="detailPrimaryButton" disabled={saving}><Save size={17} /> {saving ? "Сохраняем..." : "Сохранить"}</button>
+              </div>
+            )}
           </main>
 
           <aside className="detailCard side">
             <div className="detailCardHeader"><span>Расчёт</span><h2>Показатели</h2></div>
             <div className="calculationList">
               <div><span><Clock size={15} /> Срок</span><strong>{Number.isFinite(monthsToGoal) ? `${monthsToGoal} мес.` : "Недостижимо"}</strong></div>
-              <div><span><TrendingUp size={15} /> Эффективная доходность</span><strong>{effectiveReturn}%</strong></div>
+              <div><span><TrendingUp size={15} /> Рост после инфляции</span><strong>{effectiveReturn}%</strong></div>
+              <div><span><Target size={15} /> Осталось накопить</span><strong>{formatCurrency(metrics.remaining)} ₽</strong></div>
+              <div><span><Shield size={15} /> Вероятность</span><strong>{metrics.probability}%</strong></div>
+              <div><span><Activity size={15} /> Рейтинг</span><strong>{metrics.rating}/100</strong></div>
               <div><span><DollarSign size={15} /> Темп в день</span><strong>{formatCurrency(Math.ceil((parseFloat(scenario.monthly_contribution) || 0) / 30))} ₽</strong></div>
             </div>
           </aside>
@@ -225,7 +301,7 @@ function ScenarioDetailPage() {
             <div className="detailCardHeader"><span>Связанная цель</span><h2>{goal.title}</h2></div>
             <div className="linkedGoalGrid">
               <div><span>Цель</span><strong>{formatCurrency(goal.target_amount)} ₽</strong></div>
-              <div><span>Накоплено</span><strong>{formatCurrency(goal.current_amount)} ₽</strong></div>
+              <div><span>Накоплено</span><strong>{formatCurrency(metrics.current)} ₽</strong></div>
               <div><span>Прогресс</span><strong>{goalProgress}%</strong></div>
             </div>
             <div className="detailProgressTrack"><div style={{ width: `${goalProgress}%` }} /></div>
@@ -252,11 +328,18 @@ function ScenarioDetailPage() {
   );
 }
 
-function EditableMetric({ label, icon, editMode, name, value, onChange, display }) {
+function EditableMetric({ label, hint, icon, editMode, name, value, onChange, display, action, actionText, actionDisabled, actionIcon, note }) {
   return (
     <div className="editableMetric">
       <span>{icon} {label}</span>
+      {editMode && hint && <p className="editableMetricHint">{hint}</p>}
       {editMode ? <input name={name} value={value || ""} onChange={onChange} /> : <strong>{display}</strong>}
+      {editMode && action && (
+        <button type="button" className="editableMetricAction" onClick={action} disabled={actionDisabled}>
+          {actionIcon} {actionText}
+        </button>
+      )}
+      {editMode && note && <p className="editableMetricNote">{note}</p>}
     </div>
   );
 }

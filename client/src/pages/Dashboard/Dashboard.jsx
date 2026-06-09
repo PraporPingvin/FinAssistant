@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import {
   AlertCircle,
   ArrowUpRight,
+  Bell,
+  CalendarDays,
   CheckCircle,
   Clock3,
   PieChart,
@@ -14,13 +16,15 @@ import {
   Wallet,
 } from "lucide-react";
 import Layout from "../../components/Layout";
-import { getGoals } from "../../api/api";
+import { getCheckpoints, getGoals } from "../../api/api";
 import GoalCard from "../../components/Goal/GoalCard/GoalCard";
 import { useAuth } from "../../context/AuthContext";
+import { calculateScenarioMetrics } from "../../utils/scenarioCalculations";
 import "./Dashboard.css";
 
 function Dashboard() {
   const [goals, setGoals] = useState([]);
+  const [checkpoints, setCheckpoints] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
@@ -62,10 +66,14 @@ function Dashboard() {
         setLoading(true);
       }
 
-      const data = await getGoals(user.id);
+      const [data, checkpointsData] = await Promise.all([
+        getGoals(user.id),
+        getCheckpoints().catch(() => []),
+      ]);
 
       if (data && Array.isArray(data)) {
         setGoals(data);
+        setCheckpoints(checkpointsData || []);
         setError(null);
         setLastUpdate(new Date());
       } else {
@@ -128,6 +136,92 @@ function Dashboard() {
       .slice(0, 3);
   }, [goals]);
 
+  const baselineGoalForecast = useMemo(() => {
+    const activeForecasts = goals
+      .filter((item) => item.status === "active")
+      .map((item) => {
+        const plan = calculateScenarioMetrics({
+          goal: item,
+          scenario: {
+            monthly_contribution: item.monthly_contribution,
+            expected_return: 0,
+            inflation_rate: 0,
+          },
+        });
+        const { target, current, monthly, remaining } = plan;
+        const months = Number.isFinite(plan.monthsToGoal) ? plan.monthsToGoal : null;
+        const date = months !== null ? new Date() : null;
+        if (date) date.setMonth(date.getMonth() + months);
+
+        return {
+          ...item,
+          current,
+          date,
+          monthly,
+          months,
+          remaining,
+          target,
+          progress: target > 0 ? Math.min(100, Math.round((current / target) * 100)) : 0,
+        };
+      });
+
+    return activeForecasts.sort((a, b) => {
+      if (a.months === null && b.months === null) return b.progress - a.progress;
+      if (a.months === null) return 1;
+      if (b.months === null) return -1;
+      return a.months - b.months;
+    })[0] || null;
+  }, [goals]);
+
+  const checkpointOverview = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const plans = checkpoints.map((checkpoint) => {
+      const goal = goals.find(item => item.goal_id === checkpoint.goal_id);
+      const target = Number(checkpoint.target_amount || 0);
+      const current = Number(goal?.current_amount || 0);
+      const monthly = Number(goal?.monthly_contribution || 0);
+      const remaining = Math.max(0, target - current);
+      const months = remaining > 0 && monthly > 0 ? Math.ceil(remaining / monthly) : 0;
+      const targetDate = checkpoint.target_date ? new Date(checkpoint.target_date) : null;
+      if (targetDate) targetDate.setHours(0, 0, 0, 0);
+      const forecastDate = months > 0 ? new Date(today) : null;
+      if (forecastDate) forecastDate.setMonth(forecastDate.getMonth() + months);
+      const days = targetDate ? Math.ceil((targetDate - today) / 86400000) : null;
+      let status = "noDeadline";
+      if (checkpoint.status === "completed" || remaining <= 0) status = "achieved";
+      else if (days !== null && days < 0) status = "overdue";
+      else if (!monthly || (targetDate && forecastDate > targetDate)) status = "risk";
+      else if (targetDate) status = "onTrack";
+      return {
+        checkpoint,
+        goal,
+        remaining,
+        progress: target > 0 ? Math.min(100, Math.round((current / target) * 100)) : 0,
+        days,
+        status,
+      };
+    });
+    const active = plans.filter(item => item.status !== "achieved");
+    const next = [...active].sort((a, b) => {
+      if (a.days === null) return 1;
+      if (b.days === null) return -1;
+      return a.days - b.days;
+    })[0] || null;
+    return {
+      next,
+      alerts: active.filter(item => ["risk", "overdue"].includes(item.status)).length,
+    };
+  }, [checkpoints, goals]);
+
+  const checkpointStatusText = (status) => ({
+    achieved: "Достигнуто",
+    onTrack: "Успеваем",
+    risk: "Есть риск",
+    overdue: "Срок прошел",
+    noDeadline: "Без срока",
+  }[status] || "");
+
   if (!isAuthenticated || !user) {
     return null;
   }
@@ -181,6 +275,45 @@ function Dashboard() {
               <strong>Ошибка:</strong> {error}
             </div>
           </div>
+        )}
+
+        {checkpointOverview.next && (
+          <section className={`dashboardCheckpoint checkpoint-${checkpointOverview.next.status}`}>
+            <div className="dashboardCheckpointIcon"><Bell size={24} /></div>
+            <div className="dashboardCheckpointMain">
+              <span>Ближайшая контрольная точка</span>
+              <h2>{checkpointOverview.next.checkpoint.title}</h2>
+              <p>
+                {checkpointStatusText(checkpointOverview.next.status)} · {checkpointOverview.next.days === null
+                  ? "срок не указан"
+                  : checkpointOverview.next.days < 0
+                    ? `срок прошел ${Math.abs(checkpointOverview.next.days)} дн. назад`
+                    : `до срока ${checkpointOverview.next.days} дн.`}
+              </p>
+              <div className="dashboardCheckpointTrack"><div style={{ width: `${checkpointOverview.next.progress}%` }} /></div>
+            </div>
+            <div className="dashboardCheckpointAmount">
+              <span>Осталось</span>
+              <strong>{formatCurrency(checkpointOverview.next.remaining)} ₽</strong>
+              <small>{checkpointOverview.next.progress}% выполнено</small>
+            </div>
+            <div className="dashboardCheckpointActions">
+              <Link to={`/goals/${checkpointOverview.next.checkpoint.goal_id}/payments/new`}>Внести платеж</Link>
+              <Link to="/checkpoints">Все точки{checkpointOverview.alerts > 0 ? ` · ${checkpointOverview.alerts} требуют внимания` : ""}</Link>
+            </div>
+          </section>
+        )}
+
+        {goals.length > 0 && !checkpointOverview.next && (
+          <section className="dashboardCheckpointExample">
+            <div><Target size={26} /></div>
+            <div>
+              <span>Пример контрольной точки</span>
+              <h2>Накопить первые 50% цели</h2>
+              <p>Контрольная точка покажет, сколько осталось, успеваете ли вы к сроку и когда нужно внести платеж.</p>
+            </div>
+            <Link to="/checkpoints?create=1"><Plus size={16} /> Создать точку</Link>
+          </section>
         )}
 
         <section className="statsGrid" aria-label="Ключевые показатели">
@@ -247,6 +380,26 @@ function Dashboard() {
                     : "Добавьте ежемесячный взнос, чтобы увидеть прогноз финиша"}
                 </span>
               </div>
+              {baselineGoalForecast && (
+                <Link to={`/forecast/${baselineGoalForecast.goal_id}`} className="baselineForecastCard">
+                  <div>
+                    <span className="baselineLabel">Базовый прогноз без сценариев</span>
+                    <strong>{baselineGoalForecast.title}</strong>
+                    <small>
+                      {formatCurrency(baselineGoalForecast.current)} ₽ из {formatCurrency(baselineGoalForecast.target)} ₽
+                    </small>
+                  </div>
+                  <div className="baselineForecastMeta">
+                    <b>{baselineGoalForecast.months !== null ? `${baselineGoalForecast.months} мес.` : "Нет взноса"}</b>
+                    <span>
+                      <CalendarDays size={14} />
+                      {baselineGoalForecast.date
+                        ? baselineGoalForecast.date.toLocaleDateString("ru-RU", { month: "long", year: "numeric" })
+                        : "укажите взнос"}
+                    </span>
+                  </div>
+                </Link>
+              )}
             </article>
 
             <article className="priorityPanel">

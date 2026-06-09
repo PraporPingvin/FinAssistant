@@ -611,6 +611,231 @@
   border-top: 1px solid var(--border-color);
 }
 
+.checkpointCalculation,
+.checkpointCalculationExample {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid rgba(73, 86, 49, 0.12);
+  border-radius: 14px;
+  background: rgba(232, 244, 93, 0.12);
+}
+
+.checkpointCalculationExample {
+  margin: 4px 0 16px;
+}
+
+.checkpointExampleHint {
+  margin: 0 0 16px;
+  color: var(--cp-muted, #68745b);
+  line-height: 1.6;
+}
+
+.checkpointCalculationMeta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.checkpointCalculationTrack {
+  overflow: hidden;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(24, 32, 22, 0.1);
+}
+
+.checkpointCalculationTrack > div {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--cp-lime, #e8f45d), var(--cp-moss, #7b8f36));
+}
+
+.checkpoint-onTrack::before {
+  background: linear-gradient(90deg, #27a66a, #98c43d) !important;
+}
+
+.checkpoint-risk::before {
+  background: linear-gradient(90deg, #f0a13a, #f4d35e) !important;
+}
+
+.checkpoint-overdue::before {
+  background: linear-gradient(90deg, #ff6b5f, #d94841) !important;
+}
+
+.checkpoint-achieved::before {
+  background: linear-gradient(90deg, #27a66a, #4f7cff) !important;
+}
+
+.checkpoint-noDeadline::before {
+  background: linear-gradient(90deg, #89957c, #c4ccba) !important;
+}
+
+.statusOnTrack {
+  color: #11683d;
+  background: rgba(39, 166, 106, 0.15);
+}
+
+.statusRisk {
+  color: #9a5600;
+  background: rgba(240, 161, 58, 0.18);
+}
+
+.statusNoDeadline {
+  color: #59634f;
+  background: rgba(104, 116, 91, 0.13);
+}
+
+.riskRow td {
+  background: rgba(255, 247, 220, 0.72);
+}
+
+.overdueRow td {
+  background: rgba(255, 235, 232, 0.72);
+}
+
+.checkpointCalculation small,
+.checkpointCalculationExample span {
+  color: var(--cp-muted, #68745b);
+  line-height: 1.5;
+}
+
+.nextCheckpointFocus {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 24px;
+  padding: 20px;
+  border: 1px solid rgba(73, 86, 49, 0.14);
+  border-left: 5px solid #6f9b32;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.nextCheckpointFocusIcon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: rgba(232, 244, 93, 0.4);
+}
+
+.nextCheckpointFocusContent span,
+.nextCheckpointFocusAmount span,
+.nextCheckpointFocusAmount small {
+  color: var(--cp-muted, #68745b);
+  font-size: 0.78rem;
+}
+
+.nextCheckpointFocusContent h3,
+.nextCheckpointFocusContent p {
+  margin: 3px 0 0;
+}
+
+.nextCheckpointFocusContent p {
+  line-height: 1.55;
+}
+
+.nextCheckpointFocusAmount {
+  display: grid;
+  gap: 3px;
+  min-width: 150px;
+}
+
+.nextCheckpointFocusAmount strong {
+  font-size: 1.2rem;
+}
+
+.nextCheckpointFocus button {
+  min-height: 42px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 12px;
+  color: #182016;
+  background: #e8f45d;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.nextCheckpointFocusActions {
+  display: flex;
+  gap: 8px;
+}
+
+.nextCheckpointFocus button.secondary {
+  border: 1px solid rgba(73, 86, 49, 0.18);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.checkpointNotice {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+  padding: 16px 18px;
+  border: 1px solid rgba(240, 161, 58, 0.3);
+  border-radius: 16px;
+  color: #6f4300;
+  background: rgba(255, 247, 220, 0.82);
+}
+
+.checkpointNotice div {
+  flex: 1;
+}
+
+.checkpointNotice p {
+  margin: 3px 0 0;
+  line-height: 1.5;
+}
+
+.checkpointNotice button {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 12px;
+  color: #182016;
+  background: #e8f45d;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.checkpointsOverview .actionButton.payment {
+  color: #11683d;
+  background: rgba(39, 166, 106, 0.13);
+}
+
+.focus-risk {
+  border-left-color: #f0a13a;
+}
+
+.focus-overdue {
+  border-left-color: #ff6b5f;
+}
+
+@media (max-width: 760px) {
+  .nextCheckpointFocus {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .nextCheckpointFocusAmount,
+  .nextCheckpointFocusActions {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  .nextCheckpointFocusActions,
+  .checkpointNotice {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .nextCheckpointFocusActions button,
+  .checkpointNotice button {
+    width: 100%;
+  }
+}
+
 .checkpointActions {
   display: flex;
   gap: 8px;
@@ -1169,7 +1394,7 @@
   .chartContainer canvas {
 
     width: auto ;
-    height: auto !;
+    height: auto !important;
   }
 
   /* Обёртка для диаграммы, чтобы не вылезала */
@@ -1773,5 +1998,18 @@
 
   .checkpointsOverview .chartContainer {
     height: 280px;
+  }
+
+  .checkpointsOverview .tableContainer {
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .checkpointsOverview .modalContent {
+    width: calc(100vw - 24px);
+    max-height: calc(100vh - 24px);
+    overflow-y: auto;
+    border-radius: 20px;
   }
 }

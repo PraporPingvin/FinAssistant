@@ -5,7 +5,6 @@ import {
   Calendar,
   Clock,
   CreditCard,
-  FileText,
   Save,
   Sparkles,
   Target,
@@ -16,9 +15,34 @@ import Layout from "../../../components/Layout";
 import { getGoal, updateGoal } from "../../../api/api";
 import "./EditGoalPage.css";
 
+function toDateInputValue(date) {
+  if (!date) return "";
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function parseDateInputValue(value) {
+  if (!value) return new Date();
+  const [year, month, day] = value.split("-").map(Number);
+  return new Date(year, month - 1, day);
+}
+
+function addCalendarMonths(date, monthsToAdd) {
+  const next = new Date(date);
+  const day = next.getDate();
+  next.setDate(1);
+  next.setMonth(next.getMonth() + monthsToAdd);
+  const lastDay = new Date(next.getFullYear(), next.getMonth() + 1, 0).getDate();
+  next.setDate(Math.min(day, lastDay));
+  return next;
+}
+
 function EditGoalPage() {
   const { goalId } = useParams();
   const navigate = useNavigate();
+  const forecastFieldNames = ["target_amount", "monthly_contribution", "initial_amount", "start_date"];
 
   const [formData, setFormData] = useState({
     title: "",
@@ -27,7 +51,6 @@ function EditGoalPage() {
     initial_amount: "",
     start_date: "",
     deadline_date: "",
-    description: "",
     status: "active",
   });
 
@@ -35,6 +58,8 @@ function EditGoalPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [autoDeadline, setAutoDeadline] = useState(true);
+  const [paymentsAmount, setPaymentsAmount] = useState(0);
 
   useEffect(() => {
     if (goalId) loadGoal();
@@ -50,16 +75,22 @@ function EditGoalPage() {
         return;
       }
 
+      const loadedDeadline = goalData.deadline_date ? goalData.deadline_date.split("T")[0] : "";
+      setPaymentsAmount(Math.max(
+        0,
+        Number(goalData.current_amount || 0) - Number(goalData.initial_amount || 0)
+      ));
+
       setFormData({
         title: goalData.title || "",
         target_amount: goalData.target_amount || "",
         monthly_contribution: goalData.monthly_contribution || "",
         initial_amount: goalData.initial_amount || "0",
         start_date: goalData.start_date ? goalData.start_date.split("T")[0] : "",
-        deadline_date: goalData.deadline_date ? goalData.deadline_date.split("T")[0] : "",
-        description: goalData.description || "",
+        deadline_date: loadedDeadline,
         status: goalData.status || "active",
       });
+      setAutoDeadline(!loadedDeadline);
     } catch (err) {
       console.error("Ошибка загрузки цели:", err);
       setError(`Не удалось загрузить цель: ${err.message}`);
@@ -75,6 +106,12 @@ function EditGoalPage() {
       : value;
 
     setFormData((prev) => ({ ...prev, [name]: nextValue }));
+
+    if (name === "deadline_date") {
+      setAutoDeadline(false);
+    } else if (forecastFieldNames.includes(name)) {
+      setAutoDeadline(true);
+    }
 
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
@@ -92,8 +129,8 @@ function EditGoalPage() {
       newErrors.monthly_contribution = "Введите корректный ежемесячный взнос";
     }
     if (!formData.start_date) newErrors.start_date = "Выберите дату начала";
-    if (formData.deadline_date && new Date(formData.deadline_date) <= new Date(formData.start_date)) {
-      newErrors.deadline_date = "Дата завершения должна быть позже даты начала";
+    if (formData.deadline_date && new Date(formData.deadline_date) < new Date(formData.start_date)) {
+      newErrors.deadline_date = "Дата завершения не может быть раньше даты начала";
     }
 
     return newErrors;
@@ -108,11 +145,39 @@ function EditGoalPage() {
     const target = parseFloat(formData.target_amount) || 0;
     const initial = parseFloat(formData.initial_amount) || 0;
     const monthly = parseFloat(formData.monthly_contribution) || 0;
-    const remaining = Math.max(target - initial, 0);
-    const months = monthly > 0 ? Math.ceil(remaining / monthly) : null;
-    const progress = target > 0 ? Math.min(100, Math.round((initial / target) * 100)) : 0;
-    return { months, progress, remaining };
-  }, [formData]);
+    const current = initial + paymentsAmount;
+    const remaining = Math.max(target - current, 0);
+    const months = monthly > 0 && remaining > 0 ? Math.ceil(remaining / monthly) : null;
+    const startDate = parseDateInputValue(formData.start_date);
+    const finishDate = months !== null ? addCalendarMonths(startDate, months) : null;
+    const progress = target > 0 ? Math.min(100, Math.round((current / target) * 100)) : 0;
+    return {
+      months,
+      progress,
+      remaining,
+      deadlineValue: toDateInputValue(finishDate),
+      hasForecast: target > 0 && monthly > 0,
+      isReached: target > 0 && remaining === 0,
+    };
+  }, [formData.target_amount, formData.initial_amount, formData.monthly_contribution, formData.start_date, paymentsAmount]);
+
+  useEffect(() => {
+    if (!autoDeadline || loading) return;
+
+    const nextDeadline = preview.isReached
+      ? formData.start_date
+      : preview.hasForecast
+        ? preview.deadlineValue
+        : "";
+
+    setFormData((prev) => (
+      prev.deadline_date === nextDeadline ? prev : { ...prev, deadline_date: nextDeadline }
+    ));
+  }, [autoDeadline, loading, formData.start_date, preview.deadlineValue, preview.hasForecast, preview.isReached]);
+
+  const handleAutoDeadline = () => {
+    setAutoDeadline(true);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -135,7 +200,6 @@ function EditGoalPage() {
         start_date: formData.start_date,
         deadline_date: formData.deadline_date || null,
         status: formData.status,
-        description: formData.description,
       });
       navigate(`/goals/${goalId}`);
     } catch (err) {
@@ -240,8 +304,17 @@ function EditGoalPage() {
 
             <div className="formRow">
               <div className="formColumn">
-                <label htmlFor="deadline_date" className="formLabel"><Clock size={14} /> Желаемая дата завершения</label>
+                <div className="deadlineLabelRow">
+                  <label htmlFor="deadline_date" className="formLabel"><Clock size={14} /> Желаемая дата завершения</label>
+                  {!autoDeadline && preview.hasForecast && (
+                    <button type="button" className="autoDeadlineButton" onClick={handleAutoDeadline} disabled={saving}>
+                      Пересчитать автоматически
+                    </button>
+                  )}
+                </div>
                 <input id="deadline_date" name="deadline_date" type="date" value={formData.deadline_date} onChange={handleChange} className={`formInput ${errors.deadline_date ? "formInputError" : ""}`} min={formData.start_date} disabled={saving} />
+                {autoDeadline && preview.hasForecast && <div className="currencyPreview">Дата рассчитана автоматически по ежемесячному взносу.</div>}
+                {!autoDeadline && <div className="currencyPreview">Дата изменена вручную.</div>}
                 {errors.deadline_date && <div className="validationError">{errors.deadline_date}</div>}
               </div>
 
@@ -253,11 +326,6 @@ function EditGoalPage() {
                   <option value="completed">Выполнена</option>
                 </select>
               </div>
-            </div>
-
-            <div className="formGroup fullWidth">
-              <label htmlFor="description" className="formLabel"><FileText size={14} /> Описание цели</label>
-              <textarea id="description" name="description" placeholder="Опишите детали вашей цели..." value={formData.description} onChange={handleChange} className="formTextarea" disabled={saving} rows="4" />
             </div>
 
             <div className="formButtons">

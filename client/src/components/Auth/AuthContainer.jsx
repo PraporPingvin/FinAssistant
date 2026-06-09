@@ -11,14 +11,9 @@ function AuthContainer() {
     <div className="authContainer">
       <div className="authShell">
         <aside className="authBrandPanel">
-          <span className="brandEyebrow">FinAssistant</span>
+          <span className="brandEyebrow">Финансовый ассистент</span>
           <h1>Финансовая система, которая держит фокус.</h1>
           <p>Планируйте цели, сравнивайте сценарии и смотрите прогнозы в одном спокойном рабочем пространстве.</p>
-          <div className="brandMetrics">
-            <div><strong>360°</strong><span>обзор целей</span></div>
-            <div><strong>AI</strong><span>прогнозы</span></div>
-            <div><strong>5 мин</strong><span>до плана</span></div>
-          </div>
         </aside>
 
         <div className="authCard">

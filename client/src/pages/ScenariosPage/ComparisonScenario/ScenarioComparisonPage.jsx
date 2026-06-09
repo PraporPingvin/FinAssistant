@@ -16,9 +16,11 @@ import {
   Clock,
   DollarSign,
   TrendingUp,
+  CheckCircle,
 } from "lucide-react";
 import Layout from "../../../components/Layout";
-import { getGoals, getScenarios } from "../../../api/api";
+import { getGoals, getPayments, getScenarios } from "../../../api/api";
+import { calculateScenarioMetrics, formatPercent } from "../../../utils/scenarioCalculations";
 import "./ScenarioComparisonPage.css";
 
 function ScenarioComparisonPage() {
@@ -46,18 +48,24 @@ function ScenarioComparisonPage() {
       const scenarioGroups = await Promise.all(
         (goalsData || []).map((goal) => getScenarios(goal.goal_id).catch(() => []))
       );
+      const paymentGroups = await Promise.all(
+        (goalsData || []).map((goal) => getPayments(goal.goal_id).catch(() => []))
+      );
 
       const allScenarios = [];
       (goalsData || []).forEach((goal, index) => {
+        const payments = paymentGroups[index] || [];
+        const current = calculateScenarioMetrics({ goal, payments, scenario: { monthly_contribution: 1 } }).current;
         (scenarioGroups[index] || []).forEach((scenario) => {
           allScenarios.push({
             ...scenario,
             goal_id: goal.goal_id,
             goal_title: goal.title,
             goal_target: goal.target_amount,
-            goal_current: goal.current_amount,
+            goal_current: current,
+            goal_payments: payments,
             goal_progress: goal.target_amount > 0
-              ? Math.round(((parseFloat(goal.current_amount) || 0) / parseFloat(goal.target_amount)) * 100)
+              ? Math.round((current / parseFloat(goal.target_amount)) * 100)
               : 0,
           });
         });
@@ -85,10 +93,15 @@ function ScenarioComparisonPage() {
     return scenarios.filter((scenario) => scenario.goal_id?.toString() === selectedGoal.toString());
   }, [scenarios, selectedGoal]);
 
-  const currentGoal = useMemo(
-    () => goals.find((goal) => goal.goal_id?.toString() === selectedGoal?.toString()),
-    [goals, selectedGoal]
-  );
+  const currentGoal = useMemo(() => {
+    const goal = goals.find((item) => item.goal_id?.toString() === selectedGoal?.toString());
+    if (!goal) return null;
+    const scenarioForGoal = scenarios.find((scenario) => scenario.goal_id?.toString() === selectedGoal?.toString());
+    return {
+      ...goal,
+      computed_current: scenarioForGoal?.goal_current ?? goal.current_amount,
+    };
+  }, [goals, scenarios, selectedGoal]);
 
   useEffect(() => {
     if (!selectedGoal) return;
@@ -98,13 +111,6 @@ function ScenarioComparisonPage() {
     else setSelectedScenarios(["", ""]);
   }, [selectedGoal, scenarios]);
 
-  const calculateRisk = (expectedReturn) => {
-    const value = parseFloat(expectedReturn) || 0;
-    if (value < 5) return { label: "Низкий", score: 1, icon: <Shield size={14} />, className: "low" };
-    if (value < 10) return { label: "Средний", score: 2, icon: <Activity size={14} />, className: "medium" };
-    return { label: "Высокий", score: 3, icon: <Zap size={14} />, className: "high" };
-  };
-
   const comparisonData = useMemo(() => {
     const selected = selectedScenarios
       .filter(Boolean)
@@ -112,24 +118,27 @@ function ScenarioComparisonPage() {
       .filter(Boolean);
 
     return selected.map((scenario) => {
-      const target = parseFloat(scenario.goal_target) || 0;
-      const current = parseFloat(scenario.goal_current) || 0;
-      const monthly = parseFloat(scenario.monthly_contribution) || 0;
-      const expectedReturn = parseFloat(scenario.expected_return) || 0;
-      const inflation = parseFloat(scenario.inflation_rate) || 0;
-      const remaining = Math.max(0, target - current);
-      const monthsToGoal = monthly > 0 ? Math.ceil(remaining / monthly) : Infinity;
-      const risk = calculateRisk(expectedReturn);
-      const effectiveReturn = expectedReturn - inflation;
-      const probability = isFinite(monthsToGoal) ? Math.max(30, Math.min(98, 100 - Math.max(0, monthsToGoal - 24))) : 20;
-      const monthlyLoad = Math.min(100, Math.round((monthly / 50000) * 100));
-      const rating = Math.min(100, Math.round(
-        (isFinite(monthsToGoal) ? Math.max(8, 35 - monthsToGoal / 3) : 5) +
-        probability * 0.28 +
-        (4 - risk.score) * 7 +
-        Math.max(0, effectiveReturn) * 2 +
-        Math.max(0, 12 - monthlyLoad / 8)
-      ));
+      const metrics = calculateScenarioMetrics({
+        goal: {
+          target_amount: scenario.goal_target,
+          initial_amount: scenario.goal_current,
+        },
+        scenario,
+        payments: [],
+      });
+      const remaining = metrics.remaining;
+      const monthsToGoal = metrics.monthsToGoal;
+      const riskBase = metrics.risk;
+      const risk = {
+        label: riskBase.label,
+        score: riskBase.score,
+        className: riskBase.className,
+        icon: riskBase.className === "low" ? <Shield size={14} /> : riskBase.className === "medium" ? <Activity size={14} /> : <Zap size={14} />,
+      };
+      const effectiveReturn = metrics.effectiveReturn;
+      const probability = metrics.probability;
+      const monthlyLoad = metrics.monthlyLoad;
+      const rating = metrics.rating;
 
       return { ...scenario, monthsToGoal, risk, effectiveReturn, probability, monthlyLoad, rating, remaining };
     });
@@ -138,10 +147,25 @@ function ScenarioComparisonPage() {
   const analysis = useMemo(() => {
     if (comparisonData.length < 2) return null;
     const sorted = [...comparisonData].sort((a, b) => b.rating - a.rating);
+    const reachable = comparisonData.filter((scenario) => Number.isFinite(scenario.monthsToGoal));
+    const fastest = reachable.length
+      ? [...reachable].sort((a, b) => a.monthsToGoal - b.monthsToGoal)[0]
+      : null;
+    const safest = [...comparisonData].sort((a, b) => a.risk.score - b.risk.score || b.probability - a.probability)[0];
+    const lowestPayment = [...comparisonData].sort((a, b) => (parseFloat(a.monthly_contribution) || 0) - (parseFloat(b.monthly_contribution) || 0))[0];
+    const highestProbability = [...comparisonData].sort((a, b) => b.probability - a.probability)[0];
+    const best = sorted[0];
+    const weakest = sorted[sorted.length - 1];
+    const recommendations = buildRecommendations({ best, weakest, fastest, safest, lowestPayment, highestProbability, scenarios: comparisonData });
     return {
-      best: sorted[0],
-      weakest: sorted[sorted.length - 1],
+      best,
+      weakest,
+      fastest,
+      safest,
+      lowestPayment,
+      highestProbability,
       averageRating: Math.round(comparisonData.reduce((sum, scenario) => sum + scenario.rating, 0) / comparisonData.length),
+      recommendations,
     };
   }, [comparisonData]);
 
@@ -178,6 +202,9 @@ function ScenarioComparisonPage() {
     URL.revokeObjectURL(url);
   };
 
+  const selectedScenarioIds = selectedScenarios.filter(Boolean);
+  const fastestMonths = analysis?.fastest?.monthsToGoal;
+
   if (loading) {
     return (
       <Layout>
@@ -196,7 +223,7 @@ function ScenarioComparisonPage() {
 
         <section className="comparisonHero">
           <div>
-            <span className="comparisonEyebrow">Decision studio</span>
+          <span className="comparisonEyebrow">Центр принятия решений</span>
             <h1>Сравнение сценариев</h1>
             <p>Выберите цель и несколько стратегий, чтобы увидеть сроки, риск, вероятность успеха и общий рейтинг в одном месте.</p>
           </div>
@@ -223,7 +250,7 @@ function ScenarioComparisonPage() {
           {currentGoal && (
             <div className="selectedGoalCard">
               <div><span>Цель</span><strong>{currentGoal.title}</strong></div>
-              <div><span>Накоплено</span><strong>{formatCurrency(currentGoal.current_amount)} ₽</strong></div>
+              <div><span>Накоплено</span><strong>{formatCurrency(currentGoal.computed_current)} ₽</strong></div>
               <div><span>Нужно</span><strong>{formatCurrency(currentGoal.target_amount)} ₽</strong></div>
               <div><span>Сценариев</span><strong>{filteredScenarios.length}</strong></div>
             </div>
@@ -248,10 +275,16 @@ function ScenarioComparisonPage() {
                   <select value={selectedId || ""} onChange={(e) => handleScenarioChange(index, e.target.value)} disabled={!selectedGoal || filteredScenarios.length === 0}>
                     <option value="">Выберите сценарий</option>
                     {filteredScenarios.map((scenario) => (
-                      <option key={scenario.scenario_id} value={scenario.scenario_id}>{scenario.name} ({formatCurrency(scenario.monthly_contribution)} ₽)</option>
+                      <option
+                        key={scenario.scenario_id}
+                        value={scenario.scenario_id}
+                        disabled={selectedScenarioIds.includes(scenario.scenario_id?.toString()) && scenario.scenario_id?.toString() !== selectedId?.toString()}
+                      >
+                        {scenario.name} ({formatCurrency(scenario.monthly_contribution)} ₽)
+                      </option>
                     ))}
                   </select>
-                  {selected && <div className="scenarioMiniPreview"><span>{formatCurrency(selected.monthly_contribution)} ₽/мес</span><span>{selected.expected_return}% доходность</span></div>}
+                  {selected && <div className="scenarioMiniPreview"><span>{formatCurrency(selected.monthly_contribution)} ₽/мес</span><span>{formatPercent(selected.expected_return)}% доп. рост</span></div>}
                 </article>
               );
             })}
@@ -271,7 +304,7 @@ function ScenarioComparisonPage() {
             <section className="comparisonSummaryGrid">
               <article className="summaryScoreCard accent"><Trophy size={24} /><span>Лучший сценарий</span><strong>{analysis.best.name}</strong><small>Рейтинг {analysis.best.rating}/100</small></article>
               <article className="summaryScoreCard"><BarChart3 size={24} /><span>Средний рейтинг</span><strong>{analysis.averageRating}/100</strong><small>по выбранным стратегиям</small></article>
-              <article className="summaryScoreCard"><Clock size={24} /><span>Самый быстрый срок</span><strong>{Math.min(...comparisonData.map((s) => s.monthsToGoal).filter(Number.isFinite))} мес.</strong><small>до цели</small></article>
+              <article className="summaryScoreCard"><Clock size={24} /><span>Самый быстрый срок</span><strong>{Number.isFinite(fastestMonths) ? `${fastestMonths} мес.` : "Нет"}</strong><small>{analysis.fastest ? analysis.fastest.name : "нет достижимых сценариев"}</small></article>
             </section>
 
             <section className="comparisonTableWrapper">
@@ -285,7 +318,10 @@ function ScenarioComparisonPage() {
                   <tbody>
                     <tr><td><Target size={14} /> Цель</td>{comparisonData.map((s) => <td key={s.scenario_id}>{formatCurrency(s.goal_target)} ₽</td>)}</tr>
                     <tr><td><DollarSign size={14} /> Ежемесячный взнос</td>{comparisonData.map((s) => <td key={s.scenario_id}><strong>{formatCurrency(s.monthly_contribution)} ₽</strong></td>)}</tr>
-                    <tr><td><TrendingUp size={14} /> Доходность</td>{comparisonData.map((s) => <td key={s.scenario_id}>{s.expected_return}%</td>)}</tr>
+                    <tr><td><TrendingUp size={14} /> Доп. рост</td>{comparisonData.map((s) => <td key={s.scenario_id}>{formatPercent(s.expected_return)}%</td>)}</tr>
+                    <tr><td><Activity size={14} /> Инфляция</td>{comparisonData.map((s) => <td key={s.scenario_id}>{formatPercent(s.inflation_rate)}%</td>)}</tr>
+                    <tr><td><TrendingUp size={14} /> Рост после инфляции</td>{comparisonData.map((s) => <td key={s.scenario_id}>{s.effectiveReturn.toFixed(1)}%</td>)}</tr>
+                    <tr><td><Target size={14} /> Осталось накопить</td>{comparisonData.map((s) => <td key={s.scenario_id}>{formatCurrency(s.remaining)} ₽</td>)}</tr>
                     <tr><td><Clock size={14} /> Срок</td>{comparisonData.map((s) => <td key={s.scenario_id}>{Number.isFinite(s.monthsToGoal) ? `${s.monthsToGoal} мес.` : "Недостижимо"}</td>)}</tr>
                     <tr><td><Shield size={14} /> Риск</td>{comparisonData.map((s) => <td key={s.scenario_id}><span className={`riskBadge ${s.risk.className}`}>{s.risk.icon}{s.risk.label}</span></td>)}</tr>
                     <tr><td><Activity size={14} /> Вероятность</td>{comparisonData.map((s) => <td key={s.scenario_id}><div className="probabilityBar"><div style={{ width: `${s.probability}%` }} /><span>{s.probability}%</span></div></td>)}</tr>
@@ -296,14 +332,122 @@ function ScenarioComparisonPage() {
             </section>
 
             <section className="analysisSection">
-              <article className="bestScenarioCard"><Trophy size={24} /><span>Рекомендуемый выбор</span><h2>{analysis.best.name}</h2><p>Лучший баланс срока, риска, нагрузки и доходности среди выбранных сценариев.</p></article>
+              <article className="bestScenarioCard"><Trophy size={24} /><span>Рекомендуемый выбор</span><h2>{analysis.best.name}</h2><p>Лучший баланс срока, риска, нагрузки и дополнительного роста среди выбранных сценариев.</p></article>
               <article className="worstScenarioCard"><AlertCircle size={24} /><span>Слабее остальных</span><h2>{analysis.weakest.name}</h2><p>Этот сценарий уступает по итоговому рейтингу. Его стоит пересмотреть или использовать как запасной вариант.</p></article>
+            </section>
+
+            <section className="recommendationsPanel">
+              <div className="comparisonTableHeader">
+                <div><span>Рекомендации</span><h2>Как читать сравнение</h2></div>
+              </div>
+              <div className="recommendationsGrid">
+                {analysis.recommendations.map((item, index) => (
+                  <article key={index} className={`recommendationCard ${item.tone || ""}`}>
+                    {item.icon}
+                    <div>
+                      <strong>{item.title}</strong>
+                      <p>{item.text}</p>
+                    </div>
+                  </article>
+                ))}
+              </div>
             </section>
           </>
         )}
       </div>
     </Layout>
   );
+}
+
+function buildRecommendations({ best, weakest, fastest, safest, lowestPayment, highestProbability, scenarios }) {
+  const items = [];
+  const unreachable = scenarios.filter((scenario) => !Number.isFinite(scenario.monthsToGoal));
+  const highRisk = scenarios.filter((scenario) => scenario.risk.className === "high");
+  const negativeGrowth = scenarios.filter((scenario) => scenario.effectiveReturn < 0);
+
+  items.push({
+    tone: "success",
+    icon: <Trophy size={22} />,
+    title: `Основной выбор: ${best.name}`,
+    text: `У него лучший общий рейтинг ${best.rating}/100. Это не просто самый быстрый вариант, а баланс срока, вероятности, риска и размера взноса.`,
+  });
+
+  if (fastest) {
+    items.push({
+      icon: <Clock size={22} />,
+      title: `Самый быстрый: ${fastest.name}`,
+      text: `Этот сценарий доводит цель примерно за ${fastest.monthsToGoal} мес. Если скорость важнее нагрузки и риска, его стоит рассмотреть первым.`,
+    });
+  }
+
+  if (safest) {
+    items.push({
+      icon: <Shield size={22} />,
+      title: `Самый осторожный: ${safest.name}`,
+      text: `У него риск "${safest.risk.label}". Такой сценарий лучше подходит, если вы не хотите закладывать слишком оптимистичный дополнительный рост.`,
+    });
+  }
+
+  if (lowestPayment) {
+    items.push({
+      icon: <DollarSign size={22} />,
+      title: `Минимальная нагрузка: ${lowestPayment.name}`,
+      text: `Здесь самый небольшой ежемесячный взнос: ${new Intl.NumberFormat("ru-RU").format(parseFloat(lowestPayment.monthly_contribution) || 0)} ₽. Подходит, если важнее комфортный платёж, а не максимальная скорость.`,
+    });
+  }
+
+  if (highestProbability && highestProbability.scenario_id !== best.scenario_id) {
+    items.push({
+      icon: <Activity size={22} />,
+      title: `Самая высокая вероятность: ${highestProbability.name}`,
+      text: `Вероятность ${highestProbability.probability}%. Если хотите более устойчивый план, сравните его с рекомендованным сценарием.`,
+    });
+  }
+
+  if (negativeGrowth.length > 0) {
+    items.push({
+      tone: "warning",
+      icon: <AlertCircle size={22} />,
+      title: "Инфляция выше роста",
+      text: `В ${negativeGrowth.length} сценарии(ях) рост после инфляции отрицательный. Это значит, что инфляция замедляет достижение цели, и срок может стать длиннее.`,
+    });
+  }
+
+  if (highRisk.length > 0) {
+    items.push({
+      tone: "warning",
+      icon: <Zap size={22} />,
+      title: "Есть сценарии с высоким риском",
+      text: `Высокий риск появляется, когда дополнительный рост 10% в год или выше. Такие сценарии могут выглядеть быстрее, но они более оптимистичные.`,
+    });
+  }
+
+  if (unreachable.length > 0) {
+    items.push({
+      tone: "danger",
+      icon: <AlertCircle size={22} />,
+      title: "Есть недостижимые варианты",
+      text: `В ${unreachable.length} сценарии(ях) цель не достигается в разумный срок. Увеличьте взнос или снизьте влияние инфляции/ожидания.`,
+    });
+  }
+
+  if (weakest && weakest.scenario_id !== best.scenario_id) {
+    items.push({
+      tone: "muted",
+      icon: <X size={22} />,
+      title: `Что пересмотреть: ${weakest.name}`,
+      text: `У этого сценария самый слабый рейтинг среди выбранных. Проверьте взнос, срок и рост после инфляции.`,
+    });
+  }
+
+  items.push({
+    tone: "muted",
+    icon: <CheckCircle size={22} />,
+    title: "Практический совет",
+    text: "Для дипломной логики лучше считать базовым сценарий с доп. ростом 0%. Остальные сценарии показывают, как изменится срок, если добавить более оптимистичные условия.",
+  });
+
+  return items;
 }
 
 export default ScenarioComparisonPage;

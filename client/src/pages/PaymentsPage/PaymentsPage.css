@@ -280,6 +280,89 @@
   white-space: nowrap;
 }
 
+.nextPaymentCard {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  padding: 22px;
+  margin-bottom: 22px;
+  border: 1px solid var(--payments-line);
+  border-radius: var(--payments-radius-lg);
+  color: var(--payments-ink);
+  background:
+    radial-gradient(circle at 6% 15%, rgba(232, 244, 93, 0.34), transparent 18rem),
+    rgba(255, 255, 255, 0.84);
+  box-shadow: 0 18px 45px rgba(44, 58, 35, 0.08);
+  backdrop-filter: blur(18px);
+}
+
+.nextPaymentCard.overdue {
+  background:
+    radial-gradient(circle at 6% 15%, rgba(255, 107, 95, 0.18), transparent 18rem),
+    rgba(255, 255, 255, 0.88);
+}
+
+.nextPaymentIcon {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 20px;
+  color: var(--payments-ink);
+  background: var(--payments-lime);
+}
+
+.nextPaymentCard.overdue .nextPaymentIcon {
+  color: #ffffff;
+  background: var(--payments-red);
+}
+
+.nextPaymentContent {
+  min-width: 0;
+}
+
+.nextPaymentContent span {
+  color: var(--payments-muted);
+  font-size: 0.76rem;
+  font-weight: 900;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.nextPaymentContent h2 {
+  margin: 4px 0 6px;
+  color: var(--payments-ink);
+  font-size: clamp(1.35rem, 2.8vw, 2rem);
+  font-weight: 950;
+}
+
+.nextPaymentContent p {
+  margin: 0;
+  color: var(--payments-muted);
+}
+
+.nextPaymentButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 999px;
+  color: var(--payments-ink);
+  background: var(--payments-lime);
+  cursor: pointer;
+  font-weight: 900;
+  transition: transform var(--payments-transition), box-shadow var(--payments-transition);
+}
+
+.nextPaymentButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 36px rgba(44, 58, 35, 0.14);
+}
+
 .paymentsWorkspace {
   display: grid;
   grid-template-columns: minmax(300px, 0.38fr) minmax(0, 1fr);
@@ -450,16 +533,22 @@
 
   .sidePanelHeader,
   .paymentsHistoryHeader,
-  .heroActions {
+  .heroActions,
+  .nextPaymentCard {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .nextPaymentCard {
+    grid-template-columns: 1fr;
   }
 
   .heroPrimaryButton,
   .heroGhostButton,
   .togglePaymentButton,
   .refreshPaymentsButton,
-  .emptyPaymentButton {
+  .emptyPaymentButton,
+  .nextPaymentButton {
     width: 100%;
   }
 

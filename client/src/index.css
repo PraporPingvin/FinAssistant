@@ -58,9 +58,35 @@ body {
   min-height: 100vh;
   background-color: #eef2df;
   color: var(--text-dark);
-  line-height: 1.5;
+  line-height: 1.65;
+  letter-spacing: 0.01em;
+  word-spacing: 0.04em;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  letter-spacing: 0 !important;
+  line-height: 1.14;
+}
+
+p,
+li,
+label,
+small,
+a,
+button,
+input,
+textarea,
+select,
+td,
+th {
+  line-height: 1.6;
 }
 
 /* Контейнер страницы */

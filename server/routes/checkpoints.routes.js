@@ -53,6 +53,31 @@ router.get('/goal/:goalId', authenticateToken, checkGoalOwnership, async (req, r
 });
 
 // Создать контрольную точку
+router.get('/:checkpointId', authenticateToken, async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT cp.*, g.user_id, g.title AS goal_title, g.target_amount AS goal_target
+       FROM checkpoints cp
+       JOIN goals g ON cp.goal_id = g.goal_id
+       WHERE cp.checkpoint_id = $1`,
+      [req.params.checkpointId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Контрольная точка не найдена' });
+    }
+    if (result.rows[0].user_id !== req.user.userId) {
+      return res.status(403).json({ error: 'Доступ запрещен' });
+    }
+
+    const { user_id, ...checkpoint } = result.rows[0];
+    res.json(checkpoint);
+  } catch (error) {
+    console.error('Ошибка получения контрольной точки:', error);
+    res.status(500).json({ error: 'Ошибка сервера' });
+  }
+});
+
 router.post('/', authenticateToken, async (req, res) => {
   try {
     const { goal_id, title, target_amount, target_date, description, priority, status } = req.body;
@@ -67,14 +92,15 @@ router.post('/', authenticateToken, async (req, res) => {
       return res.status(403).json({ error: 'Доступ запрещен' });
     }
 
-    if (!goal_id || !title || !target_amount) {
+    const amount = Number(target_amount);
+    if (!goal_id || !String(title || '').trim() || !Number.isFinite(amount) || amount <= 0) {
       return res.status(400).json({ error: 'Не все обязательные поля заполнены' });
     }
 
     const result = await pool.query(
       `INSERT INTO checkpoints (goal_id, title, expected_amount, target_amount, target_date, description, priority, status)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
-      [goal_id, title, target_amount, target_amount, target_date || null, description || '', priority || 'medium', status || 'pending']
+      [goal_id, String(title).trim(), amount, amount, target_date || null, description || '', priority || 'medium', status || 'pending']
     );
 
     res.status(201).json(result.rows[0]);

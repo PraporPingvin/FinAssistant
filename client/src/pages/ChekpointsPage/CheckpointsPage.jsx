@@ -58,7 +58,7 @@ function CheckpointsPage() {
           <div className="checkpointHeroCard">
             <span>Фокус недели</span>
             <strong>Контрольные точки</strong>
-            <small>Следите за просрочками, темпом и ближайшими финансовыми milestones без лишнего шума.</small>
+            <small>Следите за просрочками, темпом и ближайшими финансовыми этапами без лишнего шума.</small>
           </div>
         </section>
 

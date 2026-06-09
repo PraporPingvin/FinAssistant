@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
-import { Mail, Lock, User, Eye, EyeOff, UserPlus } from "lucide-react";
+import { Mail, Lock, User, Eye, EyeOff, ShieldCheck, UserPlus } from "lucide-react";
 import "./Auth.css";
 
 function Register({ onToggleMode }) {
@@ -9,7 +9,8 @@ function Register({ onToggleMode }) {
     password: "",
     confirmPassword: "",
     first_name: "",
-    last_name: ""
+    last_name: "",
+    acceptedTerms: false
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -21,13 +22,13 @@ function Register({ onToggleMode }) {
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.type === "checkbox" ? e.target.checked : e.target.value
     });
     if (error) setError("");
   };
 
   const validateForm = () => {
-    const { email, password, confirmPassword } = formData;
+    const { email, password, confirmPassword, acceptedTerms } = formData;
     
     if (!email.trim()) {
       setError("Введите email");
@@ -51,6 +52,11 @@ function Register({ onToggleMode }) {
     
     if (password !== confirmPassword) {
       setError("Пароли не совпадают");
+      return false;
+    }
+
+    if (!acceptedTerms) {
+      setError("Подтвердите согласие с условиями регистрации и обработкой персональных данных");
       return false;
     }
     
@@ -85,7 +91,6 @@ function Register({ onToggleMode }) {
   return (
     <form onSubmit={handleRegister} className="authForm">
       <div className="authHeader">
-        <div className="authLogo">🚀</div>
         <h2>Создание аккаунта</h2>
         <p>Присоединяйтесь к финансовому ассистенту</p>
       </div>
@@ -208,8 +213,26 @@ function Register({ onToggleMode }) {
       </div>
       
       <p className="formHint">Пароль должен содержать не менее 6 символов</p>
+
+      <label className={`authConsent ${formData.acceptedTerms ? "checked" : ""}`}>
+        <input
+          type="checkbox"
+          name="acceptedTerms"
+          checked={formData.acceptedTerms}
+          onChange={handleChange}
+          disabled={loading}
+          required
+        />
+        <span className="authConsentBox" aria-hidden="true">
+          <ShieldCheck size={16} />
+        </span>
+        <span>
+          Я принимаю пользовательское соглашение и политику конфиденциальности,
+          а также даю согласие на обработку персональных данных.
+        </span>
+      </label>
       
-      <button type="submit" disabled={loading} className="authButton">
+      <button type="submit" disabled={loading || !formData.acceptedTerms} className="authButton">
         <UserPlus size={18} />
         {loading ? "Регистрация..." : "Зарегистрироваться"}
       </button>

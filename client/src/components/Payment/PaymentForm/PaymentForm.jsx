@@ -3,8 +3,12 @@ import { Calendar, Check, DollarSign, FileText, X } from "lucide-react";
 import "./PaymentForm.css";
 
 function PaymentForm({ goal, onSubmit, onCancel }) {
+  const defaultAmount = goal?.monthly_contribution
+    ? Math.round(Number(goal.monthly_contribution)).toString()
+    : "";
+
   const [formData, setFormData] = useState({
-    amount: "",
+    amount: defaultAmount,
     payment_date: new Date().toISOString().split("T")[0],
     description: "",
   });
@@ -63,7 +67,7 @@ function PaymentForm({ goal, onSubmit, onCancel }) {
       });
 
       setFormData({
-        amount: "",
+        amount: defaultAmount,
         payment_date: new Date().toISOString().split("T")[0],
         description: "",
       });
@@ -103,6 +107,11 @@ function PaymentForm({ goal, onSubmit, onCancel }) {
           disabled={submitting}
         />
         {formData.amount && <div className="currencyPreview">{formatCurrency(formData.amount)} ₽</div>}
+        {defaultAmount && (
+          <div className="formHint">
+            Сумма подставлена из планового взноса цели. Ее можно изменить, если нужно.
+          </div>
+        )}
         {errors.amount && <div className="formError">{errors.amount}</div>}
       </div>
 

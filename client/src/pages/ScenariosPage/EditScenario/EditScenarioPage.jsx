@@ -17,6 +17,7 @@ import {
 import Layout from "../../../components/Layout";
 import ModernDialog from "../../../components/ModernDialog/ModernDialog";
 import { getScenario, updateScenario, getGoal } from "../../../api/api";
+import { calculateScenarioMetrics } from "../../../utils/scenarioCalculations";
 import "./EditScenarioPage.css";
 
 function EditScenarioPage() {
@@ -203,15 +204,9 @@ function EditScenarioPage() {
   };
 
   const calculateMonthsToGoal = () => {
-    if (!goal || !formData.monthly_contribution) return 0;
-    
-    const target = parseFloat(formData.target_amount) || parseFloat(goal.target_amount) || 0;
-    const current = parseFloat(goal.current_amount) || 0;
-    const monthly = parseFloat(formData.monthly_contribution) || 0;
-    
-    if (monthly <= 0) return 0;
-    const remaining = target - current;
-    return Math.ceil(remaining / monthly);
+    if (!goal) return 0;
+    const months = calculateScenarioMetrics({ goal, scenario: formData }).monthsToGoal;
+    return Number.isFinite(months) ? months : 0;
   };
 
   const calculateRiskLevel = (expectedReturn) => {
@@ -251,7 +246,9 @@ function EditScenarioPage() {
 
   const monthsToGoal = calculateMonthsToGoal();
   const risk = calculateRiskLevel(formData.expected_return);
-  const effectiveReturn = (parseFloat(formData.expected_return) - parseFloat(formData.inflation_rate)).toFixed(1);
+  const effectiveReturn = goal
+    ? calculateScenarioMetrics({ goal, scenario: formData }).effectiveReturn.toFixed(1)
+    : "0.0";
 
   return (
     <Layout>

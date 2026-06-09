@@ -18,7 +18,7 @@
 
 .scenarioDetailHero { position: relative; display: grid; grid-template-columns: minmax(0,1.25fr) minmax(280px,.75fr); gap: 26px; overflow: hidden; padding: clamp(28px,5vw,58px); margin-bottom: 22px; border: 1px solid rgba(255,255,255,.72); border-radius: 44px; background: radial-gradient(circle at 86% 12%, rgba(232,244,93,.35), transparent 24rem), radial-gradient(circle at 10% 92%, rgba(79,124,255,.22), transparent 22rem), linear-gradient(125deg, rgba(23,32,20,.96), rgba(73,86,49,.9)); box-shadow: var(--detail-shadow); isolation: isolate; }
 .scenarioDetailHero::before { content: ""; position: absolute; width: 420px; height: 420px; right: -140px; bottom: -180px; border-radius: 999px; background: rgba(232,244,93,.18); z-index: -1; }
-.detailEyebrow, .detailStatCard span, .detailCardHeader span, .editableMetric span, .calculationList span, .linkedGoalGrid span { color: var(--detail-muted); font-size: .76rem; font-weight: 900; letter-spacing: .11em; text-transform: uppercase; }
+.detailEyebrow, .detailStatCard span, .detailCardHeader span, .editableMetric span, .calculationList span, .linkedGoalGrid span, .scenarioPurposeHeader span { color: var(--detail-muted); font-size: .76rem; font-weight: 900; letter-spacing: .11em; text-transform: uppercase; }
 .scenarioDetailHero .detailEyebrow { color: rgba(255,255,255,.68); }
 .scenarioDetailHero h1, .detailTitleInput { max-width: 900px; margin: 16px 0 12px; color: #fff; font-size: clamp(2.8rem,7vw,6rem); font-weight: 950; letter-spacing: -.08em; line-height: .92; }
 .detailTitleInput { width: 100%; box-sizing: border-box; border: 1px solid rgba(255,255,255,.28); border-radius: 24px; padding: 12px 18px; background: rgba(255,255,255,.12); }
@@ -37,7 +37,7 @@
 .detailHeroPanel small { color: rgba(255,255,255,.7); font-weight: 800; }
 
 .detailStatsGrid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 16px; margin-bottom: 22px; }
-.detailStatCard, .detailCard, .linkedGoalCard, .scenarioDetailError { border: 1px solid var(--detail-line); background: var(--detail-card); box-shadow: 0 18px 45px rgba(44,58,35,.08); backdrop-filter: blur(18px); }
+.detailStatCard, .detailCard, .linkedGoalCard, .scenarioPurposeCard, .scenarioDetailError { border: 1px solid var(--detail-line); background: var(--detail-card); box-shadow: 0 18px 45px rgba(44,58,35,.08); backdrop-filter: blur(18px); }
 .detailStatCard { display: grid; gap: 10px; min-height: 132px; padding: 22px; border-radius: 28px; }
 .detailStatCard.accent { background: linear-gradient(140deg, rgba(232,244,93,.62), rgba(255,255,255,.82)); }
 .detailStatCard svg { color: var(--detail-moss); }
@@ -46,9 +46,22 @@
 .riskBadge.low { color: #11683d; background: rgba(39,166,106,.14); }
 .riskBadge.medium { color: #93610d; background: rgba(245,166,35,.16); }
 .riskBadge.high { color: #c84237; background: rgba(255,107,95,.14); }
+.scenarioPurposeCard { margin-bottom: 22px; padding: clamp(22px,3vw,32px); border-radius: 36px; }
+.scenarioPurposeHeader { max-width: 880px; margin-bottom: 18px; }
+.scenarioPurposeHeader span { display: inline-flex; align-items: center; gap: 7px; }
+.scenarioPurposeHeader h2 { margin: 8px 0 8px; color: var(--detail-ink); font-size: clamp(1.55rem,3vw,2.4rem); font-weight: 950; letter-spacing: -.05em; line-height: 1.12; }
+.scenarioPurposeHeader p, .scenarioPurposeGrid p, .scenarioExampleBox p, .editableMetricHint, .editableMetricNote { color: var(--detail-muted); line-height: 1.72; }
+.scenarioPurposeHeader p { margin: 0; font-size: 1rem; }
+.scenarioPurposeGrid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 14px; }
+.scenarioPurposeGrid article, .scenarioExampleBox { padding: 16px; border-radius: 20px; background: rgba(255,255,255,.58); }
+.scenarioPurposeGrid strong, .scenarioExampleBox strong { display: block; margin-bottom: 6px; color: var(--detail-ink); font-weight: 950; }
+.scenarioPurposeGrid p, .scenarioExampleBox p, .editableMetricHint, .editableMetricNote { margin: 0; }
+.scenarioExampleBox { margin-top: 14px; border: 1px solid rgba(232,244,93,.52); background: linear-gradient(140deg, rgba(232,244,93,.24), rgba(255,255,255,.62)); }
 .detailWorkspace { display: grid; grid-template-columns: minmax(0,1fr) minmax(300px,.38fr); gap: 22px; align-items: start; margin-bottom: 22px; }
 .detailCard, .linkedGoalCard { padding: clamp(22px,3vw,32px); border-radius: 36px; }
+.detailCard { scroll-margin-top: 18px; }
 .detailCardHeader { margin-bottom: 20px; }
+.detailCardHeader.editableHeader { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
 .detailCardHeader h2 { margin: 4px 0 0; color: var(--detail-ink); font-size: clamp(1.55rem,3vw,2.35rem); font-weight: 950; letter-spacing: -.07em; }
 .detailFormGrid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px; }
 .editableMetric, .calculationList div, .linkedGoalGrid div { display: grid; gap: 8px; padding: 16px; border-radius: 20px; background: rgba(255,255,255,.58); }
@@ -56,7 +69,13 @@
 .editableMetric strong, .calculationList strong, .linkedGoalGrid strong { color: var(--detail-ink); font-size: 1.08rem; font-weight: 950; }
 .editableMetric input { width: 100%; min-height: 48px; box-sizing: border-box; padding: 0 14px; border: 1px solid var(--detail-line); border-radius: 16px; color: var(--detail-ink); background: rgba(255,255,255,.8); font: inherit; font-weight: 850; }
 .editableMetric input:focus { outline: none; border-color: var(--detail-lime); box-shadow: 0 0 0 4px rgba(232,244,93,.18); }
+.editableMetricAction { justify-self: start; display: inline-flex; align-items: center; gap: 7px; min-height: 38px; padding: 0 14px; border: 1px solid var(--detail-line); border-radius: 999px; color: var(--detail-ink); background: rgba(232,244,93,.5); cursor: pointer; font-weight: 900; transition: transform var(--detail-transition), background var(--detail-transition); }
+.editableMetricAction:hover:not(:disabled) { transform: translateY(-1px); background: var(--detail-lime); }
+.editableMetricAction:disabled { opacity: .58; cursor: not-allowed; }
 .calculationList { display: grid; gap: 12px; }
+.editableMetricHint { max-width: 62ch; font-size: .92rem; }
+.editableMetricNote { font-size: .86rem; font-weight: 750; }
+.detailEditActions { display: flex; justify-content: flex-end; gap: 12px; flex-wrap: wrap; margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--detail-line); }
 .linkedGoalGrid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; }
 .detailProgressTrack { height: 15px; overflow: hidden; margin: 20px 0; border-radius: 999px; background: rgba(24,32,22,.08); }
 .detailProgressTrack div { height: 100%; border-radius: inherit; background: linear-gradient(90deg,var(--detail-lime),#98c43d,var(--detail-moss)); }
@@ -69,5 +88,5 @@
 .scenarioDetailError h2 { margin: 0; color: var(--detail-ink); font-size: 1.8rem; font-weight: 950; letter-spacing: -.05em; }
 .scenarioDetailError p { margin: 0; color: var(--detail-muted); line-height: 1.65; }
 .scenarioDetailError svg { color: var(--detail-red); }
-@media (max-width: 1160px) { .scenarioDetailHero, .detailWorkspace { grid-template-columns: 1fr; } .detailStatsGrid, .detailFormGrid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
-@media (max-width: 720px) { .scenarioDetailHero { padding: 26px; border-radius: 32px; } .detailStatsGrid, .detailFormGrid, .linkedGoalGrid { grid-template-columns: 1fr; } .detailHeroActions, .detailBottomActions { align-items: stretch; flex-direction: column; } .detailPrimaryButton, .detailGhostButton, .detailDangerButton, .detailGhostLight { width: 100%; } }
+@media (max-width: 1160px) { .scenarioDetailHero, .detailWorkspace { grid-template-columns: 1fr; } .detailStatsGrid, .detailFormGrid, .scenarioPurposeGrid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media (max-width: 720px) { .scenarioDetailHero { padding: 26px; border-radius: 32px; } .detailStatsGrid, .detailFormGrid, .linkedGoalGrid, .scenarioPurposeGrid { grid-template-columns: 1fr; } .detailCardHeader.editableHeader, .detailHeroActions, .detailBottomActions, .detailEditActions { align-items: stretch; flex-direction: column; } .detailPrimaryButton, .detailGhostButton, .detailDangerButton, .detailGhostLight { width: 100%; } }

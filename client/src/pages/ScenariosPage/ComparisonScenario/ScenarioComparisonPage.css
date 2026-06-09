@@ -143,6 +143,7 @@
 .comparisonControlPanel,
 .scenarioPickerPanel,
 .comparisonTableWrapper,
+.recommendationsPanel,
 .summaryScoreCard,
 .analysisSection article,
 .comparisonEmptyCard {
@@ -154,7 +155,8 @@
 
 .comparisonControlPanel,
 .scenarioPickerPanel,
-.comparisonTableWrapper {
+.comparisonTableWrapper,
+.recommendationsPanel {
   padding: clamp(22px, 3vw, 32px);
   margin-bottom: 22px;
   border-radius: 36px;
@@ -458,10 +460,58 @@
 }
 
 .analysisSection p,
-.comparisonEmptyCard p {
+.comparisonEmptyCard p,
+.recommendationCard p {
   margin: 0;
   color: var(--compare-muted);
   line-height: 1.65;
+}
+
+.recommendationsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.recommendationCard {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+  padding: 18px;
+  border: 1px solid var(--compare-line);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.58);
+}
+
+.recommendationCard svg {
+  color: var(--compare-moss);
+}
+
+.recommendationCard strong {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--compare-ink);
+  font-weight: 950;
+}
+
+.recommendationCard.success {
+  border-color: rgba(39, 166, 106, 0.22);
+  background: linear-gradient(140deg, rgba(39, 166, 106, 0.12), rgba(255, 255, 255, 0.7));
+}
+
+.recommendationCard.warning {
+  border-color: rgba(245, 166, 35, 0.24);
+  background: linear-gradient(140deg, rgba(245, 166, 35, 0.13), rgba(255, 255, 255, 0.7));
+}
+
+.recommendationCard.danger {
+  border-color: rgba(255, 107, 95, 0.24);
+  background: linear-gradient(140deg, rgba(255, 107, 95, 0.12), rgba(255, 255, 255, 0.7));
+}
+
+.recommendationCard.muted {
+  background: rgba(255, 255, 255, 0.44);
 }
 
 .comparisonEmptyCard {
@@ -527,7 +577,8 @@
   }
 
   .selectedGoalCard,
-  .scenarioMiniPreview {
+  .scenarioMiniPreview,
+  .recommendationsGrid {
     grid-template-columns: 1fr;
   }
 

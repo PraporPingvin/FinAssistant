@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   Target,
   CheckCircle,
@@ -14,6 +14,7 @@ import {
   DollarSign,
   Flag,
   BarChart3,
+  TrendingUp,
   PieChart as PieChartIcon,
   ChevronDown,
   ChevronUp,
@@ -98,7 +99,7 @@ function GoalSelectorModal({ goals, onSelectGoal, onClose, formatCurrency }) {
   );
 }
 
-function CheckpointFormModal({ goal, initialData, onSubmit, onClose, isEdit = false }) {
+function CheckpointFormModal({ goal, goals = [], onGoalChange, initialData, onSubmit, onClose, isEdit = false }) {
   const [formData, setFormData] = useState({
     title: initialData?.title || "",
     target_amount: initialData?.target_amount || "",
@@ -119,6 +120,29 @@ function CheckpointFormModal({ goal, initialData, onSubmit, onClose, isEdit = fa
     if (!value) return "0";
     return new Intl.NumberFormat('ru-RU').format(parseFloat(value));
   };
+
+  const checkpointAmount = Number(formData.target_amount || 0);
+  const currentAmount = Number(goal.current_amount || 0);
+  const monthlyContribution = Number(goal.monthly_contribution || 0);
+  const remainingToCheckpoint = Math.max(0, checkpointAmount - currentAmount);
+  const monthsToCheckpoint = remainingToCheckpoint > 0 && monthlyContribution > 0
+    ? Math.ceil(remainingToCheckpoint / monthlyContribution)
+    : 0;
+  const checkpointProgress = checkpointAmount > 0
+    ? Math.min(100, Math.round((currentAmount / checkpointAmount) * 100))
+    : 0;
+  const plannedDate = formData.target_date ? new Date(formData.target_date) : null;
+  const forecastDate = monthsToCheckpoint > 0 ? new Date() : null;
+  if (forecastDate) forecastDate.setMonth(forecastDate.getMonth() + monthsToCheckpoint);
+  const formScheduleText = remainingToCheckpoint <= 0
+    ? "Эта точка уже достигнута"
+    : !plannedDate
+      ? "Добавьте дату, чтобы проверить, укладываетесь ли вы в срок"
+      : monthlyContribution <= 0
+        ? "Для прогноза нужно указать ежемесячный взнос в цели"
+        : forecastDate <= plannedDate
+          ? `При текущем взносе успеваете: прогноз ${forecastDate.toLocaleDateString("ru-RU")}`
+          : `Есть риск не успеть: прогноз ${forecastDate.toLocaleDateString("ru-RU")}`;
 
   const validateForm = () => {
     const newErrors = {};
@@ -169,6 +193,17 @@ function CheckpointFormModal({ goal, initialData, onSubmit, onClose, isEdit = fa
           <button className="modalClose" onClick={onClose}><X size={18} /></button>
         </div>
         <p className="modalSubtitle"><Target size={14} /> Цель: {goal.title} ({formatCurrency(goal.target_amount)} ₽)</p>
+        {!isEdit && goals.length > 1 && (
+          <div className="formGroup">
+            <label><Target size={14} /> Для какой цели создаем точку</label>
+            <select value={goal.goal_id} onChange={(event) => onGoalChange?.(goals.find(item => String(item.goal_id) === event.target.value))}>
+              {goals.map(item => <option key={item.goal_id} value={item.goal_id}>{item.title}</option>)}
+            </select>
+          </div>
+        )}
+        <p className="checkpointExampleHint">
+          Например, точка «Накопить половину суммы» помогает видеть промежуточный результат. После ввода суммы ниже система покажет, сколько осталось и примерный срок.
+        </p>
 
         <form onSubmit={handleSubmit}>
           <div className="formGroup">
@@ -189,6 +224,22 @@ function CheckpointFormModal({ goal, initialData, onSubmit, onClose, isEdit = fa
               <input type="date" name="target_date" value={formData.target_date} onChange={handleChange} disabled={submitting} />
             </div>
           </div>
+
+          {checkpointAmount > 0 && (
+            <div className="checkpointCalculationExample">
+              <strong>Пример расчета этой контрольной точки</strong>
+              <span>Сейчас накоплено: {formatCurrency(currentAmount)} ₽ из {formatCurrency(checkpointAmount)} ₽</span>
+              <div className="checkpointCalculationTrack">
+                <div style={{ width: `${checkpointProgress}%` }} />
+              </div>
+              <span>
+                {remainingToCheckpoint <= 0
+                  ? "Контрольная точка уже достигнута"
+                  : `Осталось ${formatCurrency(remainingToCheckpoint)} ₽${monthlyContribution > 0 ? `, примерно ${monthsToCheckpoint} мес.` : ""}`}
+              </span>
+              <strong>{formScheduleText}</strong>
+            </div>
+          )}
 
           <div className="formGroup">
             <label><Flag size={14} /> Приоритет</label>
@@ -220,6 +271,7 @@ function CheckpointFormModal({ goal, initialData, onSubmit, onClose, isEdit = fa
 
 function CheckpointsOverview() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [checkpoints, setCheckpoints] = useState([]);
   const [goals, setGoals] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -242,6 +294,15 @@ function CheckpointsOverview() {
     loadData();
   }, []);
 
+  useEffect(() => {
+    if (!loading && searchParams.get("create") === "1" && goals.length > 0) {
+      const requestedGoal = goals.find(item => String(item.goal_id) === searchParams.get("goalId"));
+      setSelectedGoal(requestedGoal || goals[0]);
+      setShowCreateModal(true);
+      setSearchParams({}, { replace: true });
+    }
+  }, [goals, loading, searchParams, setSearchParams]);
+
   const loadData = async () => {
     try {
       setLoading(true);
@@ -257,32 +318,6 @@ function CheckpointsOverview() {
       setLoading(false);
     }
   };
-
-  const isCheckpointOverdue = (checkpoint) => {
-    if (checkpoint.status !== "pending") return false;
-    if (!checkpoint.target_date) return false;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const targetDate = new Date(checkpoint.target_date);
-    targetDate.setHours(0, 0, 0, 0);
-    return targetDate < today;
-  };
-
-  const updateOverdueStatus = async () => {
-    const overdueCheckpoints = checkpoints.filter(cp => isCheckpointOverdue(cp));
-    for (const cp of overdueCheckpoints) {
-      try {
-        await updateCheckpoint(cp.checkpoint_id, { status: "overdue" });
-      } catch (error) {
-        console.error(`Ошибка обновления точки ${cp.title}:`, error);
-      }
-    }
-    if (overdueCheckpoints.length > 0) await loadData();
-  };
-
-  useEffect(() => {
-    if (!loading && checkpoints.length > 0) updateOverdueStatus();
-  }, [loading, checkpoints]);
 
   const handleMarkComplete = async (checkpointId) => {
     try {
@@ -356,27 +391,103 @@ function CheckpointsOverview() {
     return new Intl.NumberFormat('ru-RU').format(amount || 0);
   };
 
+  const openCreateForm = () => {
+    if (goals.length === 0) {
+      navigate("/goals/new");
+      return;
+    }
+    setSelectedGoal(goals[0]);
+    setShowCreateModal(true);
+  };
+
+  const getCheckpointMetrics = (checkpoint) => {
+    const goal = goals.find(item => item.goal_id === checkpoint.goal_id);
+    const target = Number(checkpoint.target_amount || 0);
+    const current = Number(goal?.current_amount || 0);
+    const monthly = Number(goal?.monthly_contribution || 0);
+    const remaining = Math.max(0, target - current);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const targetDate = checkpoint.target_date ? new Date(checkpoint.target_date) : null;
+    if (targetDate) targetDate.setHours(0, 0, 0, 0);
+    const daysToDeadline = targetDate
+      ? Math.ceil((targetDate - today) / (1000 * 60 * 60 * 24))
+      : null;
+    const months = remaining > 0 && monthly > 0 ? Math.ceil(remaining / monthly) : 0;
+    const forecastDate = months > 0 ? new Date(today) : null;
+    if (forecastDate) forecastDate.setMonth(forecastDate.getMonth() + months);
+    const forecastDelayDays = targetDate && forecastDate
+      ? Math.ceil((forecastDate - targetDate) / (1000 * 60 * 60 * 24))
+      : null;
+    const contributionMonthsBeforeDeadline = daysToDeadline === null
+      ? 0
+      : Math.max(0, Math.floor(daysToDeadline / 30.44));
+    const expectedByDeadline = current + monthly * contributionMonthsBeforeDeadline;
+    const shortfallAtDeadline = Math.max(0, target - expectedByDeadline);
+    const reserveAtDeadline = Math.max(0, expectedByDeadline - target);
+
+    let status = "noDeadline";
+    if (checkpoint.status === "completed" || remaining <= 0) status = "achieved";
+    else if (daysToDeadline !== null && daysToDeadline < 0) status = "overdue";
+    else if (monthly <= 0) status = "risk";
+    else if (targetDate && forecastDate > targetDate) status = "risk";
+    else if (targetDate) status = "onTrack";
+
+    return {
+      remaining,
+      progress: target > 0 ? Math.min(100, Math.round((current / target) * 100)) : 0,
+      months,
+      daysToDeadline,
+      forecastDate,
+      forecastDelayDays,
+      shortfallAtDeadline,
+      reserveAtDeadline,
+      status,
+    };
+  };
+
+  const getCheckpointStatusText = (status) => ({
+    achieved: "Достигнуто",
+    onTrack: "Успеваем",
+    risk: "Есть риск",
+    overdue: "Срок прошел",
+    noDeadline: "Без срока",
+  }[status] || "Без статуса");
+
+  const getCheckpointStatusClass = (status) => ({
+    achieved: "statusCompleted",
+    onTrack: "statusOnTrack",
+    risk: "statusRisk",
+    overdue: "statusOverdue",
+    noDeadline: "statusNoDeadline",
+  }[status] || "");
+
+  const getCountdownText = (metrics) => {
+    if (metrics.status === "achieved") return "Контрольная точка достигнута";
+    if (metrics.daysToDeadline === null) return "Добавьте срок, чтобы проверить темп";
+    if (metrics.daysToDeadline < 0) return `Срок прошел ${Math.abs(metrics.daysToDeadline)} дн. назад`;
+    if (metrics.daysToDeadline === 0) return "Срок наступает сегодня";
+    return `До срока осталось ${metrics.daysToDeadline} дн.`;
+  };
+
+  const getScheduleText = (metrics) => {
+    if (metrics.status === "achieved") return "Нужная сумма уже накоплена";
+    if (metrics.status === "noDeadline") return metrics.months > 0
+      ? `При текущем взносе точка будет достигнута примерно за ${metrics.months} мес.`
+      : "Укажите ежемесячный взнос для расчета";
+    if (metrics.status === "overdue") return `Не хватает ${formatCurrency(metrics.remaining)} ₽`;
+    if (metrics.status === "risk") {
+      if (!metrics.months) return "Без ежемесячного взноса достичь точки к сроку не получится";
+      return `К сроку не хватит примерно ${formatCurrency(metrics.shortfallAtDeadline)} ₽, прогноз опаздывает на ${Math.max(1, metrics.forecastDelayDays)} дн.`;
+    }
+    return metrics.reserveAtDeadline > 0
+      ? `Успеваем, запас к сроку около ${formatCurrency(metrics.reserveAtDeadline)} ₽`
+      : "Успеваем при сохранении текущего взноса";
+  };
+
   const formatDate = (dateString) => {
     if (!dateString) return "—";
     return new Date(dateString).toLocaleDateString('ru-RU');
-  };
-
-  const getStatusClass = (status) => {
-    switch (status) {
-      case "pending": return "statusPending";
-      case "completed": return "statusCompleted";
-      case "overdue": return "statusOverdue";
-      default: return "";
-    }
-  };
-
-  const getStatusText = (status) => {
-    switch (status) {
-      case "pending": return "В процессе";
-      case "completed": return "Выполнено";
-      case "overdue": return "Просрочено";
-      default: return status;
-    }
   };
 
   const getPriorityIcon = (priority) => {
@@ -398,7 +509,7 @@ function CheckpointsOverview() {
   };
 
   const filteredCheckpoints = checkpoints.filter(cp => {
-    if (filter !== "all" && cp.status !== filter) return false;
+    if (filter !== "all" && getCheckpointMetrics(cp).status !== filter) return false;
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       return cp.title?.toLowerCase().includes(query) || getGoalTitle(cp.goal_id).toLowerCase().includes(query);
@@ -409,41 +520,57 @@ function CheckpointsOverview() {
   const sortedCheckpoints = [...filteredCheckpoints].sort((a, b) => {
     let comparison = 0;
     switch (sortBy) {
-      case "date":
+      case "date": {
         const dateA = a.target_date ? new Date(a.target_date) : new Date(9999, 11, 31);
         const dateB = b.target_date ? new Date(b.target_date) : new Date(9999, 11, 31);
         comparison = dateA - dateB;
         break;
-      case "status":
-        const statusOrder = { "pending": 1, "overdue": 2, "completed": 3 };
-        comparison = (statusOrder[a.status] || 99) - (statusOrder[b.status] || 99);
+      }
+      case "status": {
+        const statusOrder = { overdue: 1, risk: 2, onTrack: 3, noDeadline: 4, achieved: 5 };
+        comparison = (statusOrder[getCheckpointMetrics(a).status] || 99) - (statusOrder[getCheckpointMetrics(b).status] || 99);
         break;
-      case "priority":
+      }
+      case "priority": {
         const priorityOrder = { "high": 1, "medium": 2, "low": 3 };
         comparison = (priorityOrder[a.priority] || 99) - (priorityOrder[b.priority] || 99);
         break;
+      }
       default: comparison = 0;
     }
     return sortOrder === "asc" ? comparison : -comparison;
   });
 
+  const checkpointPlans = checkpoints.map(checkpoint => ({
+    checkpoint,
+    metrics: getCheckpointMetrics(checkpoint),
+  }));
+  const checkpointMetrics = checkpointPlans.map(item => item.metrics);
+  const nextCheckpointPlan = checkpointPlans
+    .filter(item => item.metrics.status !== "achieved")
+    .sort((a, b) => {
+      if (a.metrics.daysToDeadline === null) return 1;
+      if (b.metrics.daysToDeadline === null) return -1;
+      return a.metrics.daysToDeadline - b.metrics.daysToDeadline;
+    })[0] || null;
   const stats = {
     total: checkpoints.length,
-    completed: checkpoints.filter(cp => cp.status === "completed").length,
-    pending: checkpoints.filter(cp => cp.status === "pending" && !isCheckpointOverdue(cp)).length,
-    overdue: checkpoints.filter(cp => cp.status === "overdue" || isCheckpointOverdue(cp)).length,
+    completed: checkpointMetrics.filter(item => item.status === "achieved").length,
+    pending: checkpointMetrics.filter(item => item.status === "onTrack").length,
+    overdue: checkpointMetrics.filter(item => item.status === "overdue").length,
+    risk: checkpointMetrics.filter(item => item.status === "risk").length,
     highPriority: checkpoints.filter(cp => cp.priority === "high").length,
     mediumPriority: checkpoints.filter(cp => cp.priority === "medium").length,
     lowPriority: checkpoints.filter(cp => cp.priority === "low").length,
-    completionRate: checkpoints.length > 0 ? Math.round((checkpoints.filter(cp => cp.status === "completed").length / checkpoints.length) * 100) : 0
+    completionRate: checkpoints.length > 0 ? Math.round((checkpointMetrics.filter(item => item.status === "achieved").length / checkpoints.length) * 100) : 0
   };
 
   // Данные для диаграмм
   const statusChartData = {
-    labels: ['Выполнено', 'В процессе', 'Просрочено'],
+    labels: ['Достигнуто', 'Успеваем', 'Есть риск', 'Срок прошел'],
     datasets: [{
-      data: [stats.completed, stats.pending, stats.overdue],
-      backgroundColor: ['#27a66a', '#f0a13a', '#ff6b5f'],
+      data: [stats.completed, stats.pending, stats.risk, stats.overdue],
+      backgroundColor: ['#27a66a', '#6f9b32', '#f0a13a', '#ff6b5f'],
       borderColor: '#ffffff',
       borderWidth: 4,
       hoverOffset: 12,
@@ -505,7 +632,7 @@ function CheckpointsOverview() {
         <GoalSelectorModal goals={goals} onSelectGoal={handleSelectGoal} onClose={() => setShowGoalSelector(false)} formatCurrency={formatCurrency} />
       )}
       {showCreateModal && selectedGoal && (
-        <CheckpointFormModal goal={selectedGoal} onSubmit={handleCreateCheckpoint} onClose={() => { setShowCreateModal(false); setSelectedGoal(null); }} isEdit={false} />
+        <CheckpointFormModal goal={selectedGoal} goals={goals} onGoalChange={setSelectedGoal} onSubmit={handleCreateCheckpoint} onClose={() => { setShowCreateModal(false); setSelectedGoal(null); }} isEdit={false} />
       )}
       {showEditModal && editingCheckpoint && selectedGoal && (
         <CheckpointFormModal goal={selectedGoal} initialData={{ title: editingCheckpoint.title, target_amount: editingCheckpoint.target_amount, target_date: editingCheckpoint.target_date, priority: editingCheckpoint.priority, description: editingCheckpoint.description }} onSubmit={handleUpdateCheckpoint} onClose={() => { setShowEditModal(false); setEditingCheckpoint(null); setSelectedGoal(null); }} isEdit={true} />
@@ -521,19 +648,50 @@ function CheckpointsOverview() {
         <div className="statCard">
           <div className="statIcon"><CheckCircle size={24} /></div>
           <div className="statValue">{stats.completed}</div>
-          <div className="statLabel">Выполнено</div>
+          <div className="statLabel">Достигнуто</div>
         </div>
         <div className="statCard">
           <div className="statIcon"><Clock size={24} /></div>
           <div className="statValue">{stats.pending}</div>
-          <div className="statLabel">В процессе</div>
+          <div className="statLabel">Успеваем</div>
         </div>
         <div className="statCard warning">
           <div className="statIcon"><AlertCircle size={24} /></div>
-          <div className="statValue">{stats.overdue}</div>
-          <div className="statLabel">Просрочено</div>
+          <div className="statValue">{stats.risk + stats.overdue}</div>
+          <div className="statLabel">Требуют внимания</div>
         </div>
       </div>
+
+      {nextCheckpointPlan && (
+        <section className={`nextCheckpointFocus focus-${nextCheckpointPlan.metrics.status}`}>
+          <div className="nextCheckpointFocusIcon"><Target size={26} /></div>
+          <div className="nextCheckpointFocusContent">
+            <span>Ближайшая контрольная точка</span>
+            <h3>{nextCheckpointPlan.checkpoint.title}</h3>
+            <p>{getCountdownText(nextCheckpointPlan.metrics)}. {getScheduleText(nextCheckpointPlan.metrics)}.</p>
+          </div>
+          <div className="nextCheckpointFocusAmount">
+            <span>Осталось накопить</span>
+            <strong>{formatCurrency(nextCheckpointPlan.metrics.remaining)} ₽</strong>
+            <small>{nextCheckpointPlan.metrics.progress}% уже выполнено</small>
+          </div>
+          <div className="nextCheckpointFocusActions">
+            <button type="button" onClick={() => navigate(`/goals/${nextCheckpointPlan.checkpoint.goal_id}/payments/new`)}>Внести платеж</button>
+            <button type="button" className="secondary" onClick={() => navigate(`/goals/${nextCheckpointPlan.checkpoint.goal_id}`)}>Открыть цель</button>
+          </div>
+        </section>
+      )}
+
+      {stats.risk + stats.overdue > 0 && (
+        <section className="checkpointNotice">
+          <AlertCircle size={22} />
+          <div>
+            <strong>Контрольные точки требуют внимания</strong>
+            <p>Есть риск не успеть или срок уже прошел. Пополните цель либо скорректируйте сумму и дату точки.</p>
+          </div>
+          <button type="button" onClick={() => setFilter(stats.overdue > 0 ? "overdue" : "risk")}>Показать</button>
+        </section>
+      )}
 
       {/* Общий прогресс */}
       <div className="overallProgress">
@@ -581,9 +739,11 @@ function CheckpointsOverview() {
         <div className="filterGroup">
           <select value={filter} onChange={(e) => setFilter(e.target.value)} className="filterSelect">
             <option value="all">Все статусы</option>
-            <option value="pending">В процессе</option>
-            <option value="completed">Выполнено</option>
-            <option value="overdue">Просрочено</option>
+            <option value="onTrack">Успеваем</option>
+            <option value="risk">Есть риск</option>
+            <option value="overdue">Срок прошел</option>
+            <option value="achieved">Достигнуто</option>
+            <option value="noDeadline">Без срока</option>
           </select>
         </div>
         <div className="filterGroup">
@@ -600,7 +760,7 @@ function CheckpointsOverview() {
           <input type="text" placeholder="Поиск..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="searchInput" />
           {searchQuery && <button className="clearSearch" onClick={() => setSearchQuery("")}>✕</button>}
         </div>
-        <button className="createButton" onClick={() => setShowGoalSelector(true)}><Plus size={14} /> Новая точка</button>
+        <button className="createButton" onClick={openCreateForm}><Plus size={14} /> Новая точка</button>
         <button className={`viewModeButton ${viewMode === "table" ? "active" : ""}`} onClick={() => setViewMode(viewMode === "cards" ? "table" : "cards")}>
           {viewMode === "cards" ? <LayoutGrid size={14} /> : <List size={14} />}
           {viewMode === "cards" ? "Карточки" : "Таблица"}
@@ -612,22 +772,23 @@ function CheckpointsOverview() {
         <div className="tableContainer">
           <table className="checkpointsTable">
             <thead>
-              <tr><th>Название</th><th>Цель</th><th>Сумма</th><th>Срок</th><th>Статус</th><th>Приоритет</th><th>Действия</th></tr>
+              <tr><th>Название</th><th>Цель</th><th>Сумма</th><th>Осталось</th><th>Срок</th><th>Статус</th><th>Приоритет</th><th>Действия</th></tr>
             </thead>
             <tbody>
               {sortedCheckpoints.map(cp => {
-                const isOverdue = isCheckpointOverdue(cp);
+                const metrics = getCheckpointMetrics(cp);
                 return (
-                  <tr key={cp.checkpoint_id} className={isOverdue || cp.status === "overdue" ? "overdueRow" : ""}>
+                  <tr key={cp.checkpoint_id} className={`${metrics.status}Row`}>
                     <td><strong>{cp.title}</strong>{cp.description && <div className="checkpointDesc">{cp.description}</div>}</td>
                     <td>{getGoalTitle(cp.goal_id)}</td>
                     <td className="amountCell">{formatCurrency(cp.target_amount)} ₽</td>
-                    <td>{formatDate(cp.target_date)}</td>
-                    <td><span className={`tableStatusBadge ${getStatusClass(cp.status)}`}>{getStatusText(cp.status)}</span></td>
+                    <td><strong>{formatCurrency(metrics.remaining)} ₽</strong><div className="checkpointDesc">{getScheduleText(metrics)}</div></td>
+                    <td><strong>{formatDate(cp.target_date)}</strong><div className="checkpointDesc">{getCountdownText(metrics)}</div></td>
+                    <td><span className={`tableStatusBadge ${getCheckpointStatusClass(metrics.status)}`}>{getCheckpointStatusText(metrics.status)}</span></td>
                     <td>{getPriorityIcon(cp.priority)} {getPriorityText(cp.priority)}</td>
                     <td className="tableActions">
-                      {cp.status === "pending" && !isOverdue && <button className="tableAction complete" onClick={() => handleMarkComplete(cp.checkpoint_id)} title="Выполнено"><CheckCircle size={14} /></button>}
-                      <button className="tableAction edit" onClick={() => handleEditClick(cp)} title="Редактировать"><Edit2 size={14} /></button>
+                      {metrics.status !== "achieved" && <button className="tableAction complete" onClick={() => handleMarkComplete(cp.checkpoint_id)} title="Отметить достигнутой"><CheckCircle size={14} /></button>}
+                      {metrics.status !== "achieved" && <button className="tableAction edit" onClick={() => handleEditClick(cp)} title="Редактировать"><Edit2 size={14} /></button>}
                       <button className="tableAction view" onClick={() => navigate(`/goals/${cp.goal_id}`)} title="К цели"><Eye size={14} /></button>
                       <button className="tableAction delete" onClick={() => setCheckpointToDelete({ id: cp.checkpoint_id, title: cp.title })} title="Удалить"><Trash2 size={14} /></button>
                     </td>
@@ -643,14 +804,14 @@ function CheckpointsOverview() {
       {viewMode === "cards" && sortedCheckpoints.length > 0 && (
         <div className="checkpointsList">
           {sortedCheckpoints.map(cp => {
-            const isOverdue = isCheckpointOverdue(cp);
+            const metrics = getCheckpointMetrics(cp);
             return (
-              <div key={cp.checkpoint_id} className={`checkpointCard ${isOverdue || cp.status === "overdue" ? "overdueCard" : ""}`}>
+              <div key={cp.checkpoint_id} className={`checkpointCard checkpoint-${metrics.status}`}>
                 <div className="checkpointHeader">
                   <div className="checkpointTitleSection">
                     <h3 className="checkpointTitle">{cp.title}</h3>
                     <div className="checkpointBadges">
-                      <span className={`statusBadge ${getStatusClass(cp.status)}`}>{getStatusText(cp.status)}</span>
+                      <span className={`statusBadge ${getCheckpointStatusClass(metrics.status)}`}>{getCheckpointStatusText(metrics.status)}</span>
                       <span className="priorityBadge">{getPriorityIcon(cp.priority)} {getPriorityText(cp.priority)}</span>
                     </div>
                   </div>
@@ -659,14 +820,22 @@ function CheckpointsOverview() {
                   <div className="checkpointGoal"><Target size={14} /><span className="goalTitle">{getGoalTitle(cp.goal_id)}</span></div>
                   <div className="checkpointDetails">
                     <div className="detailItem"><span className="detailLabel"><DollarSign size={12} /> Сумма:</span><span className="detailValue highlight">{formatCurrency(cp.target_amount)} ₽</span></div>
-                    {cp.target_date && <div className="detailItem"><span className="detailLabel"><Calendar size={12} /> Срок:</span><span className={`detailValue ${isOverdue || cp.status === "overdue" ? "overdueText" : ""}`}>{formatDate(cp.target_date)}</span></div>}
+                    <div className="detailItem"><span className="detailLabel"><Target size={12} /> Осталось:</span><span className="detailValue highlight">{formatCurrency(metrics.remaining)} ₽</span></div>
+                    <div className="checkpointCalculation">
+                      <div className="checkpointCalculationMeta"><span>{getCountdownText(metrics)}</span><strong>{metrics.progress}%</strong></div>
+                      <div className="checkpointCalculationTrack"><div style={{ width: `${metrics.progress}%` }} /></div>
+                      <small>{getScheduleText(metrics)}</small>
+                    </div>
+                    {metrics.forecastDate && metrics.status !== "achieved" && <div className="detailItem"><span className="detailLabel"><TrendingUp size={12} /> Прогноз:</span><span className="detailValue">{formatDate(metrics.forecastDate)}</span></div>}
+                    {cp.target_date && <div className="detailItem"><span className="detailLabel"><Calendar size={12} /> Срок:</span><span className={`detailValue ${metrics.status === "overdue" ? "overdueText" : ""}`}>{formatDate(cp.target_date)}</span></div>}
                     {cp.description && <div className="detailItem description"><span className="detailLabel">📝</span><span className="detailValue">{cp.description}</span></div>}
                   </div>
                 </div>
                 <div className="checkpointActions">
-                  {cp.status === "pending" && !isOverdue && <button className="actionButton complete" onClick={() => handleMarkComplete(cp.checkpoint_id)}><CheckCircle size={14} /> Выполнено</button>}
-                  <button className="actionButton edit" onClick={() => handleEditClick(cp)}><Edit2 size={14} /> Редактировать</button>
+                  {metrics.status !== "achieved" && <button className="actionButton complete" onClick={() => handleMarkComplete(cp.checkpoint_id)}><CheckCircle size={14} /> Отметить достигнутой</button>}
+                  {metrics.status !== "achieved" && <button className="actionButton edit" onClick={() => handleEditClick(cp)}><Edit2 size={14} /> Редактировать</button>}
                   <button className="actionButton view" onClick={() => navigate(`/goals/${cp.goal_id}`)}><Eye size={14} /> Цель</button>
+                  {metrics.status !== "achieved" && <button className="actionButton payment" onClick={() => navigate(`/goals/${cp.goal_id}/payments/new`)}><DollarSign size={14} /> Внести платеж</button>}
                   <button className="actionButton delete" onClick={() => setCheckpointToDelete({ id: cp.checkpoint_id, title: cp.title })}><Trash2 size={14} /> Удалить</button>
                 </div>
               </div>
@@ -681,7 +850,7 @@ function CheckpointsOverview() {
           <div className="emptyIcon">📌</div>
           <h3>Контрольных точек пока нет</h3>
           <p>Нажмите кнопку «Новая точка» и выберите цель для добавления первой контрольной точки</p>
-          <button className="createFirstButton" onClick={() => setShowGoalSelector(true)}><Plus size={14} /> Создать первую точку</button>
+          <button className="createFirstButton" onClick={openCreateForm}><Plus size={14} /> Создать первую точку</button>
         </div>
       )}
 

@@ -158,3 +158,9 @@ export async function deleteForecast(forecastId) {
 export async function getUserStats() {
   return apiClient.get('/user/stats');
 }
+
+// ============ ECONOMIC DATA ============
+
+export async function getRussiaInflation() {
+  return apiClient.get('/economic/inflation/russia');
+}

@@ -6,6 +6,16 @@ import "./PaymentList.css";
 function PaymentList({ payments, onEdit, onDelete }) {
   const [paymentToDelete, setPaymentToDelete] = useState(null);
 
+  const sortedPayments = [...payments].sort((a, b) => {
+    const dateDiff = new Date(a.payment_date) - new Date(b.payment_date);
+    if (dateDiff !== 0) return dateDiff;
+
+    const createdDiff = new Date(a.created_at || 0) - new Date(b.created_at || 0);
+    if (createdDiff !== 0) return createdDiff;
+
+    return Number(a.payment_id || 0) - Number(b.payment_id || 0);
+  });
+
   const formatCurrency = (amount) => {
     const num = parseFloat(amount) || 0;
     return new Intl.NumberFormat("ru-RU").format(num);
@@ -53,16 +63,16 @@ function PaymentList({ payments, onEdit, onDelete }) {
     );
   }
 
-  const totalAmount = payments.reduce((sum, payment) => sum + (parseFloat(payment.amount) || 0), 0);
-  const averageAmount = payments.length > 0 ? Math.round(totalAmount / payments.length) : 0;
-  const lastPayment = payments.length > 0 ? payments[0] : null;
+  const totalAmount = sortedPayments.reduce((sum, payment) => sum + (parseFloat(payment.amount) || 0), 0);
+  const averageAmount = sortedPayments.length > 0 ? Math.round(totalAmount / sortedPayments.length) : 0;
+  const lastPayment = sortedPayments.length > 0 ? sortedPayments[sortedPayments.length - 1] : null;
 
   return (
     <div className="paymentList">
       <div className="paymentSummary">
         <div className="summaryItem">
           <span className="summaryLabel">Всего платежей</span>
-          <span className="summaryValue">{payments.length}</span>
+          <span className="summaryValue">{sortedPayments.length}</span>
         </div>
         <div className="summaryItem">
           <span className="summaryLabel">Общая сумма</span>
@@ -81,7 +91,7 @@ function PaymentList({ payments, onEdit, onDelete }) {
       </div>
 
       <div className="paymentTimeline">
-        {payments.map((payment, index) => (
+        {sortedPayments.map((payment, index) => (
           <article key={payment.payment_id} className="paymentTimelineCard">
             <div className="paymentTimelineMarker">
               <span>{index + 1}</span>

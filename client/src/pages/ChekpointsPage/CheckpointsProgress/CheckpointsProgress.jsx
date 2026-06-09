@@ -13,6 +13,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { getGoals, getCheckpoints } from "../../../api/api";
+import { calculateScenarioMetrics } from "../../../utils/scenarioCalculations";
 import "./CheckpointsProgress.css";
 
 function CheckpointsProgress() {
@@ -70,19 +71,20 @@ function CheckpointsProgress() {
   };
 
   const calculateForecast = (goal) => {
-    const target = parseFloat(goal.target_amount) || 0;
-    const current = parseFloat(goal.current_amount) || 0;
-    const monthly = parseFloat(goal.monthly_contribution) || 0;
-    
-    if (monthly <= 0) return null;
-    
-    const remaining = target - current;
-    if (remaining <= 0) return { months: 0, date: new Date() };
-    
-    const months = Math.ceil(remaining / monthly);
+    const metrics = calculateScenarioMetrics({
+      goal,
+      scenario: {
+        monthly_contribution: goal.monthly_contribution,
+        expected_return: 0,
+        inflation_rate: 0,
+      },
+    });
+    if (!Number.isFinite(metrics.monthsToGoal)) return null;
+
+    const months = metrics.monthsToGoal;
     const date = new Date();
     date.setMonth(date.getMonth() + months);
-    
+
     return { months, date };
   };
 

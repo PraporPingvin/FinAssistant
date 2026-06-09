@@ -4,7 +4,6 @@ import {
   Calendar,
   Clock,
   CreditCard,
-  FileText,
   Plus,
   Sparkles,
   Target,
@@ -44,8 +43,27 @@ function toDateInputValue(date) {
   return `${year}-${month}-${day}`;
 }
 
+function parseDateInputValue(value) {
+  if (!value) return new Date();
+  const [year, month, day] = value.split("-").map(Number);
+  return new Date(year, month - 1, day);
+}
+
+function addCalendarMonths(date, monthsToAdd) {
+  const next = new Date(date);
+  const day = next.getDate();
+  next.setDate(1);
+  next.setMonth(next.getMonth() + monthsToAdd);
+  const lastDay = new Date(next.getFullYear(), next.getMonth() + 1, 0).getDate();
+  next.setDate(Math.min(day, lastDay));
+  return next;
+}
+
 function CreateGoalPage() {
   const navigate = useNavigate();
+  const formPanelRef = React.useRef(null);
+  const titleInputRef = React.useRef(null);
+  const forecastFieldNames = ["target_amount", "monthly_contribution", "initial_amount", "start_date"];
   const [formData, setFormData] = useState({
     title: "",
     target_amount: "",
@@ -53,13 +71,21 @@ function CreateGoalPage() {
     initial_amount: "",
     start_date: new Date().toISOString().split("T")[0],
     deadline_date: "",
-    description: "",
   });
 
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [autoDeadline, setAutoDeadline] = useState(true);
+
+  useEffect(() => {
+    const frameId = window.requestAnimationFrame(() => {
+      formPanelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      titleInputRef.current?.focus({ preventScroll: true });
+    });
+
+    return () => window.cancelAnimationFrame(frameId);
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -71,6 +97,8 @@ function CreateGoalPage() {
 
     if (name === "deadline_date") {
       setAutoDeadline(false);
+    } else if (forecastFieldNames.includes(name)) {
+      setAutoDeadline(true);
     }
 
     if (errors[name]) {
@@ -123,18 +151,13 @@ function CreateGoalPage() {
     const initial = parseFloat(formData.initial_amount) || 0;
     const monthly = parseFloat(formData.monthly_contribution) || 0;
     const remaining = Math.max(target - initial, 0);
-    const exactMonths = monthly > 0 && remaining > 0 ? remaining / monthly : 0;
-    const months = monthly > 0 ? Math.ceil(exactMonths) : null;
-    const totalDays = monthly > 0 ? Math.ceil(exactMonths * 30.44) : null;
-    const yearsPart = totalDays !== null ? Math.floor(totalDays / 365) : 0;
-    const monthsPart = totalDays !== null ? Math.floor((totalDays % 365) / 30.44) : 0;
-    const daysPart = totalDays !== null ? Math.max(0, Math.round((totalDays % 365) % 30.44)) : 0;
-    const startDate = formData.start_date ? new Date(formData.start_date) : new Date();
-    const finishDate = totalDays !== null ? new Date(startDate) : null;
-
-    if (finishDate) {
-      finishDate.setDate(finishDate.getDate() + totalDays);
-    }
+    const months = monthly > 0 && remaining > 0 ? Math.ceil(remaining / monthly) : null;
+    const yearsPart = months !== null ? Math.floor(months / 12) : 0;
+    const monthsPart = months !== null ? months % 12 : 0;
+    const daysPart = 0;
+    const startDate = parseDateInputValue(formData.start_date);
+    const finishDate = months !== null ? addCalendarMonths(startDate, months) : null;
+    const totalDays = finishDate ? Math.max(0, Math.round((finishDate - startDate) / (1000 * 60 * 60 * 24))) : null;
 
     const progress = target > 0 ? Math.min(100, Math.round((initial / target) * 100)) : 0;
     return {
@@ -191,7 +214,6 @@ function CreateGoalPage() {
         initial_amount: parseFloat(formData.initial_amount) || 0,
         start_date: formData.start_date,
         deadline_date: formData.deadline_date || null,
-        description: formData.description,
         status: "active",
       });
 
@@ -251,11 +273,11 @@ function CreateGoalPage() {
           </div>
         )}
 
-        <section className="goalFormShell">
+        <section ref={formPanelRef} className="goalFormShell">
           <form onSubmit={handleSubmit} className="goalFormCard">
             <div className="formGroup fullWidth">
               <label htmlFor="title" className="formLabel">Название цели <span className="required">*</span></label>
-              <input id="title" name="title" type="text" placeholder="Например: накопить на машину" value={formData.title} onChange={handleChange} className={`formInput ${errors.title ? "formInputError" : ""}`} disabled={loading} />
+              <input ref={titleInputRef} id="title" name="title" type="text" placeholder="Например: накопить на машину" value={formData.title} onChange={handleChange} className={`formInput ${errors.title ? "formInputError" : ""}`} disabled={loading} />
               {errors.title && <div className="validationError">{errors.title}</div>}
             </div>
 
@@ -343,11 +365,6 @@ function CreateGoalPage() {
                 )}
               </div>
             </section>
-            <div className="formGroup fullWidth">
-              <label htmlFor="description" className="formLabel"><FileText size={14} /> Описание цели</label>
-              <textarea id="description" name="description" placeholder="Опишите детали вашей цели..." value={formData.description} onChange={handleChange} className="formTextarea" disabled={loading} rows="4" />
-            </div>
-
             <div className="formButtons">
               <button type="button" onClick={() => navigate("/goals")} className="formButton cancelButton" disabled={loading}>Отмена</button>
               <button type="submit" disabled={loading} className="formButton submitButton">

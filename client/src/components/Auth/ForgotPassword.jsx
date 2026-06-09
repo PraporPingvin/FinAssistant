@@ -84,7 +84,6 @@ function ForgotPassword({ onBackToLogin }) {
   return (
     <form onSubmit={handleSubmit} className="authForm">
       <div className="authHeader">
-        <div className="authLogo">🔐</div>
         <h2>Сброс пароля</h2>
         <p>Введите email и новый пароль</p>
       </div>

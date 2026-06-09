@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useParams } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import AuthContainer from "./components/Auth/AuthContainer";
 import Dashboard from "./pages/Dashboard/Dashboard";
@@ -12,7 +12,6 @@ import GoalDetailPage from './pages/GoalsPage/GoalDetailPage/GoalDetailPage';
 import PaymentsPage from './pages/PaymentsPage/PaymentsPage';
 import CreateScenarioPage from './pages/ScenariosPage/CreateScenario/CreateScenarioPage';
 import ScenarioDetailPage from './pages/ScenariosPage/ScenarioDetail/ScenarioDetailPage';
-import EditScenarioPage from './pages/ScenariosPage/EditScenario/EditScenarioPage';
 import ScenariosMainPage from './pages/ScenariosPage/MainScenario/ScenariosMainPage';
 import ScenarioComparisonPage from './pages/ScenariosPage/ComparisonScenario/ScenarioComparisonPage';
 import CheckpointsPage from './pages/ChekpointsPage/CheckpointsPage';
@@ -32,6 +31,11 @@ function PrivateRoute({ children }: PrivateRouteProps) {
   }
 
   return isAuthenticated ? <>{children}</> : <Navigate to="/login" />;
+}
+
+function ScenarioEditRedirect() {
+  const { scenarioId } = useParams();
+  return <Navigate to={`/scenarios/detail/${scenarioId}?edit=1`} replace />;
 }
 
 function AppRoutes() {
@@ -86,6 +90,14 @@ function AppRoutes() {
       />
       <Route
         path="/goals/:goalId/payments"
+        element={
+          <PrivateRoute>
+            <PaymentsPage />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/goals/:goalId/payments/new"
         element={
           <PrivateRoute>
             <PaymentsPage />
@@ -149,7 +161,7 @@ function AppRoutes() {
         path="/scenarios/edit/:scenarioId"
         element={
           <PrivateRoute>
-            <EditScenarioPage />
+            <ScenarioEditRedirect />
           </PrivateRoute>
         }
       />

@@ -1,8 +1,9 @@
 ﻿import React, { useEffect, useState } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate, Link, useLocation } from "react-router-dom";
 import {
   AlertCircle,
   BarChart3,
+  CalendarClock,
   ChevronLeft,
   CreditCard,
   Home,
@@ -17,11 +18,15 @@ import { getGoal, getPayments, createPayment, updatePayment, deletePayment } fro
 import PaymentForm from "../../components/Payment/PaymentForm/PaymentForm";
 import PaymentEditForm from "../../components/Payment/PaymentEditForm/PaymentEditForm";
 import PaymentList from "../../components/Payment/PaymentList/PaymentList";
+import { buildPaymentSchedule, getPaymentStatusLabel } from "../../utils/paymentSchedule";
 import "./PaymentsPage.css";
 
 function PaymentsPage() {
   const { goalId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const isCreatePaymentPage = location.pathname.endsWith("/payments/new");
+  const formSectionRef = React.useRef(null);
 
   const [goal, setGoal] = useState(null);
   const [payments, setPayments] = useState([]);
@@ -36,6 +41,29 @@ function PaymentsPage() {
       loadData();
     }
   }, [goalId]);
+
+  useEffect(() => {
+    if (isCreatePaymentPage) {
+      setShowForm(true);
+      setEditingPayment(null);
+    }
+  }, [isCreatePaymentPage]);
+
+  useEffect(() => {
+    if (isCreatePaymentPage && !loading) {
+      requestAnimationFrame(() => {
+        formSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+  }, [isCreatePaymentPage, loading]);
+
+  useEffect(() => {
+    if (editingPayment) {
+      requestAnimationFrame(() => {
+        formSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+  }, [editingPayment]);
 
   const loadData = async () => {
     try {
@@ -71,6 +99,9 @@ function PaymentsPage() {
       });
       await loadData();
       setShowForm(false);
+      if (isCreatePaymentPage) {
+        navigate(`/goals/${goalId}/payments`);
+      }
     } catch (error) {
       console.error("Ошибка добавления платежа:", error);
       setError("Не удалось добавить платеж");
@@ -123,12 +154,18 @@ function PaymentsPage() {
   const stats = {
     totalAmount,
     averagePayment: payments.length > 0 ? Math.round(totalAmount / payments.length) : 0,
-    remainingAmount: goal ? Math.max(0, (parseFloat(goal.target_amount) || 0) - (parseFloat(goal.current_amount) || 0)) : 0,
+    currentAmount: goal ? (parseFloat(goal.initial_amount) || 0) + totalAmount : 0,
+    remainingAmount: goal ? Math.max(0, (parseFloat(goal.target_amount) || 0) - ((parseFloat(goal.initial_amount) || 0) + totalAmount)) : 0,
   };
 
   const progressPercent = goal?.target_amount > 0
-    ? Math.min(100, Math.round(((parseFloat(goal?.current_amount) || 0) / parseFloat(goal.target_amount)) * 100))
+    ? Math.min(100, Math.round((stats.currentAmount / parseFloat(goal.target_amount)) * 100))
     : 0;
+
+  const paymentSchedule = React.useMemo(
+    () => buildPaymentSchedule(goal, payments),
+    [goal, payments]
+  );
 
   if (loading) {
     return (
@@ -167,6 +204,12 @@ function PaymentsPage() {
           <Link to={`/goals/${goalId}`}>{goal.title}</Link>
           <span>/</span>
           <span>Платежи</span>
+          {isCreatePaymentPage && (
+            <>
+              <span>/</span>
+              <span>Новый платеж</span>
+            </>
+          )}
         </nav>
 
         <section className="paymentsHero">
@@ -176,10 +219,7 @@ function PaymentsPage() {
             <p>{goal.title}</p>
             <div className="heroActions">
               <button
-                onClick={() => {
-                  setShowForm(true);
-                  setEditingPayment(null);
-                }}
+                onClick={() => navigate(`/goals/${goalId}/payments/new`)}
                 className="heroPrimaryButton"
               >
                 <Plus size={18} /> Добавить платеж
@@ -196,7 +236,7 @@ function PaymentsPage() {
             <div className="paymentsProgressTrack">
               <div style={{ width: `${progressPercent}%` }} />
             </div>
-            <small>{formatCurrency(goal.current_amount)} из {formatCurrency(goal.target_amount)} ₽</small>
+            <small>{formatCurrency(stats.currentAmount)} из {formatCurrency(goal.target_amount)} ₽</small>
           </div>
         </section>
 
@@ -246,13 +286,44 @@ function PaymentsPage() {
           </div>
         </section>
 
+        {paymentSchedule && (
+          <section className={`nextPaymentCard ${paymentSchedule.status}`}>
+            <div className="nextPaymentIcon">
+              <CalendarClock size={24} />
+            </div>
+            <div className="nextPaymentContent">
+              <span>{getPaymentStatusLabel(paymentSchedule.status)}</span>
+              <h2>Следующий платеж: {paymentSchedule.dueDateLabel}</h2>
+              <p>
+                {paymentSchedule.isCurrentPeriodCovered
+                  ? `Текущий период уже закрыт. Следующий плановый взнос: ${formatCurrency(paymentSchedule.amountDue)} ₽.`
+                  : `${paymentSchedule.message}. Осталось внести за текущий период: ${formatCurrency(paymentSchedule.amountDue)} ₽.`}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => navigate(`/goals/${goalId}/payments/new`)}
+              className="nextPaymentButton"
+            >
+              <Plus size={16} /> Внести платеж
+            </button>
+          </section>
+        )}
+
         <section className="paymentsWorkspace">
-          <aside className="paymentsSidePanel">
+          <aside className="paymentsSidePanel" ref={formSectionRef}>
             <div className="sidePanelHeader">
               <span>{editingPayment ? "Редактирование" : showForm ? "Новый платеж" : "Быстрое действие"}</span>
               <button
                 onClick={() => {
-                  setShowForm(!showForm);
+                  if (!showForm) {
+                    navigate(`/goals/${goalId}/payments/new`);
+                    return;
+                  }
+                  if (isCreatePaymentPage) {
+                    navigate(`/goals/${goalId}/payments`);
+                  }
+                  setShowForm(false);
                   setEditingPayment(null);
                 }}
                 className={`togglePaymentButton ${showForm ? "active" : ""}`}
@@ -272,7 +343,12 @@ function PaymentsPage() {
               <PaymentForm
                 goal={goal}
                 onSubmit={handleAddPayment}
-                onCancel={() => setShowForm(false)}
+                onCancel={() => {
+                  setShowForm(false);
+                  if (isCreatePaymentPage) {
+                    navigate(`/goals/${goalId}/payments`);
+                  }
+                }}
               />
             ) : (
               <div className="paymentGuide">
@@ -312,7 +388,7 @@ function PaymentsPage() {
                 <Wallet size={48} />
                 <h3>Платежей пока нет</h3>
                 <p>Добавьте первый платеж, чтобы увидеть историю пополнений и статистику.</p>
-                <button onClick={() => setShowForm(true)} className="emptyPaymentButton">
+                <button onClick={() => navigate(`/goals/${goalId}/payments/new`)} className="emptyPaymentButton">
                   <Plus size={16} /> Добавить первый платеж
                 </button>
               </div>

@@ -22,7 +22,8 @@ import {
 } from "lucide-react";
 import Layout from "../../components/Layout";
 import ModernDialog from "../../components/ModernDialog/ModernDialog";
-import { getGoal, getScenarios, deleteScenario } from "../../api/api";
+import { getGoal, getPayments, getScenarios, deleteScenario } from "../../api/api";
+import { calculateScenarioMetrics } from "../../utils/scenarioCalculations";
 import "./ScenariosPage.css";
 
 function ScenariosPage() {
@@ -30,6 +31,7 @@ function ScenariosPage() {
   const navigate = useNavigate();
 
   const [goal, setGoal] = useState(null);
+  const [payments, setPayments] = useState([]);
   const [scenarios, setScenarios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -48,12 +50,16 @@ function ScenariosPage() {
     try {
       setLoading(true);
       setError("");
-      const goalData = await getGoal(goalId);
+      const [goalData, paymentsData] = await Promise.all([
+        getGoal(goalId),
+        getPayments(goalId).catch(() => []),
+      ]);
       if (!goalData) {
         setError("Цель не найдена");
         return;
       }
       setGoal(goalData);
+      setPayments(paymentsData || []);
       const scenariosData = await getScenarios(goalId).catch(() => []);
       setScenarios(scenariosData || []);
     } catch (error) {
@@ -76,23 +82,21 @@ function ScenariosPage() {
   };
 
   const calculateMonthsToGoal = (scenario) => {
-    if (!goal || !scenario) return 0;
-    const target = parseFloat(goal.target_amount) || 0;
-    const current = parseFloat(goal.current_amount) || 0;
-    const monthly = parseFloat(scenario.monthly_contribution) || 0;
-    if (monthly <= 0) return Infinity;
-    return Math.max(0, Math.ceil((target - current) / monthly));
+    return calculateScenarioMetrics({ goal, scenario, payments }).monthsToGoal;
   };
 
   const calculateRiskLevel = (expectedReturn) => {
-    const value = parseFloat(expectedReturn) || 0;
-    if (value < 5) return { level: "Низкий", className: "low", icon: <Shield size={13} /> };
-    if (value < 10) return { level: "Средний", className: "medium", icon: <Activity size={13} /> };
-    return { level: "Высокий", className: "high", icon: <Zap size={13} /> };
+    const metrics = calculateScenarioMetrics({ goal, scenario: { expected_return: expectedReturn }, payments });
+    const icon = metrics.risk.className === "low" ? <Shield size={13} /> : metrics.risk.className === "medium" ? <Activity size={13} /> : <Zap size={13} />;
+    return { level: metrics.risk.level, className: metrics.risk.className, icon };
   };
 
+  const currentAmount = goal
+    ? calculateScenarioMetrics({ goal, scenario: { monthly_contribution: 1 }, payments }).current
+    : 0;
+
   const progress = goal?.target_amount > 0
-    ? Math.min(100, Math.round(((parseFloat(goal.current_amount) || 0) / parseFloat(goal.target_amount)) * 100))
+    ? Math.min(100, Math.round((currentAmount / parseFloat(goal.target_amount)) * 100))
     : 0;
 
   const filteredScenarios = useMemo(() => {
@@ -117,7 +121,7 @@ function ScenariosPage() {
       minMonths: months.length ? Math.min(...months) : 0,
       maxMonths: months.length ? Math.max(...months) : 0,
     };
-  }, [scenarios, goal]);
+  }, [scenarios, goal, payments]);
 
   const handleDeleteScenario = async () => {
     if (!scenarioToDelete) return;
@@ -163,7 +167,7 @@ function ScenariosPage() {
           <div>
             <span className="scenarioEyebrow">Финансовые стратегии</span>
             <h1>Сценарии достижения цели</h1>
-            <p>Сравнивайте взносы, доходность, риск и сроки, чтобы выбрать самый уверенный путь к цели: {goal.title}</p>
+            <p>Сравнивайте взносы, дополнительный рост, риск и сроки, чтобы выбрать самый уверенный путь к цели: {goal.title}</p>
             <div className="scenarioHeroActions">
               <button onClick={() => navigate(`/scenarios/new/${goalId}`)} className="scenarioPrimaryButton"><Plus size={18} /> Новый сценарий</button>
               <button onClick={() => navigate(`/goals/${goalId}`)} className="scenarioGhostButton"><ArrowLeft size={18} /> К цели</button>
@@ -173,20 +177,20 @@ function ScenariosPage() {
           <div className="scenarioHeroPanel">
             <span>Прогресс цели</span><strong>{progress}%</strong>
             <div className="scenarioProgressTrack"><div style={{ width: `${progress}%` }} /></div>
-            <small>{formatCurrency(goal.current_amount)} из {formatCurrency(goal.target_amount)} ₽</small>
+            <small>{formatCurrency(currentAmount)} из {formatCurrency(goal.target_amount)} ₽</small>
           </div>
         </section>
 
         <section className="scenarioStatsGrid">
           <article className="scenarioStatCard accent"><BarChart3 size={24} /><span>Сценариев</span><strong>{scenarios.length}</strong></article>
           <article className="scenarioStatCard"><DollarSign size={24} /><span>Средний взнос</span><strong>{formatCurrency(stats.avgMonthly)} ₽</strong></article>
-          <article className="scenarioStatCard"><TrendingUp size={24} /><span>Средняя доходность</span><strong>{stats.avgReturn}%</strong></article>
+          <article className="scenarioStatCard"><TrendingUp size={24} /><span>Средний доп. рост</span><strong>{stats.avgReturn}%</strong></article>
           <article className="scenarioStatCard"><Clock size={24} /><span>Диапазон сроков</span><strong>{stats.minMonths}-{stats.maxMonths} мес.</strong></article>
         </section>
 
         {scenarios.length > 0 && (
           <section className="scenarioToolbar">
-            <div><span>Сортировка</span><select value={sortBy} onChange={(e) => setSortBy(e.target.value)}><option value="created_at">Сначала новые</option><option value="name">По названию</option><option value="expected_return">По доходности</option><option value="monthly_contribution">По взносу</option></select></div>
+            <div><span>Сортировка</span><select value={sortBy} onChange={(e) => setSortBy(e.target.value)}><option value="created_at">Сначала новые</option><option value="name">По названию</option><option value="expected_return">По доп. росту</option><option value="monthly_contribution">По взносу</option></select></div>
             <button onClick={loadData} className="scenarioRefreshButton"><RefreshCw size={15} /> Обновить</button>
           </section>
         )}
@@ -196,13 +200,14 @@ function ScenariosPage() {
             {filteredScenarios.map((scenario, index) => {
               const months = calculateMonthsToGoal(scenario);
               const risk = calculateRiskLevel(scenario.expected_return);
-              const effectiveReturn = ((parseFloat(scenario.expected_return) || 0) - (parseFloat(scenario.inflation_rate) || 0)).toFixed(1);
+              const metrics = calculateScenarioMetrics({ goal, scenario, payments });
+              const effectiveReturn = metrics.effectiveReturn.toFixed(1);
               return (
                 <article key={scenario.scenario_id || index} className="scenarioCard" onClick={() => navigate(`/scenarios/detail/${scenario.scenario_id}`)}>
                   <div className="scenarioCardTop">
                     <div><span>Сценарий {index + 1}</span><h2>{scenario.name || `Сценарий ${index + 1}`}</h2><small><Calendar size={13} /> {formatDate(scenario.created_at)}</small></div>
                     <div className="scenarioActions">
-                      <button onClick={(e) => { e.stopPropagation(); navigate(`/scenarios/edit/${scenario.scenario_id}`); }} title="Редактировать"><Edit2 size={15} /></button>
+                      <button onClick={(e) => { e.stopPropagation(); navigate(`/scenarios/detail/${scenario.scenario_id}?edit=1`); }} title="Редактировать"><Edit2 size={15} /></button>
                       <button onClick={(e) => { e.stopPropagation(); navigate(`/scenarios/detail/${scenario.scenario_id}`); }} title="Открыть"><Eye size={15} /></button>
                       <button
                         className="danger"
@@ -219,7 +224,7 @@ function ScenariosPage() {
 
                   <div className="scenarioMetricList">
                     <div><span><DollarSign size={14} /> Ежемесячный взнос</span><strong>{formatCurrency(scenario.monthly_contribution)} ₽</strong></div>
-                    <div><span><TrendingUp size={14} /> Ожидаемая доходность</span><strong>{scenario.expected_return || 0}%</strong></div>
+                    <div><span><TrendingUp size={14} /> Доп. рост</span><strong>{scenario.expected_return || 0}%</strong></div>
                     <div><span><Activity size={14} /> Инфляция</span><strong>{scenario.inflation_rate || 0}%</strong></div>
                   </div>
 

@@ -52,7 +52,7 @@ function Login({ onToggleMode, onForgotPassword }) {
     <form onSubmit={handleLogin} className="authForm loginForm">
       <div className="authHeader">
         <div className="authLogo"><TrendingUp size={30} /></div>
-        <span className="authEyebrow">Financial workspace</span>
+          <span className="authEyebrow">Финансовый помощник</span>
         <h2>Добро пожаловать</h2>
         <p>Войдите в аккаунт, чтобы продолжить работу с целями, сценариями и прогнозами.</p>
       </div>
@@ -65,7 +65,7 @@ function Login({ onToggleMode, onForgotPassword }) {
       {error && <div className="authError">{error}</div>}
 
       <div className="formGroup">
-        <label htmlFor="email" className="formLabel"><Mail size={16} /> Email</label>
+              <label htmlFor="email" className="formLabel"><Mail size={16} /> Электронная почта</label>
         <input
           id="email"
           type="email"

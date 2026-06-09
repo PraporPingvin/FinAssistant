@@ -61,6 +61,7 @@
   border: 1px solid rgba(255, 255, 255, 0.72);
   border-radius: 42px;
   background:
+    linear-gradient(90deg, rgba(7, 12, 6, 0.82) 0%, rgba(17, 24, 14, 0.72) 42%, rgba(23, 32, 20, 0.18) 76%),
     radial-gradient(circle at 84% 10%, rgba(232, 244, 93, 0.35), transparent 24rem),
     radial-gradient(circle at 10% 92%, rgba(79, 124, 255, 0.22), transparent 22rem),
     linear-gradient(125deg, rgba(23, 32, 20, 0.96), rgba(73, 86, 49, 0.9));
@@ -86,6 +87,16 @@
   justify-content: space-between;
   gap: 32px;
   min-width: 0;
+}
+
+.goalHeroCopy {
+  width: min(100%, 900px);
+  padding: clamp(18px, 3vw, 28px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 28px;
+  background: linear-gradient(115deg, rgba(4, 8, 4, 0.74), rgba(14, 22, 11, 0.46));
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(8px);
 }
 
 .statusBadge {
@@ -116,22 +127,18 @@
   background: rgba(240, 161, 58, 0.18);
 }
 
-.goalTitle {
+.goalDetailPage .goalHero .goalTitle,
+.goalDetailPage .goalHero h1.goalTitle {
   max-width: 860px;
   margin: 0 0 16px;
-  color: #ffffff;
-  font-size: clamp(2.75rem, 6.5vw, 6rem);
+  color: #ffffff !important;
+  font-size: clamp(2.25rem, 5.8vw, 5.1rem) !important;
   font-weight: 950;
-  letter-spacing: -0.08em;
-  line-height: 0.93;
-}
-
-.goalDescription {
-  max-width: 720px;
-  margin: 0;
-  color: rgba(255, 255, 255, 0.74);
-  font-size: clamp(1rem, 1.5vw, 1.16rem);
-  line-height: 1.7;
+  letter-spacing: 0 !important;
+  line-height: 1.08 !important;
+  text-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.22),
+    0 10px 34px rgba(0, 0, 0, 0.68);
 }
 
 .heroActions {
@@ -265,6 +272,88 @@
   border-radius: var(--detail-radius-xl);
 }
 
+.goalNextPaymentCard {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  padding: 22px;
+  margin-bottom: 24px;
+  border: 1px solid var(--detail-line);
+  border-radius: var(--detail-radius-lg);
+  color: var(--detail-ink);
+  background:
+    radial-gradient(circle at 6% 15%, rgba(232, 244, 93, 0.34), transparent 18rem),
+    rgba(255, 255, 255, 0.84);
+  box-shadow: 0 18px 45px rgba(44, 58, 35, 0.08);
+  backdrop-filter: blur(18px);
+}
+
+.goalNextPaymentCard.overdue {
+  background:
+    radial-gradient(circle at 6% 15%, rgba(255, 107, 95, 0.18), transparent 18rem),
+    rgba(255, 255, 255, 0.88);
+}
+
+.goalNextPaymentIcon {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 20px;
+  color: var(--detail-ink);
+  background: var(--detail-lime);
+}
+
+.goalNextPaymentCard.overdue .goalNextPaymentIcon {
+  color: #ffffff;
+  background: var(--detail-red);
+}
+
+.goalNextPaymentContent {
+  min-width: 0;
+}
+
+.goalNextPaymentContent span {
+  color: var(--detail-muted);
+  font-size: 0.76rem;
+  font-weight: 900;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.goalNextPaymentContent h2 {
+  margin: 4px 0 6px;
+  color: var(--detail-ink);
+  font-size: clamp(1.35rem, 2.8vw, 2rem);
+  font-weight: 950;
+}
+
+.goalNextPaymentContent p {
+  margin: 0;
+  color: var(--detail-muted);
+}
+
+.goalNextPaymentButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 0 18px;
+  border-radius: 999px;
+  color: var(--detail-ink);
+  background: var(--detail-lime);
+  font-weight: 900;
+  text-decoration: none;
+  transition: transform var(--detail-transition), box-shadow var(--detail-transition);
+}
+
+.goalNextPaymentButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 36px rgba(44, 58, 35, 0.14);
+}
+
 .progressHeader {
   display: flex;
   align-items: flex-start;
@@ -319,6 +408,141 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
   margin-top: 22px;
+}
+
+.goalCheckpointTimeline {
+  margin-bottom: 24px;
+  padding: 26px;
+  border: 1px solid var(--detail-line);
+  border-radius: var(--detail-radius-xl);
+  background: rgba(255, 255, 255, 0.68);
+}
+
+.goalCheckpointHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.goalCheckpointHeader h2 {
+  margin: 4px 0;
+  color: var(--detail-ink);
+  font-size: 1.45rem;
+}
+
+.goalCheckpointHeader p {
+  margin: 0;
+  color: var(--detail-muted);
+  line-height: 1.55;
+}
+
+.goalCheckpointCreate,
+.goalCheckpointEmpty a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: 12px;
+  color: var(--detail-ink);
+  background: var(--detail-lime);
+  font-weight: 850;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.goalCheckpointScale {
+  position: relative;
+  height: 100px;
+  margin: 14px 28px 30px;
+  border-top: 10px solid rgba(24, 32, 22, 0.1);
+  border-radius: 999px;
+}
+
+.goalCheckpointScaleFill {
+  position: absolute;
+  top: -10px;
+  left: 0;
+  height: 10px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--detail-lime), var(--detail-moss));
+}
+
+.goalCheckpointMarker {
+  position: absolute;
+  top: -18px;
+  transform: translateX(-50%);
+}
+
+.goalCheckpointMarker > span {
+  display: block;
+  width: 26px;
+  height: 26px;
+  margin: 0 auto;
+  border: 5px solid #ffffff;
+  border-radius: 50%;
+  background: #f0a13a;
+  box-shadow: 0 5px 14px rgba(44, 58, 35, 0.18);
+}
+
+.goalCheckpointMarker.achieved > span {
+  background: #27a66a;
+}
+
+.goalCheckpointMarker > div {
+  display: grid;
+  gap: 2px;
+  width: 150px;
+  margin-top: 9px;
+  color: var(--detail-ink);
+  text-align: center;
+  transform: translateX(calc(-50% + 13px));
+}
+
+.goalCheckpointMarker small {
+  color: var(--detail-muted);
+}
+
+.goalCheckpointList {
+  display: grid;
+  gap: 10px;
+}
+
+.goalCheckpointList article,
+.goalCheckpointEmpty {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 15px;
+  border-radius: 16px;
+  background: rgba(24, 32, 22, 0.045);
+}
+
+.goalCheckpointList article.achieved {
+  background: rgba(39, 166, 106, 0.1);
+}
+
+.goalCheckpointList article > div:first-of-type,
+.goalCheckpointEmpty div {
+  display: grid;
+  flex: 1;
+  gap: 3px;
+}
+
+.goalCheckpointList article > div:last-child {
+  display: grid;
+  gap: 3px;
+  text-align: right;
+}
+
+.goalCheckpointList span,
+.goalCheckpointList small,
+.goalCheckpointEmpty span {
+  color: var(--detail-muted);
+  font-size: 0.84rem;
 }
 
 .goalDetailStatCard {
@@ -537,9 +761,14 @@
     flex-direction: column;
   }
 
+  .goalNextPaymentCard {
+    grid-template-columns: 1fr;
+  }
+
   .heroButton,
   .modalButton,
-  .backButton {
+  .backButton,
+  .goalNextPaymentButton {
     width: 100%;
   }
 
@@ -549,7 +778,35 @@
   }
 
   .progressCard,
-  .modalCard {
+  .modalCard,
+  .goalCheckpointTimeline {
     padding: 24px;
+  }
+
+  .goalCheckpointHeader,
+  .goalCheckpointList article,
+  .goalCheckpointEmpty {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .goalCheckpointCreate,
+  .goalCheckpointEmpty a {
+    width: 100%;
+  }
+
+  .goalCheckpointScale {
+    height: auto;
+    margin: 8px 0 20px;
+    border-top: 0;
+  }
+
+  .goalCheckpointScaleFill,
+  .goalCheckpointMarker {
+    display: none;
+  }
+
+  .goalCheckpointList article > div:last-child {
+    text-align: left;
   }
 }
