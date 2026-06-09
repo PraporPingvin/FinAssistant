@@ -188,7 +188,7 @@
 .optimalStrategyCard,
 .chartCardForecast,
 .scenarioCard,
-.comparisonTable,
+.forecastComparisonTableWrapper,
 .emptyState {
   border: 1px solid var(--forecast-line);
   background: var(--forecast-card);
@@ -525,7 +525,7 @@
 .summaryText h3,
 .optimalStrategyCard h3,
 .chartCardForecast h3,
-.comparisonTable h3 {
+.forecastComparisonTableWrapper h3 {
   margin: 0 0 12px;
   color: var(--forecast-ink);
   font-size: 1.15rem;
@@ -581,7 +581,7 @@
 
 .optimalStrategyCard,
 .chartCardForecast,
-.comparisonTable,
+.forecastComparisonTableWrapper,
 .scenarioCard {
   padding: 26px;
   border-radius: var(--forecast-radius-lg);
@@ -723,27 +723,31 @@
   background: rgba(255, 107, 95, 0.14);
 }
 
-.comparisonTable {
+.forecastComparisonTableWrapper {
   width: 100%;
   min-width: 0;
   margin-top: 22px;
 }
 
-.tableWrapper {
+.forecastModernTableScroll {
   width: 100%;
   max-width: 100%;
+  min-width: 0;
   overflow-x: auto;
+  overflow-y: hidden;
   overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
-.comparisonTable table {
+.forecastComparisonTable {
   width: 100%;
+  min-width: 760px;
   border-collapse: separate;
   border-spacing: 0 8px;
   font-size: 0.88rem;
 }
 
-.comparisonTable th {
+.forecastComparisonTable th {
   padding: 0 14px 8px;
   color: var(--forecast-muted);
   font-size: 0.72rem;
@@ -753,17 +757,17 @@
   text-transform: uppercase;
 }
 
-.comparisonTable td {
+.forecastComparisonTable td {
   padding: 14px;
   color: var(--forecast-ink);
   background: rgba(255, 255, 255, 0.62);
 }
 
-.comparisonTable td:first-child {
+.forecastComparisonTable td:first-child {
   border-radius: 16px 0 0 16px;
 }
 
-.comparisonTable td:last-child {
+.forecastComparisonTable td:last-child {
   border-radius: 0 16px 16px 0;
 }
 
@@ -830,11 +834,15 @@
   .forecastPage,
   .tabContent,
   .chartCardForecast,
-  .comparisonTable,
-  .tableWrapper {
+  .forecastComparisonTableWrapper,
+  .forecastModernTableScroll {
     width: 100%;
     max-width: 100%;
     min-width: 0;
+  }
+
+  .forecastPage {
+    overflow-x: hidden;
   }
 
   .forecastHero {
@@ -875,65 +883,117 @@
   }
 
   .chartCardForecast,
-  .comparisonTable {
+  .forecastComparisonTableWrapper {
     padding: 18px;
   }
 
-  .comparisonTable table,
-  .comparisonTable tbody,
-  .comparisonTable tr,
-  .comparisonTable td {
+  .forecastComparisonTableWrapper {
+    padding: 16px 12px;
+    overflow: hidden;
+  }
+
+  .forecastComparisonTableWrapper h3 {
+    padding: 0 4px;
+  }
+
+  .forecastModernTableScroll {
     display: block;
     width: 100%;
-  }
-
-  .comparisonTable thead {
-    display: none;
-  }
-
-  .comparisonTable table {
-    border-spacing: 0;
-  }
-
-  .comparisonTable tr {
-    overflow: hidden;
-    margin-bottom: 14px;
-    border: 1px solid var(--forecast-line);
-    border-radius: 18px;
-    background: rgba(255, 255, 255, 0.68);
-  }
-
-  .comparisonTable td {
-    display: grid;
-    grid-template-columns: minmax(120px, 0.9fr) minmax(0, 1.1fr);
-    align-items: center;
-    gap: 12px;
-    padding: 11px 14px;
-    border-bottom: 1px solid var(--forecast-line);
-    border-radius: 0 !important;
-    font-size: 0.88rem;
-    overflow-wrap: anywhere;
-    background: transparent;
-  }
-
-  .comparisonTable td:last-child {
-    border-bottom: 0;
-  }
-
-  .comparisonTable td::before {
-    content: attr(data-label);
-    color: var(--forecast-muted);
-    font-size: 0.72rem;
-    font-weight: 900;
-    text-transform: uppercase;
-  }
-
-  .comparisonTable .confidenceBar {
-    width: 100%;
+    max-width: 100%;
     min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 8px;
+    scrollbar-width: thin;
+    touch-action: pan-x;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
   }
 
-  .optimalRow {
-    background: rgba(232, 244, 93, 0.24) !important;
+  .forecastComparisonTable {
+    width: 620px;
+    min-width: 620px;
+    table-layout: fixed;
+    border-spacing: 0 5px;
+    font-size: 0.64rem;
+  }
+
+  .forecastComparisonTable th,
+  .forecastComparisonTable td {
+    min-width: 0;
+    padding: 7px 3px;
+    font-size: 0.62rem;
+    line-height: 1.2;
+    vertical-align: middle;
+    overflow-wrap: anywhere;
+  }
+
+  .forecastComparisonTable th {
+    letter-spacing: 0;
+    white-space: normal;
+  }
+
+  .forecastComparisonTable th:nth-child(1),
+  .forecastComparisonTable td:nth-child(1) {
+    width: 130px;
+  }
+
+  .forecastComparisonTable th:nth-child(2),
+  .forecastComparisonTable td:nth-child(2) {
+    width: 76px;
+  }
+
+  .forecastComparisonTable th:nth-child(3),
+  .forecastComparisonTable td:nth-child(3) {
+    width: 58px;
+  }
+
+  .forecastComparisonTable th:nth-child(4),
+  .forecastComparisonTable td:nth-child(4) {
+    width: 76px;
+  }
+
+  .forecastComparisonTable th:nth-child(5),
+  .forecastComparisonTable td:nth-child(5) {
+    width: 88px;
+  }
+
+  .forecastComparisonTable th:nth-child(6),
+  .forecastComparisonTable td:nth-child(6) {
+    width: 112px;
+  }
+
+  .forecastComparisonTable th:nth-child(7),
+  .forecastComparisonTable td:nth-child(7) {
+    width: 80px;
+  }
+
+  .forecastComparisonTable td:first-child {
+    overflow-wrap: anywhere;
+    border-radius: 10px 0 0 10px;
+  }
+
+  .forecastComparisonTable td:last-child {
+    border-radius: 0 10px 10px 0;
+  }
+
+  .forecastComparisonTable .confidenceBar {
+    min-width: 0;
+    width: 100%;
+    height: 18px;
+  }
+
+  .forecastComparisonTable .confidenceBar span {
+    right: 3px;
+    font-size: 0.56rem;
+  }
+
+  .forecastComparisonTable .riskBadge {
+    display: block;
+    width: 100%;
+    padding: 4px 2px;
+    font-size: 0.52rem;
+    text-align: center;
+    white-space: normal;
   }
 }

@@ -611,10 +611,10 @@ function ForecastPage() {
                   </div>
                 </div>
 
-                <div className="comparisonTable">
+                <section className="forecastComparisonTableWrapper">
                   <h3>Детальное сравнение</h3>
-                  <div className="tableWrapper">
-                    <table>
+                  <div className="forecastModernTableScroll">
+                    <table className="forecastComparisonTable">
                       <thead>
                         <tr>
                           <th>Вариант</th>
@@ -650,7 +650,7 @@ function ForecastPage() {
                       </tbody>
                     </table>
                   </div>
-                </div>
+                </section>
               </div>
             )}
 
