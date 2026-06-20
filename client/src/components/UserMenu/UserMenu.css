@@ -25,4 +25,4 @@
 .dropdownItem:hover { background: rgba(232,244,93,.18); }
 .dropdownItem.logout { color: #c84237; }
 .dropdownItem.logout:hover { color: #fff; background: var(--user-red); }
-@media (max-width: 620px) { .userName { display: none; } .userMenuButton { padding-right: 5px; } .userDropdown { right: -48px; width: 250px; } }
+@media (max-width: 620px) { .userName { display: none; } .userMenuButton { padding-right: 5px; } .userDropdown { right: 0; width: min(250px, calc(100vw - 20px)); } }

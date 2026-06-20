@@ -25,6 +25,7 @@
 
 .authShell {
   width: min(1120px, 100%);
+  min-width: 0;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(380px, 0.78fr);
   overflow: hidden;
@@ -43,6 +44,7 @@
 
 .authBrandPanel {
   position: relative;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -92,6 +94,7 @@
   font-weight: 950;
   letter-spacing: -0.085em;
   line-height: 0.92;
+  overflow-wrap: break-word;
 }
 
 .authBrandPanel p {
@@ -184,11 +187,13 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
+  max-width: 100%;
   padding: 10px 12px;
   border-radius: 999px;
   color: var(--auth-muted);
   background: rgba(232, 244, 93, 0.17);
   letter-spacing: 0.05em;
+  line-height: 1.25;
 }
 
 .authError {
@@ -289,6 +294,7 @@
 .forgotLink,
 .switchButton,
 .backLink {
+  max-width: 100%;
   border: 0;
   color: var(--auth-moss);
   background: transparent;
@@ -442,11 +448,18 @@
   }
 
   .authBrandPanel {
-    padding: 28px;
+    padding: 24px 22px;
   }
 
   .authBrandPanel h1 {
-    font-size: clamp(2.3rem, 14vw, 3.4rem);
+    max-width: 100%;
+    font-size: clamp(2rem, 10.5vw, 2.75rem);
+    letter-spacing: -0.045em;
+    line-height: 1.02;
+  }
+
+  .authBrandPanel p {
+    font-size: 0.94rem;
   }
 
   .brandMetrics,
@@ -455,6 +468,45 @@
   }
 
   .authForm {
-    padding: 28px 22px;
+    padding: 26px 18px;
+  }
+
+  .authHeader h2 {
+    font-size: clamp(1.75rem, 9vw, 2.35rem);
+    letter-spacing: -0.045em;
+    line-height: 1.08;
+  }
+
+  .authFeatureStrip span,
+  .formLabel {
+    letter-spacing: 0.035em;
+  }
+
+  .forgotPasswordLink {
+    justify-content: flex-start;
+  }
+
+  .forgotLink,
+  .switchButton,
+  .backLink {
+    white-space: normal;
+  }
+}
+
+@media (max-width: 380px) {
+  .authContainer {
+    padding: 10px;
+  }
+
+  .authBrandPanel {
+    padding: 22px 20px;
+  }
+
+  .authBrandPanel h1 {
+    font-size: clamp(1.85rem, 10vw, 2.25rem);
+  }
+
+  .authForm {
+    padding: 24px 16px;
   }
 }

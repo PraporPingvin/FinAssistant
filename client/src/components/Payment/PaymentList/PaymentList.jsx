@@ -7,13 +7,13 @@ function PaymentList({ payments, onEdit, onDelete }) {
   const [paymentToDelete, setPaymentToDelete] = useState(null);
 
   const sortedPayments = [...payments].sort((a, b) => {
-    const dateDiff = new Date(a.payment_date) - new Date(b.payment_date);
+    const dateDiff = new Date(b.payment_date) - new Date(a.payment_date);
     if (dateDiff !== 0) return dateDiff;
 
-    const createdDiff = new Date(a.created_at || 0) - new Date(b.created_at || 0);
+    const createdDiff = new Date(b.created_at || 0) - new Date(a.created_at || 0);
     if (createdDiff !== 0) return createdDiff;
 
-    return Number(a.payment_id || 0) - Number(b.payment_id || 0);
+    return Number(b.payment_id || 0) - Number(a.payment_id || 0);
   });
 
   const formatCurrency = (amount) => {
@@ -63,38 +63,13 @@ function PaymentList({ payments, onEdit, onDelete }) {
     );
   }
 
-  const totalAmount = sortedPayments.reduce((sum, payment) => sum + (parseFloat(payment.amount) || 0), 0);
-  const averageAmount = sortedPayments.length > 0 ? Math.round(totalAmount / sortedPayments.length) : 0;
-  const lastPayment = sortedPayments.length > 0 ? sortedPayments[sortedPayments.length - 1] : null;
-
   return (
     <div className="paymentList">
-      <div className="paymentSummary">
-        <div className="summaryItem">
-          <span className="summaryLabel">Всего платежей</span>
-          <span className="summaryValue">{sortedPayments.length}</span>
-        </div>
-        <div className="summaryItem">
-          <span className="summaryLabel">Общая сумма</span>
-          <span className="summaryValue totalAmount">{formatCurrency(totalAmount)} ₽</span>
-        </div>
-        <div className="summaryItem">
-          <span className="summaryLabel">Средний платеж</span>
-          <span className="summaryValue">{formatCurrency(averageAmount)} ₽</span>
-        </div>
-        {lastPayment && (
-          <div className="summaryItem">
-            <span className="summaryLabel">Последний платеж</span>
-            <span className="summaryValue">{formatDate(lastPayment.payment_date)}</span>
-          </div>
-        )}
-      </div>
-
       <div className="paymentTimeline">
         {sortedPayments.map((payment, index) => (
           <article key={payment.payment_id} className="paymentTimelineCard">
             <div className="paymentTimelineMarker">
-              <span>{index + 1}</span>
+              <span>{sortedPayments.length - index}</span>
             </div>
 
             <div className="paymentCardBody">

@@ -89,13 +89,6 @@ function CheckpointsPage() {
           {activeTab === "calendar" && <CheckpointsCalendar />}
           {activeTab === "stats" && <CheckpointsStats />}
         </div>
-
-        <button
-          className="scrollToTop"
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-        >
-          ↑
-        </button>
       </div>
     </Layout>
   );

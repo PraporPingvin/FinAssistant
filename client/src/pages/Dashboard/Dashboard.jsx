@@ -372,6 +372,24 @@ function Dashboard() {
                 <span>{formatCurrency(metrics.totalSaved)} ₽ собрано</span>
                 <span>{formatCurrency(metrics.remaining)} ₽ осталось</span>
               </div>
+              <div className="dashboardPortfolioStats" aria-label="Сводка портфеля целей">
+                <div>
+                  <span>Всего</span>
+                  <strong>{goals.length}</strong>
+                </div>
+                <div>
+                  <span>Активно</span>
+                  <strong>{metrics.activeGoals}</strong>
+                </div>
+                <div>
+                  <span>Завершено</span>
+                  <strong>{metrics.completedGoals}</strong>
+                </div>
+                <div>
+                  <span>Темп в месяц</span>
+                  <strong>{formatCurrency(metrics.monthlyFlow)} ₽</strong>
+                </div>
+              </div>
               <div className="forecastStrip">
                 <Clock3 size={18} />
                 <span>

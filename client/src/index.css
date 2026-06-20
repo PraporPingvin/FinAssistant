@@ -52,10 +52,19 @@
   box-sizing: border-box;
 }
 
+html {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
 body {
   font-family: var(--font-sans);
+  width: 100%;
+  max-width: 100%;
   min-width: 320px;
   min-height: 100vh;
+  overflow-x: hidden;
   background-color: #eef2df;
   color: var(--text-dark);
   line-height: 1.65;
@@ -87,6 +96,34 @@ select,
 td,
 th {
   line-height: 1.6;
+}
+
+img,
+svg,
+canvas,
+video {
+  max-width: 100%;
+}
+
+input,
+textarea,
+select,
+button {
+  max-width: 100%;
+}
+
+input,
+textarea,
+select {
+  min-width: 0;
+}
+
+#root,
+.appShell,
+.appMain {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 /* Контейнер страницы */

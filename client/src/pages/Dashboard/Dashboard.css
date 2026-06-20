@@ -224,8 +224,8 @@
   border: 1px solid rgba(217, 79, 79, 0.22);
 }
 
-.statsGrid {
-  display: grid;
+.dashboardPage .statsGrid {
+  display: none !important;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 18px;
   margin-bottom: 24px;
@@ -385,6 +385,45 @@
   margin-top: 16px;
   color: var(--dash-muted);
   font-weight: 750;
+}
+
+.dashboardPortfolioStats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.dashboardPortfolioStats div {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid rgba(24, 32, 22, 0.08);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.62);
+}
+
+.dashboardPortfolioStats span {
+  display: block;
+  overflow: hidden;
+  color: var(--dash-muted);
+  font-size: 0.68rem;
+  font-weight: 850;
+  letter-spacing: 0.06em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.dashboardPortfolioStats strong {
+  display: block;
+  margin-top: 5px;
+  overflow: hidden;
+  color: var(--dash-ink);
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  font-weight: 900;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .forecastStrip {
@@ -621,6 +660,15 @@
   background: var(--dash-lime);
 }
 
+.dashboardCheckpointActions a:nth-child(2) {
+  font-size: 0;
+}
+
+.dashboardCheckpointActions a:nth-child(2)::after {
+  content: "Все точки";
+  font-size: 0.92rem;
+}
+
 .dashboardCheckpointExample {
   grid-template-columns: auto minmax(0, 1fr) auto;
   border-left-color: var(--dash-lime);
@@ -731,7 +779,7 @@
     grid-template-columns: 1fr;
   }
 
-  .statsGrid {
+  .dashboardPage .statsGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -760,9 +808,26 @@
     width: 100%;
   }
 
-  .statsGrid,
+  .dashboardPage .statsGrid,
   .goalsGrid {
     grid-template-columns: 1fr;
+  }
+
+  .dashboardPortfolioStats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .dashboardPortfolioStats div {
+    padding: 10px;
+  }
+
+  .dashboardPortfolioStats span {
+    font-size: 0.6rem;
+  }
+
+  .dashboardPortfolioStats strong {
+    font-size: 0.95rem;
   }
 
   .dashboardStatCard {

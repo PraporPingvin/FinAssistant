@@ -311,6 +311,12 @@ function GoalDetailPage() {
               <strong>{calculations.estimatedTime}</strong>
             </div>
           </div>
+          <div className="goalMetaInline">
+            <div><span>Старт</span><strong>{formatCurrency(goal.initial_amount || 0)}</strong></div>
+            <div><span>Начало</span><strong>{formatDate(goal.start_date)}</strong></div>
+            <div><span>Дедлайн</span><strong>{goal.deadline_date ? formatDate(goal.deadline_date) : "Не установлен"}</strong></div>
+            <div><span>Статус</span><strong>{goal.status === "active" ? "В процессе" : statusLabel}</strong></div>
+          </div>
         </section>
 
         <section className="goalCheckpointTimeline">

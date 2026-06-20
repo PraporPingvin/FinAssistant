@@ -166,6 +166,25 @@ function ScenariosMainPage() {
           <article className="mainStatCard"><TrendingUp size={24} /><span>Средний прогресс</span><strong>{totals.avgProgress}%</strong></article>
         </section>
 
+        <section className="scenarioPortfolioProgress">
+          <div className="scenarioPortfolioHeader">
+            <div>
+              <span>Портфель целей</span>
+              <h2>Общий прогресс</h2>
+            </div>
+            <strong>{totals.avgProgress}%</strong>
+          </div>
+          <div className="scenarioPortfolioTrack">
+            <div style={{ width: `${totals.avgProgress}%` }} />
+          </div>
+          <div className="scenarioPortfolioSummary" aria-label="Краткая сводка сценариев">
+            <div><span>Сценариев</span><strong>{totals.scenarios}</strong></div>
+            <div><span>Целей</span><strong>{totals.goals}</strong></div>
+            <div><span>Активных</span><strong>{totals.activeGoals}</strong></div>
+            <div><span>Средний прогресс</span><strong>{totals.avgProgress}%</strong></div>
+          </div>
+        </section>
+
         <section className="scenarioMainFilters">
           <div className="filterTitle"><Filter size={16} /><span>Фильтры и поиск</span></div>
           <div className="filterGridModern">

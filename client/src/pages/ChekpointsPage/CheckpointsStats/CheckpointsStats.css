@@ -275,17 +275,149 @@
   color: var(--cp-ink);
 }
 
+.statsHeroPanel {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) auto minmax(260px, 0.8fr);
+  gap: 22px;
+  align-items: center;
+  margin-bottom: 22px;
+  padding: clamp(22px, 3vw, 34px);
+  border: 1px solid var(--cp-line);
+  border-radius: 30px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(79, 124, 255, 0.12), transparent 18rem),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(232, 244, 93, 0.18));
+  box-shadow: 0 18px 45px rgba(44, 58, 35, 0.08);
+  backdrop-filter: blur(18px);
+  animation: statsRise 420ms ease both;
+}
+
+.statsHeroPanel::after {
+  content: "";
+  position: absolute;
+  right: -90px;
+  top: -120px;
+  width: 260px;
+  height: 260px;
+  border-radius: 999px;
+  background: rgba(232, 244, 93, 0.22);
+  pointer-events: none;
+}
+
+.statsHeroCopy,
+.statsHeroProgress,
+.statsHeroFacts {
+  position: relative;
+  z-index: 1;
+}
+
+.statsHeroCopy span,
+.statsHeroFacts span {
+  color: var(--cp-muted);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.statsHeroCopy h2 {
+  margin: 6px 0 8px;
+  color: var(--cp-ink);
+  font-size: clamp(1.6rem, 3vw, 2.5rem);
+  font-weight: 950;
+  letter-spacing: -0.06em;
+}
+
+.statsHeroCopy p {
+  max-width: 620px;
+  margin: 0;
+  color: var(--cp-muted);
+  line-height: 1.55;
+}
+
+.statsHeroProgress {
+  --progress: 0%;
+  display: grid;
+  place-items: center;
+  width: clamp(132px, 15vw, 172px);
+  aspect-ratio: 1;
+  border-radius: 999px;
+  background:
+    conic-gradient(var(--cp-lime) var(--progress), rgba(24, 32, 22, 0.08) 0),
+    rgba(255, 255, 255, 0.62);
+  box-shadow: inset 0 0 0 1px rgba(24, 32, 22, 0.08);
+}
+
+.statsHeroProgress > div {
+  display: grid;
+  place-items: center;
+  width: 72%;
+  aspect-ratio: 1;
+  border-radius: inherit;
+  background: rgba(255, 255, 255, 0.88);
+}
+
+.statsHeroProgress strong {
+  color: var(--cp-ink);
+  font-size: clamp(1.7rem, 3vw, 2.5rem);
+  font-weight: 950;
+  line-height: 1;
+}
+
+.statsHeroProgress span {
+  color: var(--cp-muted);
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.statsHeroFacts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.statsHeroFacts div {
+  min-width: 0;
+  padding: 13px;
+  border: 1px solid rgba(24, 32, 22, 0.08);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.64);
+}
+
+.statsHeroFacts strong {
+  display: block;
+  margin-top: 5px;
+  overflow: hidden;
+  color: var(--cp-ink);
+  font-size: 1.08rem;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .statsPage .statsSection {
   position: relative;
   overflow: hidden;
-  padding: 28px;
-  margin-bottom: 24px;
+  padding: 24px;
+  margin-bottom: 20px;
   border: 1px solid var(--cp-line);
   border-radius: 30px;
   background: var(--cp-card);
   box-shadow: 0 18px 45px rgba(44, 58, 35, 0.08);
   backdrop-filter: blur(18px);
+  animation: statsRise 420ms ease both;
 }
+
+.statsPage .statsSection:nth-of-type(2) { animation-delay: 40ms; }
+.statsPage .statsSection:nth-of-type(3) { animation-delay: 80ms; }
+.statsPage .statsSection:nth-of-type(4) { animation-delay: 120ms; }
+.statsPage .statsSection:nth-of-type(5) { animation-delay: 160ms; }
+.statsPage .statsSection:nth-of-type(6) { animation-delay: 200ms; }
 
 .statsPage .statsSection::before {
   content: "";
@@ -304,7 +436,7 @@
   border-bottom: 0;
   padding-bottom: 0;
   color: var(--cp-ink);
-  font-size: 1.2rem;
+  font-size: 1.08rem;
   font-weight: 900;
   letter-spacing: -0.04em;
 }
@@ -312,16 +444,16 @@
 .statsPage .statsGrid {
   position: relative;
   z-index: 1;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 12px;
 }
 
 .statsPage .statCard,
 .statsPage .priorityCard {
-  min-height: 112px;
-  padding: 18px;
+  min-height: 96px;
+  padding: 15px;
   border: 1px solid var(--cp-line);
-  border-radius: 22px;
+  border-radius: 18px;
   background: rgba(255, 255, 255, 0.64);
   box-shadow: none;
 }
@@ -341,10 +473,10 @@
 .statsPage .priorityIcon {
   display: grid;
   place-items: center;
-  flex: 0 0 50px;
-  width: 50px;
-  height: 50px;
-  border-radius: 17px;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
   color: var(--cp-ink);
   background: var(--cp-lime);
   box-shadow: none;
@@ -365,7 +497,7 @@
 .statsPage .statValue,
 .statsPage .priorityValue {
   color: var(--cp-ink);
-  font-size: clamp(1.35rem, 2vw, 1.9rem);
+  font-size: clamp(1.18rem, 1.7vw, 1.55rem);
   font-weight: 900;
   letter-spacing: -0.055em;
 }
@@ -394,16 +526,45 @@
 .statsPage .progressBarContainer {
   position: relative;
   z-index: 1;
-  margin-top: 22px;
-  padding: 18px;
+  margin-top: 16px;
+  padding: 14px;
   border: 1px solid var(--cp-line);
-  border-radius: 22px;
+  border-radius: 18px;
   background: rgba(255, 255, 255, 0.56);
 }
 
 .statsPage .progressBar {
-  height: 14px;
+  height: 12px;
   background: rgba(24, 32, 22, 0.08);
+}
+
+.statsPage .statsSection:nth-of-type(3) {
+  background:
+    radial-gradient(circle at 100% 0%, rgba(245, 166, 35, 0.1), transparent 15rem),
+    var(--cp-card);
+}
+
+.statsPage .statsSection:nth-of-type(4) {
+  background:
+    radial-gradient(circle at 100% 0%, rgba(39, 166, 106, 0.1), transparent 15rem),
+    var(--cp-card);
+}
+
+.statsPage .statsSection:nth-of-type(5) {
+  background:
+    radial-gradient(circle at 100% 0%, rgba(79, 124, 255, 0.1), transparent 15rem),
+    var(--cp-card);
+}
+
+@keyframes statsRise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .statsPage .progressFill {
@@ -420,8 +581,22 @@
 }
 
 @media (max-width: 760px) {
+  .statsHeroPanel {
+    grid-template-columns: 1fr;
+    padding: 20px;
+  }
+
+  .statsHeroProgress {
+    width: 132px;
+    justify-self: center;
+  }
+
+  .statsHeroFacts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .statsPage .statsSection {
-    padding: 22px;
+    padding: 18px;
   }
 
   .statsPage .statsGrid,

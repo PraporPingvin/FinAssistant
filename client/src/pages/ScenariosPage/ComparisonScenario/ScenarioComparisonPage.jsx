@@ -3,7 +3,6 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import {
   AlertCircle,
   BarChart3,
-  Download,
   Home,
   Plus,
   RefreshCw,
@@ -17,6 +16,9 @@ import {
   DollarSign,
   TrendingUp,
   CheckCircle,
+  FileSpreadsheet,
+  FileText,
+  Printer,
 } from "lucide-react";
 import Layout from "../../../components/Layout";
 import { getGoals, getPayments, getScenarios } from "../../../api/api";
@@ -191,15 +193,329 @@ function ScenarioComparisonPage() {
     setSelectedScenarios(next.length ? next : [""]);
   };
 
-  const handleExport = () => {
-    const payload = JSON.stringify({ goal: currentGoal, scenarios: comparisonData, analysis }, null, 2);
-    const blob = new Blob([payload], { type: "application/json" });
+  const exportTitle = currentGoal?.title ? `Сравнение сценариев - ${currentGoal.title}` : "Сравнение сценариев";
+
+  const exportRows = useMemo(() => {
+    if (comparisonData.length < 2) return [];
+
+    return [
+      ["Цель", ...comparisonData.map((scenario) => `${formatCurrency(scenario.goal_target)} ₽`)],
+      ["Ежемесячный взнос", ...comparisonData.map((scenario) => `${formatCurrency(scenario.monthly_contribution)} ₽`)],
+      ["Дополнительный рост", ...comparisonData.map((scenario) => `${formatPercent(scenario.expected_return)}%`)],
+      ["Инфляция", ...comparisonData.map((scenario) => `${formatPercent(scenario.inflation_rate)}%`)],
+      ["Рост после инфляции", ...comparisonData.map((scenario) => `${scenario.effectiveReturn.toFixed(1)}%`)],
+      ["Осталось накопить", ...comparisonData.map((scenario) => `${formatCurrency(scenario.remaining)} ₽`)],
+      ["Срок", ...comparisonData.map((scenario) => Number.isFinite(scenario.monthsToGoal) ? `${scenario.monthsToGoal} мес.` : "Недостижимо")],
+      ["Риск", ...comparisonData.map((scenario) => scenario.risk.label)],
+      ["Вероятность", ...comparisonData.map((scenario) => `${scenario.probability}%`)],
+      ["Рейтинг", ...comparisonData.map((scenario) => `${scenario.rating}/100`)],
+    ];
+  }, [comparisonData]);
+
+  const escapeHtml = (value) => String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+
+  const buildExportTable = ({ printable = false } = {}) => {
+    const headers = ["Параметр", ...comparisonData.map((scenario) => scenario.name)];
+    const generatedAt = new Date().toLocaleString("ru-RU");
+
+    return `
+      <!doctype html>
+      <html>
+        <head>
+          <meta charset="utf-8" />
+          <title>${escapeHtml(exportTitle)}</title>
+          <style>
+            body { font-family: Arial, sans-serif; color: #172014; margin: ${printable ? "18mm" : "24px"}; }
+            h1 { margin: 0 0 6px; font-size: 24px; }
+            p { margin: 0 0 18px; color: #66715c; }
+            table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+            th, td { border: 1px solid #cfd8bf; padding: 10px 12px; text-align: left; vertical-align: top; }
+            th { background: #e8f45d; font-weight: 700; }
+            td:first-child { width: 28%; font-weight: 700; background: #f5f7eb; }
+            tr:nth-child(even) td:not(:first-child) { background: #fbfcf5; }
+            .meta { font-size: 12px; color: #66715c; }
+            @media print {
+              body { margin: 12mm; }
+              button { display: none; }
+              table { page-break-inside: auto; }
+              tr { page-break-inside: avoid; page-break-after: auto; }
+            }
+          </style>
+        </head>
+        <body>
+          <h1>${escapeHtml(exportTitle)}</h1>
+          <p class="meta">Сформировано: ${escapeHtml(generatedAt)}</p>
+          <table>
+            <thead>
+              <tr>${headers.map((header) => `<th>${escapeHtml(header)}</th>`).join("")}</tr>
+            </thead>
+            <tbody>
+              ${exportRows.map((row) => `<tr>${row.map((cell) => `<td>${escapeHtml(cell)}</td>`).join("")}</tr>`).join("")}
+            </tbody>
+          </table>
+        </body>
+      </html>
+    `;
+  };
+
+  const downloadTable = (content, filename, type) => {
+    const blob = new Blob([`\uFEFF${content}`], { type });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `scenario-comparison-${selectedGoal || "all"}.json`;
+    link.download = filename;
     link.click();
     URL.revokeObjectURL(url);
+  };
+
+  const buildFilename = (extension) => {
+    const safeGoal = (currentGoal?.title || selectedGoal || "comparison")
+      .toString()
+      .replace(/[\\/:*?"<>|]+/g, "")
+      .replace(/\s+/g, "_")
+      .slice(0, 60);
+    return `scenario-comparison-${safeGoal}.${extension}`;
+  };
+
+  const escapeXml = (value) => String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+
+  const columnName = (index) => {
+    let name = "";
+    let current = index + 1;
+    while (current > 0) {
+      const remainder = (current - 1) % 26;
+      name = String.fromCharCode(65 + remainder) + name;
+      current = Math.floor((current - 1) / 26);
+    }
+    return name;
+  };
+
+  const crcTable = useMemo(() => {
+    const table = [];
+    for (let i = 0; i < 256; i += 1) {
+      let crc = i;
+      for (let j = 0; j < 8; j += 1) {
+        crc = crc & 1 ? 0xedb88320 ^ (crc >>> 1) : crc >>> 1;
+      }
+      table[i] = crc >>> 0;
+    }
+    return table;
+  }, []);
+
+  const crc32 = (bytes) => {
+    let crc = 0xffffffff;
+    for (let i = 0; i < bytes.length; i += 1) {
+      crc = crcTable[(crc ^ bytes[i]) & 0xff] ^ (crc >>> 8);
+    }
+    return (crc ^ 0xffffffff) >>> 0;
+  };
+
+  const writeUint16 = (target, offset, value) => {
+    target[offset] = value & 0xff;
+    target[offset + 1] = (value >>> 8) & 0xff;
+  };
+
+  const writeUint32 = (target, offset, value) => {
+    target[offset] = value & 0xff;
+    target[offset + 1] = (value >>> 8) & 0xff;
+    target[offset + 2] = (value >>> 16) & 0xff;
+    target[offset + 3] = (value >>> 24) & 0xff;
+  };
+
+  const concatBytes = (parts) => {
+    const totalLength = parts.reduce((sum, part) => sum + part.length, 0);
+    const result = new Uint8Array(totalLength);
+    let offset = 0;
+    parts.forEach((part) => {
+      result.set(part, offset);
+      offset += part.length;
+    });
+    return result;
+  };
+
+  const createZip = (files) => {
+    const encoder = new TextEncoder();
+    const localParts = [];
+    const centralParts = [];
+    let offset = 0;
+    const now = new Date();
+    const dosTime = (now.getHours() << 11) | (now.getMinutes() << 5) | Math.floor(now.getSeconds() / 2);
+    const dosDate = ((now.getFullYear() - 1980) << 9) | ((now.getMonth() + 1) << 5) | now.getDate();
+
+    files.forEach(({ path, content }) => {
+      const nameBytes = encoder.encode(path);
+      const contentBytes = typeof content === "string" ? encoder.encode(content) : content;
+      const checksum = crc32(contentBytes);
+
+      const localHeader = new Uint8Array(30 + nameBytes.length);
+      writeUint32(localHeader, 0, 0x04034b50);
+      writeUint16(localHeader, 4, 20);
+      writeUint16(localHeader, 6, 0x0800);
+      writeUint16(localHeader, 8, 0);
+      writeUint16(localHeader, 10, dosTime);
+      writeUint16(localHeader, 12, dosDate);
+      writeUint32(localHeader, 14, checksum);
+      writeUint32(localHeader, 18, contentBytes.length);
+      writeUint32(localHeader, 22, contentBytes.length);
+      writeUint16(localHeader, 26, nameBytes.length);
+      writeUint16(localHeader, 28, 0);
+      localHeader.set(nameBytes, 30);
+
+      localParts.push(localHeader, contentBytes);
+
+      const centralHeader = new Uint8Array(46 + nameBytes.length);
+      writeUint32(centralHeader, 0, 0x02014b50);
+      writeUint16(centralHeader, 4, 20);
+      writeUint16(centralHeader, 6, 20);
+      writeUint16(centralHeader, 8, 0x0800);
+      writeUint16(centralHeader, 10, 0);
+      writeUint16(centralHeader, 12, dosTime);
+      writeUint16(centralHeader, 14, dosDate);
+      writeUint32(centralHeader, 16, checksum);
+      writeUint32(centralHeader, 20, contentBytes.length);
+      writeUint32(centralHeader, 24, contentBytes.length);
+      writeUint16(centralHeader, 28, nameBytes.length);
+      writeUint16(centralHeader, 30, 0);
+      writeUint16(centralHeader, 32, 0);
+      writeUint16(centralHeader, 34, 0);
+      writeUint16(centralHeader, 36, 0);
+      writeUint32(centralHeader, 38, 0);
+      writeUint32(centralHeader, 42, offset);
+      centralHeader.set(nameBytes, 46);
+      centralParts.push(centralHeader);
+
+      offset += localHeader.length + contentBytes.length;
+    });
+
+    const centralDirectory = concatBytes(centralParts);
+    const endRecord = new Uint8Array(22);
+    writeUint32(endRecord, 0, 0x06054b50);
+    writeUint16(endRecord, 8, files.length);
+    writeUint16(endRecord, 10, files.length);
+    writeUint32(endRecord, 12, centralDirectory.length);
+    writeUint32(endRecord, 16, offset);
+
+    return concatBytes([...localParts, centralDirectory, endRecord]);
+  };
+
+  const buildXlsxWorkbook = () => {
+    const table = [["Параметр", ...comparisonData.map((scenario) => scenario.name)], ...exportRows];
+    const rowsXml = table.map((row, rowIndex) => {
+      const cellsXml = row.map((cell, cellIndex) => {
+        const ref = `${columnName(cellIndex)}${rowIndex + 1}`;
+        const style = rowIndex === 0 ? 1 : cellIndex === 0 ? 2 : 0;
+        return `<c r="${ref}" t="inlineStr" s="${style}"><is><t>${escapeXml(cell)}</t></is></c>`;
+      }).join("");
+      return `<row r="${rowIndex + 1}">${cellsXml}</row>`;
+    }).join("");
+    const lastCell = `${columnName(table[0].length - 1)}${table.length}`;
+
+    const sheetXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <dimension ref="A1:${lastCell}"/>
+  <sheetViews><sheetView workbookViewId="0"/></sheetViews>
+  <sheetFormatPr defaultRowHeight="18"/>
+  <cols>
+    <col min="1" max="1" width="26" customWidth="1"/>
+    <col min="2" max="${table[0].length}" width="22" customWidth="1"/>
+  </cols>
+  <sheetData>${rowsXml}</sheetData>
+  <pageMargins left="0.4" right="0.4" top="0.6" bottom="0.6" header="0.3" footer="0.3"/>
+</worksheet>`;
+
+    return createZip([
+      {
+        path: "[Content_Types].xml",
+        content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
+  <Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+  <Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>
+</Types>`,
+      },
+      {
+        path: "_rels/.rels",
+        content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+</Relationships>`,
+      },
+      {
+        path: "xl/workbook.xml",
+        content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <sheets><sheet name="Сравнение" sheetId="1" r:id="rId1"/></sheets>
+</workbook>`,
+      },
+      {
+        path: "xl/_rels/workbook.xml.rels",
+        content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+</Relationships>`,
+      },
+      {
+        path: "xl/styles.xml",
+        content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <fonts count="2"><font><sz val="11"/><name val="Arial"/></font><font><b/><sz val="11"/><name val="Arial"/></font></fonts>
+  <fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FFE8F45D"/><bgColor indexed="64"/></patternFill></fill></fills>
+  <borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border><border><left style="thin"><color rgb="FFCFD8BF"/></left><right style="thin"><color rgb="FFCFD8BF"/></right><top style="thin"><color rgb="FFCFD8BF"/></top><bottom style="thin"><color rgb="FFCFD8BF"/></bottom><diagonal/></border></borders>
+  <cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>
+  <cellXfs count="3"><xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1"/><xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1"/><xf numFmtId="0" fontId="1" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1"/></cellXfs>
+  <cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>
+  <dxfs count="0"/><tableStyles count="0" defaultTableStyle="TableStyleMedium2" defaultPivotStyle="PivotStyleLight16"/>
+</styleSheet>`,
+      },
+      { path: "xl/worksheets/sheet1.xml", content: sheetXml },
+    ]);
+  };
+
+  const handleExcelExport = () => {
+    const workbook = buildXlsxWorkbook();
+    const blob = new Blob([workbook], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = buildFilename("xlsx");
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleWordExport = () => {
+    downloadTable(
+      buildExportTable(),
+      buildFilename("doc"),
+      "application/msword;charset=utf-8"
+    );
+  };
+
+  const handlePrintTable = () => {
+    const printWindow = window.open("", "_blank", "width=1100,height=800");
+    if (!printWindow) {
+      alert("Не удалось открыть окно печати. Разрешите всплывающие окна для этого сайта.");
+      return;
+    }
+
+    printWindow.document.open();
+    printWindow.document.write(buildExportTable({ printable: true }));
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
   };
 
   const selectedScenarioIds = selectedScenarios.filter(Boolean);
@@ -310,7 +626,11 @@ function ScenarioComparisonPage() {
             <section className="comparisonTableWrapper">
               <div className="comparisonTableHeader">
                 <div><span>Матрица</span><h2>Параметры сценариев</h2></div>
-                <button onClick={handleExport} className="comparisonPrimaryButton"><Download size={15} /> Экспорт JSON</button>
+                <div className="comparisonExportActions" aria-label="Экспорт и печать таблицы">
+                  <button onClick={handleExcelExport} className="comparisonPrimaryButton"><FileSpreadsheet size={15} /> Excel</button>
+                  <button onClick={handleWordExport} className="comparisonUtilityButton"><FileText size={15} /> Word</button>
+                  <button onClick={handlePrintTable} className="comparisonUtilityButton"><Printer size={15} /> Печать</button>
+                </div>
               </div>
               <div className="modernTableScroll">
                 <table className="comparisonTable">

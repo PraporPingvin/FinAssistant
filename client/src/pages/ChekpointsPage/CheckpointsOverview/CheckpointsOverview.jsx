@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   Target,
@@ -289,19 +289,32 @@ function CheckpointsOverview() {
   const [editingCheckpoint, setEditingCheckpoint] = useState(null);
   const [checkpointToDelete, setCheckpointToDelete] = useState(null);
   const [notice, setNotice] = useState(null);
+  const listStartRef = useRef(null);
+  const createRequestHandledRef = useRef("");
 
   useEffect(() => {
     loadData();
   }, []);
 
   useEffect(() => {
-    if (!loading && searchParams.get("create") === "1" && goals.length > 0) {
-      const requestedGoal = goals.find(item => String(item.goal_id) === searchParams.get("goalId"));
-      setSelectedGoal(requestedGoal || goals[0]);
-      setShowCreateModal(true);
+    if (loading || searchParams.get("create") !== "1") return;
+
+    const requestKey = `${searchParams.get("create")}:${searchParams.get("goalId") || ""}`;
+    if (createRequestHandledRef.current === requestKey) return;
+    createRequestHandledRef.current = requestKey;
+
+    if (goals.length === 0) {
       setSearchParams({}, { replace: true });
+      navigate("/goals/new");
+      return;
     }
-  }, [goals, loading, searchParams, setSearchParams]);
+
+    const requestedGoal = goals.find(item => String(item.goal_id) === searchParams.get("goalId"));
+    setSelectedGoal(requestedGoal || goals[0]);
+    setShowGoalSelector(false);
+    setShowCreateModal(true);
+    setSearchParams({}, { replace: true });
+  }, [goals, loading, navigate, searchParams, setSearchParams]);
 
   const loadData = async () => {
     try {
@@ -398,6 +411,15 @@ function CheckpointsOverview() {
     }
     setSelectedGoal(goals[0]);
     setShowCreateModal(true);
+  };
+
+  const showAttentionCheckpoints = () => {
+    setFilter(stats.overdue > 0 ? "overdue" : "risk");
+    setSearchQuery("");
+    setViewMode("cards");
+    requestAnimationFrame(() => {
+      listStartRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
   };
 
   const getCheckpointMetrics = (checkpoint) => {
@@ -689,7 +711,7 @@ function CheckpointsOverview() {
             <strong>Контрольные точки требуют внимания</strong>
             <p>Есть риск не успеть или срок уже прошел. Пополните цель либо скорректируйте сумму и дату точки.</p>
           </div>
-          <button type="button" onClick={() => setFilter(stats.overdue > 0 ? "overdue" : "risk")}>Показать</button>
+          <button type="button" onClick={showAttentionCheckpoints}>Показать</button>
         </section>
       )}
 
@@ -701,6 +723,24 @@ function CheckpointsOverview() {
         </div>
         <div className="progressBar">
           <div className="progressFill" style={{ width: `${stats.completionRate}%` }} />
+        </div>
+        <div className="checkpointProgressSummary" aria-label="Краткая сводка контрольных точек">
+          <div>
+            <span>Всего</span>
+            <strong>{stats.total}</strong>
+          </div>
+          <div>
+            <span>Достигнуто</span>
+            <strong>{stats.completed}</strong>
+          </div>
+          <div>
+            <span>Успеваем</span>
+            <strong>{stats.pending}</strong>
+          </div>
+          <div>
+            <span>Внимание</span>
+            <strong>{stats.risk + stats.overdue}</strong>
+          </div>
         </div>
       </div>
 
@@ -735,6 +775,8 @@ function CheckpointsOverview() {
       )}
 
       {/* Фильтры */}
+      <div ref={listStartRef} className="checkpointsListAnchor" />
+
       <div className="filtersBar">
         <div className="filterGroup">
           <select value={filter} onChange={(e) => setFilter(e.target.value)} className="filterSelect">

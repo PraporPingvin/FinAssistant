@@ -122,6 +122,25 @@ function CheckpointsStats() {
 
   return (
     <div className="statsPage">
+      <section className="statsHeroPanel">
+        <div className="statsHeroCopy">
+          <span>Аналитика контроля</span>
+          <h2>Статистика в одном взгляде</h2>
+          <p>Главные показатели целей, контрольных точек, приоритетов, финансов и сценариев собраны в компактную сводку.</p>
+        </div>
+        <div className="statsHeroProgress" style={{ "--progress": `${stats.finances.totalProgress}%` }}>
+          <div>
+            <strong>{stats.finances.totalProgress}%</strong>
+            <span>общий прогресс</span>
+          </div>
+        </div>
+        <div className="statsHeroFacts">
+          <div><span>Целей</span><strong>{stats.goals.total}</strong></div>
+          <div><span>Точек</span><strong>{stats.checkpoints.total}</strong></div>
+          <div><span>Сценариев</span><strong>{stats.scenarios.total}</strong></div>
+          <div><span>Осталось</span><strong>{formatCurrency(stats.finances.remaining)} ₽</strong></div>
+        </div>
+      </section>
       {/* Цели */}
       <div className="statsSection">
         <h3><Target size={18} /> Цели</h3>

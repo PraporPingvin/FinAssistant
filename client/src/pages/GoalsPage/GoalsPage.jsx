@@ -203,9 +203,27 @@ function GoalsPage() {
                   <span>{formatCurrency(metrics.totalSaved)} ₽ собрано</span>
                   <span>{formatCurrency(Math.max(metrics.totalTarget - metrics.totalSaved, 0))} ₽ осталось</span>
                 </div>
+                <div className="goalsPortfolioSummary" aria-label="Краткая сводка портфеля целей">
+                  <div>
+                    <span>Всего</span>
+                    <strong>{goals.length}</strong>
+                  </div>
+                  <div>
+                    <span>Активно</span>
+                    <strong>{metrics.active}</strong>
+                  </div>
+                  <div>
+                    <span>Завершено</span>
+                    <strong>{metrics.completed}</strong>
+                  </div>
+                  <div>
+                    <span>Темп в месяц</span>
+                    <strong>{formatCurrency(metrics.monthlyFlow)} ₽</strong>
+                  </div>
+                </div>
               </article>
 
-              <article className="goalsChartCard">
+              <article className="goalsChartCard goalsStatusSummary">
                 <div className="goalsSectionHeader">
                   <div>
                     <span>Статусы</span>

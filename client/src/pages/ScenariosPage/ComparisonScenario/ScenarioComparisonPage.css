@@ -171,6 +171,18 @@
   margin-bottom: 20px;
 }
 
+.comparisonExportActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.comparisonExportActions .comparisonPrimaryButton,
+.comparisonExportActions .comparisonUtilityButton {
+  min-width: 118px;
+}
+
 .controlHeader h2,
 .comparisonTableHeader h2,
 .analysisSection h2 {
@@ -347,12 +359,32 @@
   font-weight: 850;
 }
 
+.comparisonTableWrapper {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
 .modernTableScroll {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.comparisonTableWrapper::before,
+.comparisonTableWrapper::after {
+  display: none;
 }
 
 .comparisonTable {
-  width: 100%;
+  width: 760px;
   min-width: 760px;
   border-collapse: separate;
   border-spacing: 0 10px;
@@ -552,6 +584,16 @@
 
 @keyframes compareSpin { to { transform: rotate(360deg); } }
 
+@keyframes tableScrollCue {
+  0%, 100% { transform: translateX(0); opacity: 0.72; }
+  50% { transform: translateX(-14px); opacity: 1; }
+}
+
+@keyframes tableEdgeGlow {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 0.85; }
+}
+
 @media (max-width: 1160px) {
   .comparisonHero,
   .comparisonSummaryGrid,
@@ -576,6 +618,12 @@
     flex-direction: column;
   }
 
+  .comparisonExportActions {
+    display: grid;
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+
   .selectedGoalCard,
   .scenarioMiniPreview,
   .recommendationsGrid {
@@ -585,5 +633,41 @@
   .comparisonUtilityButton,
   .comparisonPrimaryButton {
     width: 100%;
+  }
+
+  .comparisonTableWrapper::before {
+    content: "";
+    position: absolute;
+    top: 104px;
+    right: 0;
+    bottom: 26px;
+    z-index: 2;
+    display: block;
+    width: 58px;
+    border-radius: 0 0 28px 0;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(232, 244, 93, 0.42));
+    pointer-events: none;
+    animation: tableEdgeGlow 1.8s ease-in-out infinite;
+  }
+
+  .comparisonTableWrapper::after {
+    content: "↔";
+    position: absolute;
+    right: 18px;
+    bottom: 22px;
+    z-index: 3;
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 28px;
+    border: 1px solid rgba(24, 32, 22, 0.1);
+    border-radius: 999px;
+    color: var(--compare-ink);
+    background: rgba(232, 244, 93, 0.92);
+    box-shadow: 0 12px 28px rgba(44, 58, 35, 0.16);
+    font-size: 1.05rem;
+    font-weight: 950;
+    pointer-events: none;
+    animation: tableScrollCue 1.25s ease-in-out infinite;
   }
 }

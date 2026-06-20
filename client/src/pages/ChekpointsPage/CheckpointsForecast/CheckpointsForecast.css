@@ -182,15 +182,21 @@
 }
 
 .tableContainer {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   border-radius: var(--radius-lg);
   background: var(--card-bg);
   backdrop-filter: blur(16px);
   border: 1px solid var(--border-color);
   overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
 .forecastTable {
   width: 100%;
+  min-width: 760px;
   border-collapse: collapse;
   font-size: 0.85rem;
 }
@@ -429,8 +435,8 @@
 
 .checkpointsForecastPage .forecastSummary {
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 18px;
-  margin-bottom: 24px;
+  gap: 12px;
+  margin-bottom: 16px;
 }
 
 .checkpointsForecastPage .summaryCardCheckpoint,
@@ -448,16 +454,16 @@
 .checkpointsForecastPage .summaryCardCheckpoint {
   position: relative;
   overflow: hidden;
-  min-height: 128px;
-  padding: 22px;
-  border-radius: 26px;
+  min-height: 92px;
+  padding: 16px;
+  border-radius: 20px;
 }
 
 .checkpointsForecastPage .summaryCardCheckpoint::after {
   content: "";
   position: absolute;
-  width: 120px;
-  height: 120px;
+  width: 96px;
+  height: 96px;
   right: -55px;
   top: -55px;
   border-radius: 999px;
@@ -467,24 +473,24 @@
 .checkpointsForecastPage .summaryIcon {
   display: grid;
   place-items: center;
-  flex: 0 0 54px;
-  width: 54px;
-  height: 54px;
-  border-radius: 18px;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
   color: var(--cp-ink);
   background: var(--cp-lime);
 }
 
 .checkpointsForecastPage .summaryLabel {
   color: var(--cp-muted);
-  font-size: 0.72rem;
+  font-size: 0.66rem;
   font-weight: 850;
   letter-spacing: 0.08em;
 }
 
 .checkpointsForecastPage .summaryValue {
   color: var(--cp-ink);
-  font-size: clamp(1.45rem, 2vw, 2rem);
+  font-size: clamp(1.22rem, 1.7vw, 1.65rem);
   font-weight: 900;
   letter-spacing: -0.055em;
 }
@@ -496,12 +502,14 @@
 .checkpointsForecastPage .chartsSection,
 .checkpointsForecastPage .forecastTableSection,
 .checkpointsForecastPage .forecastEmpty {
-  padding: 28px;
-  border-radius: 30px;
+  padding: 20px;
+  border-radius: 24px;
 }
 
 .checkpointsForecastPage .chartsHeader {
+  align-items: center;
   border-bottom: 0;
+  margin-bottom: 14px;
   padding-bottom: 0;
 }
 
@@ -509,6 +517,7 @@
 .checkpointsForecastPage .forecastTableSection h3,
 .checkpointsForecastPage .chartCardCheckpointF h4 {
   color: var(--cp-ink);
+  font-size: 0.95rem;
   font-weight: 900;
   letter-spacing: -0.035em;
 }
@@ -531,8 +540,8 @@
 }
 
 .checkpointsForecastPage .chartCardCheckpointF {
-  padding: 24px;
-  border-radius: 26px;
+  padding: 16px;
+  border-radius: 20px;
   background:
     radial-gradient(circle at 100% 0%, rgba(79, 124, 255, 0.1), transparent 16rem),
     rgba(255, 255, 255, 0.66);
@@ -540,8 +549,8 @@
 
 .checkpointsForecastPage .simpleChart {
   display: grid;
-  gap: 12px;
-  padding: 4px;
+  gap: 8px;
+  padding: 0;
 }
 
 .checkpointsForecastPage .simpleChart div {
@@ -550,10 +559,10 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 48px;
-  padding: 0 16px;
+  min-height: 36px;
+  padding: 0 12px;
   border: 1px solid var(--cp-line);
-  border-radius: 16px;
+  border-radius: 12px;
   color: var(--cp-ink);
   background: rgba(24, 32, 22, 0.045);
 }
@@ -579,18 +588,18 @@
 }
 
 .checkpointsForecastPage .simpleChart strong {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 950;
 }
 
 .checkpointsForecastPage .tableContainer {
-  padding: 10px;
-  border-radius: 26px;
+  padding: 8px;
+  border-radius: 22px;
 }
 
 .checkpointsForecastPage .forecastTable {
   border-collapse: separate;
-  border-spacing: 0 8px;
+  border-spacing: 0 6px;
 }
 
 .checkpointsForecastPage .forecastTable th {
@@ -605,7 +614,7 @@
 }
 
 .checkpointsForecastPage .forecastTable td {
-  padding: 14px;
+  padding: 11px;
   border: 0;
   background: rgba(255, 255, 255, 0.62);
 }
@@ -665,13 +674,28 @@
     grid-template-columns: 1fr;
   }
 
+  .checkpointsForecastPage .summaryCardCheckpoint {
+    min-height: 78px;
+    padding: 13px;
+  }
+
+  .checkpointsForecastPage .chartsSection,
+  .checkpointsForecastPage .forecastTableSection,
+  .checkpointsForecastPage .forecastEmpty {
+    padding: 16px;
+  }
+
   .checkpointsForecastPage .tableContainer {
+    width: 100%;
     max-width: 100%;
+    min-width: 0;
     overflow-x: auto;
+    overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
   }
 
   .checkpointsForecastPage .forecastTable {
+    width: 760px;
     min-width: 760px;
   }
 }

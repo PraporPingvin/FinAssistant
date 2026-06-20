@@ -49,13 +49,13 @@
 .paymentsHero {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(310px, 0.75fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 24px;
   overflow: hidden;
-  padding: clamp(28px, 5vw, 58px);
-  margin-bottom: 22px;
+  padding: clamp(24px, 4vw, 44px);
+  margin-bottom: 18px;
   border: 1px solid rgba(255, 255, 255, 0.72);
-  border-radius: 44px;
+  border-radius: 34px;
   background:
     radial-gradient(circle at 86% 12%, rgba(232, 244, 93, 0.34), transparent 24rem),
     radial-gradient(circle at 12% 96%, rgba(79, 124, 255, 0.2), transparent 22rem),
@@ -94,9 +94,9 @@
 
 .paymentsHero h1 {
   max-width: 780px;
-  margin: 16px 0 12px;
+  margin: 12px 0 8px;
   color: #ffffff;
-  font-size: clamp(2.9rem, 7vw, 6rem);
+  font-size: clamp(2.4rem, 5.4vw, 4.8rem);
   font-weight: 950;
   letter-spacing: -0.08em;
   line-height: 0.92;
@@ -106,7 +106,7 @@
   max-width: 680px;
   margin: 0;
   color: rgba(255, 255, 255, 0.74);
-  font-size: clamp(1rem, 1.5vw, 1.18rem);
+  font-size: clamp(0.95rem, 1.3vw, 1.08rem);
   line-height: 1.65;
 }
 
@@ -114,7 +114,11 @@
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  margin-top: 26px;
+  margin-top: 20px;
+}
+
+.paymentsHeroPanel {
+  display: none;
 }
 
 .heroPrimaryButton,
@@ -163,7 +167,7 @@
 
 .paymentsHeroPanel {
   align-self: center;
-  display: grid;
+  display: none;
   gap: 12px;
   padding: 28px;
   border: 1px solid rgba(255, 255, 255, 0.22);
@@ -208,10 +212,94 @@
 }
 
 .paymentsStatsGrid {
-  display: grid;
+  display: none !important;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px;
   margin-bottom: 18px;
+}
+
+.paymentsProgressSummary {
+  padding: clamp(20px, 2.6vw, 28px);
+  margin-bottom: 18px;
+  border: 1px solid var(--payments-line);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(79, 124, 255, 0.1), transparent 18rem),
+    var(--payments-card);
+  box-shadow: 0 18px 45px rgba(44, 58, 35, 0.08);
+  backdrop-filter: blur(18px);
+}
+
+.paymentsSummaryHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.paymentsSummaryHeader span,
+.paymentsSummaryGrid span {
+  color: var(--payments-muted);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.paymentsSummaryHeader h2 {
+  margin: 4px 0 0;
+  color: var(--payments-ink);
+  font-size: clamp(1.45rem, 3vw, 2.1rem);
+  font-weight: 950;
+  letter-spacing: -0.06em;
+}
+
+.paymentsSummaryHeader > strong {
+  color: var(--payments-moss);
+  font-size: clamp(1.9rem, 4vw, 3.2rem);
+  font-weight: 950;
+  letter-spacing: -0.07em;
+  line-height: 1;
+}
+
+.paymentsSummaryTrack {
+  height: 14px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(24, 32, 22, 0.08);
+}
+
+.paymentsSummaryTrack div {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--payments-lime), #98c43d, var(--payments-moss));
+}
+
+.paymentsSummaryGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.paymentsSummaryGrid div {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid rgba(24, 32, 22, 0.08);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.62);
+}
+
+.paymentsSummaryGrid strong {
+  display: block;
+  margin-top: 5px;
+  overflow: hidden;
+  color: var(--payments-ink);
+  font-size: 0.98rem;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .paymentsStatCard,
@@ -250,7 +338,7 @@
 }
 
 .goalSnapshotCard {
-  display: grid;
+  display: none;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px;
   padding: 18px;
@@ -284,11 +372,11 @@
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: 18px;
-  padding: 22px;
-  margin-bottom: 22px;
+  gap: 14px;
+  padding: 16px 18px;
+  margin-bottom: 18px;
   border: 1px solid var(--payments-line);
-  border-radius: var(--payments-radius-lg);
+  border-radius: 22px;
   color: var(--payments-ink);
   background:
     radial-gradient(circle at 6% 15%, rgba(232, 244, 93, 0.34), transparent 18rem),
@@ -306,9 +394,9 @@
 .nextPaymentIcon {
   display: grid;
   place-items: center;
-  width: 54px;
-  height: 54px;
-  border-radius: 20px;
+  width: 44px;
+  height: 44px;
+  border-radius: 15px;
   color: var(--payments-ink);
   background: var(--payments-lime);
 }
@@ -331,9 +419,9 @@
 }
 
 .nextPaymentContent h2 {
-  margin: 4px 0 6px;
+  margin: 3px 0 4px;
   color: var(--payments-ink);
-  font-size: clamp(1.35rem, 2.8vw, 2rem);
+  font-size: clamp(1.12rem, 2.2vw, 1.55rem);
   font-weight: 950;
 }
 
@@ -515,7 +603,8 @@
   }
 
   .paymentsStatsGrid,
-  .goalSnapshotCard {
+  .goalSnapshotCard,
+  .paymentsSummaryGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -527,8 +616,18 @@
   }
 
   .paymentsStatsGrid,
-  .goalSnapshotCard {
+  .goalSnapshotCard,
+  .paymentsSummaryGrid {
     grid-template-columns: 1fr;
+  }
+
+  .paymentsProgressSummary {
+    padding: 18px;
+  }
+
+  .paymentsSummaryHeader {
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .sidePanelHeader,

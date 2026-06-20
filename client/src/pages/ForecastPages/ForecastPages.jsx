@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   Activity,
@@ -10,7 +10,6 @@ import {
   LineChart,
   PieChart,
   Plus,
-  RefreshCw,
   Shield,
   Target,
   TrendingUp,
@@ -30,7 +29,7 @@ import {
 } from "chart.js";
 import { Bar, Line } from "react-chartjs-2";
 import Layout from "../../components/Layout";
-import { getGoal, getGoals, getPayments, getScenarios } from "../../api/api";
+import { getCheckpointsByGoal, getGoal, getGoals, getPayments, getScenarios } from "../../api/api";
 import { calculateScenarioMetrics, formatPercent } from "../../utils/scenarioCalculations";
 import "./ForecastPage.css";
 
@@ -47,6 +46,34 @@ ChartJS.register(
 );
 
 const BASELINE_ID = "goal-baseline";
+function RevealOnScroll({ className = "", children }) {
+  const ref = useRef(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const node = ref.current;
+    if (!node) return undefined;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.unobserve(entry.target);
+        }
+      },
+      { threshold: 0.22, rootMargin: "0px 0px -8% 0px" }
+    );
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div ref={ref} className={`${className} scrollReveal ${visible ? "isVisible" : ""}`}>
+      {children}
+    </div>
+  );
+}
 
 function ForecastPage() {
   const { goalId } = useParams();
@@ -56,6 +83,7 @@ function ForecastPage() {
   const [goal, setGoal] = useState(null);
   const [payments, setPayments] = useState([]);
   const [scenarios, setScenarios] = useState([]);
+  const [checkpoints, setCheckpoints] = useState([]);
   const [selectedGoalId, setSelectedGoalId] = useState(goalId || "");
   const [loading, setLoading] = useState(true);
   const [calculating, setCalculating] = useState(false);
@@ -77,6 +105,7 @@ function ForecastPage() {
       setGoal(null);
       setPayments([]);
       setScenarios([]);
+      setCheckpoints([]);
       setLoading(false);
     }
   }, [selectedGoalId]);
@@ -97,10 +126,11 @@ function ForecastPage() {
       setCalculating(true);
       setError("");
 
-      const [goalData, scenariosData, paymentsData] = await Promise.all([
+      const [goalData, scenariosData, paymentsData, checkpointsData] = await Promise.all([
         getGoal(id),
         getScenarios(id).catch(() => []),
         getPayments(id).catch(() => []),
+        getCheckpointsByGoal(id).catch(() => []),
       ]);
 
       if (!goalData) {
@@ -111,6 +141,7 @@ function ForecastPage() {
       setGoal(goalData);
       setScenarios(Array.isArray(scenariosData) ? scenariosData : []);
       setPayments(Array.isArray(paymentsData) ? paymentsData : []);
+      setCheckpoints(Array.isArray(checkpointsData) ? checkpointsData : []);
     } catch (loadError) {
       console.error("Ошибка загрузки прогноза:", loadError);
       setError(`Не удалось загрузить прогноз: ${loadError.message}`);
@@ -181,6 +212,14 @@ function ForecastPage() {
     return generateTimelineData({ goal, scenariosForecast: forecast.scenarios });
   }, [goal, forecast]);
 
+  const checkpointAnalysis = useMemo(() => {
+    if (!forecast || !Array.isArray(checkpoints) || checkpoints.length === 0) return null;
+    return analyzeCheckpoints({
+      checkpoints,
+      baseline: forecast.baseline,
+    });
+  }, [checkpoints, forecast]);
+
   const comparisonData = useMemo(() => {
     if (!forecast) return null;
     return {
@@ -208,12 +247,6 @@ function ForecastPage() {
     const newGoalId = event.target.value;
     setSelectedGoalId(newGoalId);
     navigate(newGoalId ? `/forecast/${newGoalId}` : "/forecast");
-  };
-
-  const handleRecalculate = async () => {
-    if (!goal) return;
-    setCalculating(true);
-    await loadGoalData(goal.goal_id);
   };
 
   const formatCurrency = (amount) => {
@@ -244,11 +277,21 @@ function ForecastPage() {
   const chartFont = {
     family: "Manrope, Aptos Display, Segoe UI, sans-serif",
   };
+  const isCompactChart = typeof window !== "undefined" && window.innerWidth <= 520;
 
   const lineOptions = {
     responsive: true,
     maintainAspectRatio: false,
     interaction: { intersect: false, mode: "index" },
+    animation: {
+      duration: 900,
+      easing: "easeOutQuart",
+    },
+    transitions: {
+      active: {
+        animation: { duration: 220 },
+      },
+    },
     plugins: {
       legend: {
         position: "bottom",
@@ -267,7 +310,14 @@ function ForecastPage() {
         titleColor: "#ffffff",
         bodyColor: "rgba(255, 255, 255, 0.82)",
         callbacks: {
+          title: (items) => `Период: ${items?.[0]?.label || ""}`,
           label: (context) => `${context.dataset.label}: ${formatCurrency(context.parsed.y)}`,
+          afterLabel: (context) => {
+            const target = Number(forecast?.goal?.target || 0);
+            if (!target) return "";
+            const progress = Math.min(100, Math.round((context.parsed.y / target) * 100));
+            return `Прогресс к цели: ${progress}%`;
+          },
         },
       },
     },
@@ -283,10 +333,16 @@ function ForecastPage() {
       },
       x: {
         border: { display: false },
+        offset: true,
         ticks: {
+          autoSkip: true,
+          autoSkipPadding: isCompactChart ? 22 : 14,
           color: "#7b8465",
+          maxTicksLimit: isCompactChart ? 4 : 8,
           maxRotation: 0,
-          font: { ...chartFont, size: 11, weight: "700" },
+          minRotation: 0,
+          padding: 8,
+          font: { ...chartFont, size: isCompactChart ? 9 : 11, weight: "700" },
         },
         grid: { display: false, drawTicks: false },
       },
@@ -500,7 +556,7 @@ function ForecastPage() {
             </div>
 
             {activeTab === "overview" && (
-              <div className="tabContent">
+              <div className="tabContent forecastOverviewContent">
                 <div className="summaryCard">
                   <div className="summaryIcon">
                     <TrendingUp size={32} />
@@ -540,16 +596,49 @@ function ForecastPage() {
                   ))}
                 </div>
 
+                {checkpointAnalysis && (
+                  <section className={`checkpointForecastPanel forecastCheckpointBlock ${checkpointAnalysis.tone}`}>
+                    <div className="checkpointForecastHeader">
+                      <span>Контроль маршрута</span>
+                      <h3>{checkpointAnalysis.title}</h3>
+                      <p>{checkpointAnalysis.summary}</p>
+                    </div>
+
+                    <div className="checkpointForecastGrid">
+                      {checkpointAnalysis.items.map((item) => (
+                        <article key={item.id} className={`checkpointForecastItem ${item.status}`}>
+                          <div>
+                            <span>{item.dateLabel}</span>
+                            <strong>{item.title}</strong>
+                          </div>
+                          <div className="checkpointForecastAmounts">
+                            <span>План точки: {formatCurrency(item.expected)}</span>
+                            <span>Прогноз: {formatCurrency(item.projected)}</span>
+                          </div>
+                          <div className="checkpointForecastTrack">
+                            <div style={{ width: `${item.progress}%` }} />
+                          </div>
+                          <small>{item.message}</small>
+                        </article>
+                      ))}
+                    </div>
+                  </section>
+                )}
+
                 {timelineData && (
-                  <div className="chartCardForecast">
-                    <h3>Прогноз роста накоплений</h3>
-                    <p className="chartHint">
-                      Первая линия - базовый план цели без сценариев. Остальные линии показывают, как сценарии меняют срок и темп.
-                    </p>
+                  <RevealOnScroll className="chartCardForecast forecastGrowthChart">
+                    <div className="forecastChartHeader">
+                      <div>
+                        <h3>Прогноз роста накоплений</h3>
+                        <p className="chartHint">
+                          Первая линия - базовый план цели без сценариев. Остальные линии показывают, как сценарии меняют срок и темп.
+                        </p>
+                      </div>
+                    </div>
                     <div className="chartContainer">
                       <Line data={timelineData} options={lineOptions} />
                     </div>
-                  </div>
+                  </RevealOnScroll>
                 )}
               </div>
             )}
@@ -655,10 +744,6 @@ function ForecastPage() {
             )}
 
             <div className="recalculateSection">
-              <button onClick={handleRecalculate} disabled={calculating} className="recalculateButton">
-                <RefreshCw size={16} className={calculating ? "spinning" : ""} />
-                {calculating ? "Пересчет..." : "Пересчитать прогноз"}
-              </button>
               <Link to={`/scenarios/new/${selectedGoalId}`} className="createButton">
                 <Plus size={16} />
                 Добавить сценарий
@@ -751,8 +836,90 @@ function buildRecommendations({ baseline, optimal, scenariosCount }) {
   return items;
 }
 
+function analyzeCheckpoints({ checkpoints, baseline }) {
+  const today = new Date();
+  const normalized = checkpoints
+    .map((checkpoint) => {
+      const dateValue = checkpoint.target_date || checkpoint.checkpoint_date;
+      const expected = Number(checkpoint.expected_amount || checkpoint.target_amount || 0);
+      const date = dateValue ? new Date(dateValue) : null;
+      if (!date || Number.isNaN(date.getTime()) || expected <= 0) return null;
+
+      const months = Math.max(0, monthDiff(today, date));
+      const projected = simulateAmount({
+        start: baseline.current,
+        monthly: baseline.monthlyContribution,
+        annualRate: baseline.effectiveReturn,
+        months,
+      });
+      const difference = projected - expected;
+      const progress = expected > 0 ? Math.min(100, Math.round((projected / expected) * 100)) : 0;
+      const status = difference >= 0 ? "onTrack" : difference >= -expected * 0.12 ? "watch" : "risk";
+
+      return {
+        id: checkpoint.checkpoint_id || checkpoint.id || `${checkpoint.title}-${dateValue}`,
+        title: checkpoint.title || "Контрольная точка",
+        date,
+        dateLabel: date.toLocaleDateString("ru-RU", { day: "2-digit", month: "short", year: "numeric" }),
+        expected,
+        projected,
+        difference,
+        progress,
+        status,
+        message: difference >= 0
+          ? `Есть запас ${formatPlainCurrency(difference)} к этой дате.`
+          : `Отставание ${formatPlainCurrency(Math.abs(difference))} к этой дате.`,
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => a.date - b.date);
+
+  if (normalized.length === 0) return null;
+
+  const risky = normalized.filter((item) => item.status === "risk");
+  const watch = normalized.filter((item) => item.status === "watch");
+  const nextItems = [...risky, ...watch, ...normalized].slice(0, 3);
+
+  if (risky.length > 0) {
+    return {
+      tone: "risk",
+      title: `${risky.length} контрольные точки под риском`,
+      summary: "Прогнозная линия не меняется, но маршрут показывает отставание по промежуточным датам.",
+      items: nextItems,
+    };
+  }
+
+  if (watch.length > 0) {
+    return {
+      tone: "watch",
+      title: `${watch.length} контрольные точки близко к риску`,
+      summary: "По основному прогнозу цель достижима, но по некоторым промежуточным датам запас небольшой.",
+      items: nextItems,
+    };
+  }
+
+  return {
+    tone: "onTrack",
+    title: "Контрольные точки идут по плану",
+    summary: "По базовому прогнозу ближайшие промежуточные цели выглядят достижимыми.",
+    items: normalized.slice(0, 3),
+  };
+}
+
+function monthDiff(startDate, endDate) {
+  const years = endDate.getFullYear() - startDate.getFullYear();
+  const months = endDate.getMonth() - startDate.getMonth();
+  const dayAdjustment = endDate.getDate() < startDate.getDate() ? -1 : 0;
+  return Math.max(0, years * 12 + months + dayAdjustment);
+}
+
+function formatPlainCurrency(amount) {
+  return `${new Intl.NumberFormat("ru-RU").format(Math.round(Number(amount) || 0))} ₽`;
+}
+
 function generateTimelineData({ goal, scenariosForecast }) {
   const target = Number(goal?.target_amount || 0);
+  const compactLabels = typeof window !== "undefined" && window.innerWidth <= 520;
   const maxReachable = scenariosForecast
     .map((item) => item.monthsToGoal)
     .filter(Number.isFinite);
@@ -762,7 +929,9 @@ function generateTimelineData({ goal, scenariosForecast }) {
   for (let month = 0; month <= maxMonths; month += 3) {
     const date = new Date();
     date.setMonth(date.getMonth() + month);
-    labels.push(date.toLocaleDateString("ru-RU", { month: "short", year: "numeric" }));
+    labels.push(date.toLocaleDateString("ru-RU", compactLabels
+      ? { month: "2-digit", year: "2-digit" }
+      : { month: "short", year: "numeric" }));
   }
 
   const datasets = scenariosForecast.map((scenario, index) => {

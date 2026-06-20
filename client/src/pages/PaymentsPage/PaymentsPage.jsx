@@ -263,6 +263,28 @@ function PaymentsPage() {
           </article>
         </section>
 
+        <section className="paymentsProgressSummary">
+          <div className="paymentsSummaryHeader">
+            <div>
+              <span>Платежный маршрут</span>
+              <h2>Платежный прогресс</h2>
+            </div>
+            <strong>{progressPercent}%</strong>
+          </div>
+          <div className="paymentsSummaryTrack">
+            <div style={{ width: `${progressPercent}%` }} />
+          </div>
+          <div className="paymentsSummaryGrid">
+            <div><span>Платежей</span><strong>{payments.length}</strong></div>
+            <div><span>Внесено</span><strong>{formatCurrency(stats.totalAmount)} ₽</strong></div>
+            <div><span>Средний платеж</span><strong>{formatCurrency(stats.averagePayment)} ₽</strong></div>
+            <div><span>Осталось</span><strong>{formatCurrency(stats.remainingAmount)} ₽</strong></div>
+            <div><span>Цель</span><strong>{goal.title}</strong></div>
+            <div><span>Плановый взнос</span><strong>{formatCurrency(goal.monthly_contribution)} ₽/мес</strong></div>
+            <div><span>Статус</span><strong>{getStatusText(goal.status)}</strong></div>
+          </div>
+        </section>
+
         <section className="goalSnapshotCard">
           <div className="goalSnapshotItem">
             <Target size={18} />
